@@ -1,0 +1,50 @@
+---
+# Documentação do Desenvolvedor JoaquinX: https://code.experian.local/projects/SCIB/repos/joaquin-x/browse/doc/user_guide_developer.md
+running_in: aws
+itil:
+  request: true
+  changeorder: false
+definition: Este launch realizará a instalação do Argo Rollouts em um cluster de EKS
+team_owner: Enterprise Architecture
+manual_time: 30
+notification:
+  onfailure:
+    email:
+      recipients: douglas.pereira@experian.com
+      subject: 'JoaquinX Falha Automacao - aws-eks-argo-rollouts'
+global:
+  aws_account_id:
+    type: text
+    pattern: ^(\d{1,12}|\d{1,12})$
+    description: Account number where the cluster is running
+    required: true
+    answer: null
+    validationEndpoint: '/catalog-jenkins/v1/validate/aws_account'
+  aws_region:
+    type: options
+    options: sa-east-1;us-east-1
+    description: Region where the cluster is running
+    required: true
+    answer: null
+  eks_domain_name:
+    type: text
+    pattern: ^((?!-)[A-Za-z0-9\-]{1,63}(?<!-)\.)+[A-Za-z]{2,6}$
+    description: Domain name to be used in this EKS Cluster (Ex. prod-ds.br.experian.eeca)
+    required: true
+    answer: null
+  eks_cluster_name:
+    type: text
+    pattern: ^[a-zA-Z0-9\-]{5,30}$
+    description: EKS cluster name where the Argo Rollouts will be installed (Ex. bu-eks-version-env = ds-eks-01-prod) MAX 30 CHARACTERS
+    required: true
+    answer: null
+  eks_namespace:
+    type: text
+    pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+    description: EKS namespace to install argo (Ex. argo-rollouts e/ou deployment-system)
+    required: true
+    answer: null
+before_plan:
+  - replace apply.sh
+plan:
+  - ./apply.sh
