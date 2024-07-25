@@ -1,0 +1,65 @@
+itil: 
+  request: false
+  changeorder: false
+definition: Este job cria um Bucket S3
+global:
+  aws_account_id:
+    type: text 
+    pattern : ~/\w{4}/
+    description : Qual o Id da conta AWS
+    required: true
+    answer: null
+  aws_key_id:
+    type: password 
+    pattern: ~/\w{4}/
+    description: Define o aws key ID da conta
+    required: true
+    answer: null
+  aws_access_key:
+    type: password 
+    pattern: ~/\w{4}/
+    description: Define o aws key Password da conta
+    required: true
+    answer: null
+  prefix_hostname:
+    type: text 
+    pattern: ~/\w{4}/
+    description: prefixo do hostname, o Padrão é spobr
+    required: true
+    answer: null
+  stack_name:
+    type: text 
+    pattern: ~/\w{4}/
+    description: Nome da Stack ( MaX 7 Caracteres)
+    required: true
+    answer: null
+  acl:
+    type: options 
+    options: private;public
+    description: ACL do s3 bucket
+    required: true
+    answer: null
+  force_destroy:
+    type: options 
+    options: false;true
+    description: Force Destroy
+    required: true
+    answer: null
+  versioning_enabled:
+    type: options 
+    options: false;true
+    description: Versionamento Habilitado
+    required: true
+    answer: null
+  encrypted_only:
+    type: options 
+    options: false;true
+    description: Apenas Upload encryptografado
+    required: true
+    answer: null
+  
+before_plan:
+  - replace ans-shared-vars/s3-credentials-env.yml,main.tf.j2,vars.tf.j2,playbook-01.yml
+plan:
+  - infra vars
+  - infra upt
