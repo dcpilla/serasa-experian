@@ -1,0 +1,106 @@
+repos: 
+- id: "/.*iac-eec.*/"
+#"/.*/"
+#  allowed_overrides: [workflow, apply_requirements]
+#  apply_requirements: [mergeable]
+#  allow_custom_workflows: true
+  workflow: nike
+
+- id: "/.*iac-terragrunt.*/"
+# "/code.experian.local/projects/EITS nikesre/iac-terragrunt.*/"
+#  allowed_overrides: [workflow, apply_requirements]
+#  apply_requirements: [mergeable]
+  #allow_custom_workflows: true 
+  workflow: terragrunt
+## - id: "/code.experian.local\/EITS nikesre\/iac-.*/"\ 
+#- id: code.experian.local/projects/EITS nikesre/iac-terragrunt.*
+##  allow_custom_workflows: falseso 
+#  apply_requirements: [mergeable]
+#  allowed_overrides: [apply_requirements, workflow]
+##  allowed_workflows: [custom]
+#  workflow: custom
+##  pre_workflow_hooks:
+##  - run: /access/accesstoSaml2Aws.sh --profile=${profile}
+##    description: Configura Acesso 
+##  workflow: default
+##  #apply_requirements: [approved,mergeable]
+##  apply_requirements: [mergeable]
+##  allow_custom_workflows:  true
+workflows:
+  nike:
+     plan: 
+      steps:
+      - init:
+         extra_args: 
+          - "-lock=false"
+          - "-backend-config=backend.hcl"
+  #        extra_args:
+  #        - "-backend-config=bucket=tfstate-504195663072-sa-east-1-dev"
+  #        - "-backend-config=key=terraform.tfstate"
+  #        - "-backend-config=region=sa-east-1"
+  #        - "-backend-config=workspace_key_prefix=s3-bucket-sredev"
+          - "-reconfigure"
+      - plan:
+     apply:
+      steps:
+      - apply
+  terragrunt:
+    plan:
+      steps:
+      - env:
+          name: TERRAGRUNT_TFPATH
+          command: 'echo "terraform${ATLANTIS_TERRAFORM_VERSION}"'
+      - env:
+          # Reduce Terraform suggestion output
+          name: TF_IN_AUTOMATION
+          value: 'true'
+      - run:
+          # Allow for targetted plans/applies as not supported for Terraform wrappers by default # $(printf '%s' $COMMENT_ARGS | sed 's/,/ /g' | tr -d '\\') -no-color
+          command: terragrunt plan -input=false  -out=/tmp/plan
+          output: hide
+      - run: |
+          terragrunt show /tmp/plan
+    apply:
+      steps:
+      - env:
+          name: TERRAGRUNT_TFPATH
+          command: 'echo "terraform${ATLANTIS_TERRAFORM_VERSION}"'
+      - env:
+          # Reduce Terraform suggestion output
+          name: TF_IN_AUTOMATION
+          value: 'true'
+      - run: terragrunt apply -input=false /tmp/plan
+  #  import:
+  #    steps:
+  #    - env:
+  #        name: TERRAGRUNT_TFPATH
+  #        command: 'echo "terraform${DEFAULT_TERRAFORM_VERSION}"'
+  #    - env:
+  #        name: TF_VAR_author
+  #        command: 'git show -s --format="%ae" $HEAD_COMMIT'
+  #    # Allow for imports as not supported for Terraform wrappers by default
+  #    - run: terragrunt import -input=false  $(printf '%s' $COMMENT_ARGS | sed 's/,/ /' | tr -d '\\')
+  #  state_rm:
+  #    steps:
+  #    - env:
+  #        name: TERRAGRUNT_TFPATH
+  #        command: 'echo "terraform${DEFAULT_TERRAFORM_VERSION}"'
+  #    # Allow for state removals as not supported for Terraform wrappers by default
+  #    - run: terragrunt state rm $(printf '%s' $COMMENT_ARGS | sed 's/,/ /' | tr -d '\\')
+
+
+
+
+
+
+
+
+#    plan:
+#      steps:
+#      - run: terragrunt plan 
+#    apply:
+#      steps:
+#      - run: terragrunt apply  -input=false #--terragrunt-source-update
+#    
+      
+  

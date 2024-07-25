@@ -1,0 +1,17 @@
+
+accounts:
+  - id: "187739130313"
+    name: "arcsandbox"
+    regions:
+      - sa-east-1
+    roles:
+      - "arn:aws:iam::187739130313:role/BURoleForSREAutomation"
+  - id: "504195663072"
+    name: "sredev"
+    regions:
+      - sa-east-1
+    roles:
+      - "arn:aws:iam::504195663072:role/BURoleForSREAutomation"
+global:
+  default_region: sa-east-1
+  assume_role_arn: "arn:aws:iam::564593125549:role/BURoleForSREAutomation"

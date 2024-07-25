@@ -1,0 +1,152 @@
+global:
+  default_region: sa-east-1
+  assume_role_arn: "arn:aws:iam::564593125549:role/BURoleForSREAutomation"
+
+accounts:
+  - id: "146737708860" # eec-aws-br-ds-dataservices-stage
+    name: "dsstage"
+    regions:
+      - sa-east-1
+    roles:
+      - "arn:aws:iam::146737708860:role/BURoleForSREAutomation"
+
+  - id: "530914589075" # eec-aws-br-ds-dataservices-dev
+    name: "dsdev"
+    regions:
+      - sa-east-1
+    roles:
+      - "arn:aws:iam::530914589075:role/BURoleForSREAutomation"
+
+  - id: "662860092544" # eec-aws-br-ds-dataservices-prod
+    name: "dsprod"
+    regions:
+      - sa-east-1
+    roles:
+      - "arn:aws:iam::662860092544:role/BURoleForSREAutomation"
+
+  - id: "353091569218" # eec-aws-us-eits-datahub-dev
+    name: "datahubdev"
+    regions:
+      - us-east-1
+    roles:
+      - "arn:aws:iam::353091569218:role/BURoleForSREAutomation"
+
+  - id: "415071355886" # eec-aws-br-eits-datahub-prod 
+    name: "datahubprod"
+    regions:
+      - sa-east-1
+    roles:
+      - "arn:aws:iam::415071355886:role/BURoleForSREAutomation" 
+
+  - id: "992382670558" # eec-aws-us-eits-consent-dev
+    name: "consentdev"
+    regions:
+      - us-east-1
+    roles:
+      - "arn:aws:iam::992382670558:role/BURoleForSREAutomation"
+
+  - id: "975050357449" # eec-aws-us-eits-consent-prod
+    name: "consentprod"
+    regions:
+      - us-east-1
+    roles:
+      - "arn:aws:iam::975050357449:role/BURoleForSREAutomation"
+
+  - id: "087086536124" # eec-aws-br-nike-ss-sandbox
+    name: "ssrmsandbox"
+    regions:
+      - sa-east-1
+    roles:
+      - "arn:aws:iam::087086536124:role/BURoleForSREAutomation"
+
+  - id: "877001948254" # eec-aws-br-nike-sales-prod
+    name: "ssrmprod"
+    regions:
+      - sa-east-1
+    roles:
+      - "arn:aws:iam::877001948254:role/BURoleForSREAutomation"
+
+  - id: "187739130313" # eec-aws-br-nike-architecture-sandbox
+    name: "arcsandbox"
+    regions:
+      - sa-east-1
+    roles:
+      - "arn:aws:iam::187739130313:role/BURoleForSREAutomation"
+
+###########################
+
+
+  - id: "504195663072"
+    name: "sredev"
+    regions:
+      - sa-east-1
+    roles:
+      - "arn:aws:iam::504195663072:role/BURoleForSREAutomation"
+  - id: "928193545380"
+    name: "reportsdev"
+    regions:
+      - sa-east-1
+    roles:
+      - "arn:aws:iam::928193545380:role/BURoleForSREAutomation"
+
+
+  - id: "536080110524"
+    name: "reportsprod"
+    regions:
+      - sa-east-1
+    roles:
+      - "arn:aws:iam::536080110524:role/BURoleForSREAutomation"
+  - id: "306716481758"
+    name: "ssrmdev"
+    regions:
+      - sa-east-1
+    roles:
+      - "arn:aws:iam::306716481758:role/BURoleForSREAutomation"
+
+  - id: "153056696998"
+    name: "corporatedev"
+    regions:
+      - sa-east-1
+    roles:
+      - "arn:aws:iam::153056696998:role/BURoleForSREAutomation"
+
+  - id: "838498078144"
+    name: "devhubtest"
+    regions:
+      - sa-east-1
+    roles:
+      - "arn:aws:iam::838498078144:role/BURoleForSREAutomation"
+  - id: "977554819825"
+    name: "devhubdev"
+    regions:
+      - sa-east-1
+    roles:
+      - "arn:aws:iam::977554819825:role/BURoleForSREAutomation"
+  - id: "071087690196"
+    name: "devhubsandbox"
+    regions:
+      - sa-east-1
+    roles:
+      - "arn:aws:iam::071087690196:role/BURoleForSREAutomation"
+  - id: "306298826605"
+    name: "devhubprod"
+    regions:
+     - sa-east-1
+    roles:
+      - "arn:aws:iam::306298826605:role/BURoleForSREAutomation"
+  - id: "574914005232"
+    name: "datahubuat"
+    regions:
+      - sa-east-1
+    roles:
+      - "arn:aws:iam::574914005232:role/BURoleForSREAutomation"
+
+
+
+
+  #- id: "272722295717"
+  #  name: "datahubdev"
+  #  regions:
+  #    - sa-east-1
+  #  roles:
+  #    - "arn:aws:iam::272722295717:role/BURoleForSREAutomation"
