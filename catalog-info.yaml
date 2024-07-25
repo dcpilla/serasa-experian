@@ -1,0 +1,16 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: aws-eks-serasa
+  description: AWS EKS Serasa
+  links:
+    - url: https://code.experian.local/projects/SCIB/repos/aws-eks-serasa/browse/README.md
+      title: About the Project
+      icon: dashboard
+    - url: https://code.experian.local/projects/SCIB/repos/aws-eks-serasa/browse/README.md
+      title: Project Configuration
+      icon: dashboard
+spec:
+  type: library
+  owner: APP-dev-hub-portal-galacticos-devsecops
+  lifecycle: production

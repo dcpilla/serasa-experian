@@ -1,0 +1,11 @@
+site_name: "aws-eks-serasa"
+site_description: "AWS EKS Serasa"
+
+plugins:
+  - techdocs-core
+
+nav:
+  - Overview:
+      - About the Project: "about.md"
+  - Getting Started:
+      - Project Configuration: "started.md"

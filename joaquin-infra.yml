@@ -1,0 +1,243 @@
+---
+# Documentação do Desenvolvedor JoaquinX: https://code.experian.local/projects/SCIB/repos/joaquin-x/browse/doc/user_guide_developer.md
+running_in: aws
+itil:
+  request: true
+  changeorder: false
+definition: Launch and Upgrade Amazon EKS
+team_owner: SRE Core
+manual_time: 480
+notification:
+  onsuccess:
+    email:
+      recipients: SRECore@br.experian.com
+      subject: "JoaquinX - Execução com sucesso - aws-eks-serasa"
+  onfailure:
+    email:
+      recipients: SRECore@br.experian.com
+      subject: "JoaquinX - Falha na automação - aws-eks-serasa"
+global:
+  aws_account_id:
+    type: text
+    pattern: ^(\d{1,12}|\d{1,12})$
+    description: Account number where the cluster will be created
+    required: true
+    answer: null
+    validationEndpoint: '/catalog-jenkins/v1/validate/aws_account'
+  aws_region:
+    type: options
+    options: sa-east-1;us-east-1
+    description: Region where the cluster is deployed
+    required: true
+    answer: null
+  eks_cluster_name:
+    type: text
+    pattern: ^[a-zA-Z0-9\-]{5,22}$
+    description: Give a name to your EKS Cluster, max. length of 22 chars
+    required: true
+    answer: null
+  env:
+    type: options
+    options: dev;uat;sandbox;prod
+    description: Environment
+    required: true
+    answer: null
+  tfstate_name:
+    type: text
+    pattern: ^[a-zA-Z0-9\-_]+$
+    description: Name of the Terraform state file
+    required: true
+    answer: null
+  eks_cluster_version:
+    type: options
+    options: 1.29;1.28;1.27;1.26;1.25;1.24
+    description: Kubernetes version to be deployed or upgraded
+    required: true
+    answer: null
+  acm:
+    type: text
+    pattern: arn:[\w+=/,.@-]+:[\w+=/,.@-]+:[\w+=/,.@-]*:[0-9]+:[\w+=,.@-]+(/[\w+=,.@-]+)*
+    description: ACM ARN to be used by the LoadBalancer
+    required: true
+    answer: null
+  domain_name:
+    type: text
+    pattern: ^((?!-)[A-Za-z0-9\-]{1,63}(?<!-)\.)+[A-Za-z]{2,6}$
+    description: Domain name to be used in this EKS Cluster (Ex. prod-digital.br.experian.eeca)
+    required: true
+    answer: null
+  eks_ami_id:
+    type: text
+    pattern: ^(latest|(ami-[a-zA-Z0-9\-_]+))$
+    description: AMI to be used in the nodegroup or (default = latest)
+    required: true
+    answer: null
+  vpc_id:
+    type: text
+    pattern: ^(auto|(vpc-[a-zA-Z0-9\-_]+))$
+    description: VPC to be used to provision all AWS resources (default = auto)
+    required: true
+    answer: null
+  subnets:
+    type: text
+    pattern: ^(auto|(subnet-[a-zA-Z0-9\-_]+(,subnet-[a-zA-Z0-9\-_]+)+))$
+    description: Subnets to be used on EKS, EC2, NLB and EFS (default = auto)
+    required: true
+    answer: null
+  nodegroup_names_prefix:
+    type: text
+    pattern: ^(combined|simple|([a-zA-Z0-9\-_]{5,20}))$
+    description: Nodegroup Prefix style to prepend names (`combined` with cluster name, `simple`, or arbitrary)
+    required: true
+    answer: null
+  addomain:
+    type: options
+    options: br.experian.local;ena.us.experian.local;gdc.local
+    description: Active Directory Domain to register EC2 instances
+    required: true
+    answer: null
+  karpenter:
+    type: options
+    options: disabled;enabled;enabled+resources
+    description: Enables Karpenter to be deployed, without or with servicecatalog's EC2NodeClass and NodePool
+    required: true
+    answer: null
+  efs_enabled:
+    type: options
+    options: true;false
+    description: Boolean that indicates if EFS should be installed and configured (default = true)
+    required: false
+    answer: null
+  docker_hub_cache_prefix:
+    type: text
+    pattern: ^(off|own|([a-zA-Z0-9\-\.\/]{8,200}))$
+    description: "'off' to use Docker Hub directly, 'own' to cache from SRE Core's Pull Through Cache, or full address of caching repository to prepend"
+    required: true
+    answer: null
+  use_proxy:
+    type: text
+    pattern: ^(auto|no-proxy|([a-zA-Z0-9\-\.]{5,20}:[0-9]{2,5}))$
+    description: "'auto' to use EEC-region proxy, or 'ADDRESS:IP' for custom proxy"
+    required: true
+    answer: null
+  node_infra_max_size:
+    type: text
+    pattern: \d{1,5}
+    description: Max node size for infra nodegroup (default = 3)
+    required: true
+    answer: null
+  node_small_max_size:
+    type: text
+    pattern: \d{1,5}
+    description: Max node size for small nodegroup (default = 3, or 0 to disable this nodegroup)
+    required: true
+    answer: null
+  node_medium_max_size:
+    type: text
+    pattern: \d{1,5}
+    description: Max node size for medium nodegroup (default = 3, or 0 to disable this nodegroup)
+    required: true
+    answer: null
+  node_larger_max_size:
+    type: text
+    pattern: \d{1,5}
+    description: Max node size for large nodegroup (default = 3, or 0 to disable this nodegroup)
+    required: true
+    answer: null
+  node_spot_max_size:
+    type: text
+    pattern: \d{1,5}
+    description: Max node size for spot nodegroup (default = 3, or 0 to disable this nodegroup)
+    required: true
+    answer: null
+  node_infra_instance_type:
+    type: text
+    pattern: ^[a-z0-9.]+$
+    description: Instance type for infra nodegroup (default = c6i.2xlarge)
+    required: true
+    answer: null
+  node_small_instance_type:
+    type: text
+    pattern: ^[a-z0-9.]+$
+    description: Instance type for small nodegroup (default = t3.large)
+    required: true
+    answer: null
+  node_medium_instance_type:
+    type: text
+    pattern: ^[a-z0-9.]+$
+    description: Instance type for medium nodegroup (default = t3.xlarge)
+    required: true
+    answer: null
+  node_larger_instance_type:
+    type: text
+    pattern: ^[a-z0-9.]+$
+    description: Instance type for large nodegroup (default = t3.2xlarge)
+    required: true
+    answer: null
+  node_spot_instance_type:
+    type: text
+    pattern: ^[a-z0-9.]+$
+    description: Instance type for spot nodegroup (default = t3.large)
+    required: true
+    answer: null
+  project_name:
+    type: text
+    pattern: \w{2,20}
+    description: Name of this project
+    required: true
+    answer: null
+  resource_business_unit:
+    type: text
+    pattern: \w{2,100}
+    description: 'Business Unit Name (Required by EEC: https://pages.experian.com/display/SC/How+to+build+EC2+instances+using+the+Experian+Golden+AMIs)'
+    required: true
+    answer: null
+  resource_name:
+    type: text
+    pattern: ^[a-zA-Z0-9\-\._]+$
+    description: Name of the EC2 instances (fully qualified domain name). The approved AMIs will also use this tag to configure hostname and hosts file in the machine.
+    required: true
+    answer: null
+  resource_owner:
+    type: text
+    pattern: ^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$
+    description: Team Distribution List (Mail List) that owns the cluster. This email will also be used to notify the Distribution List about any errors found in the AMI post-build phase.
+    required: true
+    answer: null
+  resource_app_id:
+    type: text
+    pattern: \d{1,10}
+    description: GEARR ID of one application that will run inside the cluster
+    required: true
+    answer: null
+  resource_cost_center:
+    type: text
+    pattern: ^[a-zA-Z0-9\.]{15,30}$
+    description: Business Unit Cost String
+    required: true
+    answer: null
+  kubeconfig_enabled:
+    type: options
+    options: false;true
+    description: Boolean that indicates if Terraform should use KUBECONFIG file (default = false)
+    required: false
+    answer: null
+  edge_credentials:
+    type: vault
+    description: The Apigee Edge Credentials.
+    required: true
+    answer: edgecli
+  apigee_credentials:
+    type: vault
+    description: The Apigee Edge Internal APIs Credentials.
+    required: true
+    answer: apigee_credentials
+  number_ritm:
+    type: text
+    description: Numero da solicitação no SNOW
+    required: true
+    answer: ritm.number_ritm
+before_plan:
+  - replace everything.sh,pre-flight.py
+plan:
+  - . ./everything.sh
