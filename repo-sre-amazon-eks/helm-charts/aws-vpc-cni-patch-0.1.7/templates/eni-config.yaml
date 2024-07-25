@@ -1,0 +1,14 @@
+{{- $sg  := .Values.securityGroups -}}
+{{- range $avZone, $subnet := .Values.availabityZones }}
+apiVersion: crd.k8s.amazonaws.com/v1alpha1
+kind: ENIConfig
+metadata: 
+  name: {{ $avZone }}
+spec: 
+  securityGroups: 
+  {{- range $sg }}
+    - {{ . }}  
+  {{- end}}
+  subnet: {{ $subnet }}
+---
+{{- end }} 

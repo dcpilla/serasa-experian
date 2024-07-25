@@ -1,0 +1,22 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ include "app.fullname" . }}-virtual-service
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  hosts:
+  - "{{ include "app.fullname" . }}.{{ .Values.istio.domain }}"
+  gateways:
+  - {{ include "app.fullname" . }}-gateway
+  http:
+  - route:
+    - destination:
+        host: {{ .Values.service.name }}
+        port:
+          number: {{ .Values.service.port }}
+      headers:
+        request:
+          set:
+            X-Forwarded-Proto: https

@@ -1,0 +1,8 @@
+nameOverride: ""
+
+fullnameOverride: ""
+
+monitoring: 
+  kind: ServiceMonitor
+  spec: { }
+

@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "jaeger.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+{{ include "jaeger.labels" . | indent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+{{ include "jaeger.labels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{ include "jaeger.labels" . | indent 8 }}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "14269"
+    spec:
+      containers:
+        - name: {{ include "jaeger.fullname" . }}
+          image: "docker.io/jaegertracing/all-in-one:1.35"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: BADGER_EPHEMERAL
+              value: "false"
+            - name: SPAN_STORAGE_TYPE
+              value: "badger"
+            - name: BADGER_DIRECTORY_VALUE
+              value: "/badger/data"
+            - name: BADGER_DIRECTORY_KEY
+              value: "/badger/key"
+            - name: COLLECTOR_ZIPKIN_HOST_PORT
+              value: ":9411"
+            - name: MEMORY_MAX_TRACES
+              value: "50000"
+            - name: QUERY_BASE_PATH
+              value: "/jaeger"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 14269
+              scheme: HTTP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 14269
+              scheme: HTTP
+          volumeMounts:
+            - name: data
+              mountPath: /badger
+      volumes:
+        - name: data
+          emptyDir: {}
+      {{- if .Values.tolerations }}
+      tolerations:
+      {{- toYaml .Values.tolerations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.nodeSelector }}
+      nodeSelector:
+      {{- toYaml .Values.nodeSelector | nindent 8 }}
+      {{- end }}

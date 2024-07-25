@@ -1,0 +1,10 @@
+image:
+  name: bitnami/kubectl
+  version: latest
+  pullPolicy: IfNotPresent
+
+accountid: "012345678901"
+
+roles: ["BUAdministratorAccessRole"]
+
+users: ["BUUserForDevSecOpsPiaaS"]

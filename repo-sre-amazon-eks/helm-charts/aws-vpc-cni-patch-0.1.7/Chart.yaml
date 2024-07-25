@@ -1,0 +1,23 @@
+apiVersion: v2
+name: aws-vpc-cni-patch
+description: Configure AWS VPC CNI to work with secondary IP address
+
+type: application
+
+version: 0.1.7
+
+appVersion: "355"
+
+icon: https://trino.io/assets/trino.png
+
+home: https://docs.aws.amazon.com/eks/latest/userguide/pod-networking.html
+
+maintainers:
+  - name: CoE - SRE
+    email: mlopscoe@br.experian.com
+  - name: Patch AWS CNI
+
+keywords:
+  - aws-cni
+  - secondary-ip-eks
+  - offline-store

@@ -1,0 +1,11 @@
+apiVersion: v2
+version: 1.0.0
+appVersion: 1.0.0
+description: Grafana Dashboards for Loki and Flagger
+name: grafana-dashboards
+type: application
+
+keywords:
+- grafana
+- loki
+- flagger

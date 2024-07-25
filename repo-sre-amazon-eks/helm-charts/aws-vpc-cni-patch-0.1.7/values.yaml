@@ -1,0 +1,35 @@
+image:
+  name: bitnami/kubectl
+  version: latest
+  pullPolicy: IfNotPresent
+
+accountid: "012345678901"
+
+roles: ["BUAdministratorAccessRole"]
+
+users: ["BUUserForDevSecOpsPiaaS"]
+
+availabityZones:
+  sa-east-1a: subnet-0779c58103612bee1
+  sa-east-1b: subnet-040c5bbb7b799deed
+  sa-east-1c: subnet-03d3ce1d45663bd6c
+
+securityGroups:
+  - sg-04db2241f31397098
+  - sg-0ed01eedae5301764
+
+env: []
+
+resources:
+  requests:
+    cpu: 1
+    memory: 512Mi
+  limits:
+    cpu: 4
+    memory: 1Gi
+
+nodeSelector: {}
+
+tolerations: {}
+
+affinity: {}
