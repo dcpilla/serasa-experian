@@ -1,0 +1,86 @@
+---
+# Documentação do Desenvolvedor JoaquinX: https://code.experian.local/projects/SCIB/repos/joaquin-x/browse/doc/user_guide_developer.md
+running_in: aws
+itil: 
+  request: false
+  changeorder: false
+definition: Cria ou remove entradas de DNS no Route53
+team_owner: Tribe SRE CS - Cross/Credit Services
+manual_time: 5
+notification:
+  onfailure:
+    email:
+      recipients: TribeSRECSCross@br.experian.com
+      subject: 'JoaquinX falha automacao - aws-route53 '
+  onsuccess:
+    email:
+      recipients: TribeSRECSCross@br.experian.com
+      subject: 'JoaquinX sucesso automacao - aws-route53 '
+global:
+  aws_account_id:
+    type: text 
+    pattern : ^(\d{1,12}|\d{1,12})$
+    description : Qual o ID da conta AWS?
+    required: true
+    answer: null
+    validationEndpoint: '/catalog-jenkins/v1/validate/aws_account'
+  aws_region:
+    type: options
+    options: sa-east-1;us-east-1
+    description: Região onde o serviço está implantado
+    required: true
+    answer: null
+  bu:
+    type: options 
+    options: Decision_Analytics;Marketing_Services;EITS_Enterprise;Credit_Services;Experian_Consumer_Services;Automotive_Services
+    description: Defina a unidade de negócio
+    required: true
+    answer: null
+  env:
+    type: options
+    options: dev;uat;sandbox;prod
+    description: Environment
+    required: true
+    answer: null
+  hosted_zones:
+    type: text
+    pattern: ^((?!-)[A-Za-z0-9-]{1,63}(?<!-)\.)+[A-Za-z]{2,6}$
+    description: Nome da zona / domíno hospedada ex. sandbox-cs-tribe-sre.br.experian.eeca
+    required: true
+    answer: null
+  record_name:
+    type: text
+    description: Nome do registro (subdomínio) ex. nova-api
+    required: true
+    answer: null
+  record_type:
+    type: options
+    options: A;AAAA;CAA;CNAME;MX;NAPTR;PTR;SRV;TXT
+    description: Selecione o tipo de registro
+    required: true
+    answer: null
+  records:
+    type: text
+    pattern: ^[^\s]+(, ?[^\s]+)*$
+    description: Lista de registros, separados por VÍRGULA, não requerido em caso de DELETE.
+    required: false
+    answer: null
+  ttl:
+    type: text
+    pattern: ^(?:[6-9]\d|[1-9]\d{2,4}|1[0-7]\d{4}|172800)$
+    description: TTL em segundos, valores recomendados 60 a 172800 (dois dias), não requerido em caso de DELETE
+    required: false
+    answer: null
+  # TODO. Implements
+  #       Add action to change records existed
+  action:
+    type: options
+    options: create;delete
+    description: Escolha entre criar ou deletar o registro
+    required: true
+    answer: null
+before_plan:
+  - replace data.tf,main.tf.j2,vars.tf.j2,playbook-01.yml
+plan:
+  - infra vars
+  - infra upt

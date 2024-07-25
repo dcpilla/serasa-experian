@@ -1,0 +1,79 @@
+#----------------------------------------------------------------
+# AWS Account Informations
+#----------------------------------------------------------------
+
+variable "aws_account_id" {
+  description = "AWS Account id"
+  type        = string
+  default     = "@@AWS_ACCOUNT_ID@@"
+}
+
+variable "aws_region" {
+  description = "AWS Region"
+  type        = string
+  default     = "@@AWS_REGION@@"
+}
+
+variable "env" {
+  description = "Name of environment"
+  type        = string
+  default     = "@@ENV@@"
+}
+
+variable "bu_name" {
+  description   = "BU Name"
+  type          = string
+  default       = "@@BU@@"
+}
+
+variable "assume_role_arn" {
+  description   = "Assume Role ARN"
+  type          = string
+  default       = "arn:aws:iam::@@AWS_ACCOUNT_ID@@:role/BURoleForDevSecOpsCockpitService"
+}
+
+#----------------------------------------------------------------
+# ROUTE53 
+#----------------------------------------------------------------
+variable "hosted_zones" {
+  description = "Host zone name"
+  type        = string
+  default     = "@@HOSTED_ZONES@@" 
+}
+
+variable "records" {
+  description = "List of objects of DNS records"
+  type        = string
+  default     = "@@RECORDS@@" 
+}
+
+variable "record_name" {
+  description = "Record name (subdomain)"
+  type        = string
+  default     = "@@RECORD_NAME@@"
+}
+
+variable "record_type" {
+  description = "Type record"
+  type        = string
+  default     = "@@RECORD_TYPE@@"
+}
+
+variable "ttl" {
+  description = "TTL in seconds Default. 300"
+  type        = string
+  default     = "@@TTL@@"
+}
+
+# TODO. Implements
+#       Add action to change records existed
+variable "action" {
+  description = "Action"
+  type        = string
+  default     = "@@ACTION@@" 
+
+  validation {
+    condition     = contains(["create", "delete"], var.action)
+    error_message = "Invalid input, options: \"create\", \"delete\"."
+  }
+}

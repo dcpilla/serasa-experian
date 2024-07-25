@@ -1,0 +1,17 @@
+module "route_53" {
+    source                = "git::https://code.experian.local/scm/trsrecs/aws-route53-module.git?ref=master"
+
+    aws_account_id        = var.aws_account_id
+    aws_region            = var.aws_region
+    bu_name               = var.bu_name
+    env                   = var.env
+
+    hosted_zones          = var.hosted_zones
+    record_name           = var.record_name
+    record_type           = var.record_type
+    records               = var.records != "" && var.records != null ? split(",", var.records) : []
+    ttl                   = var.ttl != "" && var.ttl != null ? var.ttl : 300
+    # TODO. Implements
+    #       Add action to change records existed
+    action                = var.action
+}
