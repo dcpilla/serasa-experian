@@ -1,0 +1,71 @@
+---
+# Documentação do Desenvolvedor JoaquinX: https://code.experian.local/projects/SCIB/repos/joaquin-x/browse/doc/user_guide_developer.md
+running_in: aws
+itil:
+  request: false
+  changeorder: false
+definition: Este launch realizará o controle do Argo Rollouts em canary/blue-green deployments
+team_owner: DevSecOps PaaS Brazil
+manual_time: 30
+notification:
+  onfailure:
+    email:
+      recipients: douglas.pereira@experian.com
+      subject: 'JoaquinX Falha Automacao - aws-eks-argo-rollouts-control'
+global:
+  change_order:
+    type: text
+    pattern: ^CHG[0-9]+$
+    description: Informe a Change Order em caso de execução em conta de Produção
+    required: false
+    answer: null
+  incident_number:
+    type: text
+    pattern: ^INC[0-9]+$
+    description: Incident number (If exists)
+    required: false
+    answer: null
+  aws_account_id:
+    type: text
+    pattern: ^(\d{1,12}|\d{1,12})$
+    description: Account number where the cluster is running
+    required: true
+    answer: null
+    validationEndpoint: '/catalog-jenkins/v1/validate/aws_account'
+  aws_region:
+    type: options
+    options: sa-east-1;us-east-1
+    description: Region where the cluster is running
+    required: true
+    answer: null
+  eks_cluster_name:
+    type: text
+    pattern: ^[a-zA-Z0-9\-]{5,30}$
+    description: EKS cluster name where the Argo Rollouts will be installed (Ex. bu-eks-version-env = ds-eks-01-prod) MAX 30 CHARACTERS
+    required: true
+    answer: null
+  eks_namespace:
+    type: text
+    pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+    description: EKS namespace to install argo (Ex. argo-rollouts e/ou deployment-system)
+    required: true
+    answer: null
+  eks_deployment_name:
+    type: text 
+    description : EKS deployment name to rollout command (Ex. cockpit)
+    required: true
+    answer: null
+  eks_rollouts_command:
+    type: options 
+    options: abort;pause;promote;promote-full;retry;retry-experiment
+    description : Argo rollout command will run (Ex. promote = kubectl argo rollouts promote cockpit -n devsecops)
+    required: true
+    answer: null
+before_plan:
+  - replace aws_account.py
+  - replace itil.py
+  - replace apply.sh
+plan:
+  - python3 aws_account.py
+  - ./apply.sh
+
