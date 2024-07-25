@@ -1,0 +1,16 @@
+##NAO ALTERAR!!!!!!######
+#Role for ALL
+- hosts: spobrcatalog
+  become: true
+  environment: "{{ proxy_env }}"
+  vars_files:
+#FIXO
+    - ans-shared-vars/aws-@@AWS_ACCOUNT_ID@@-env.yml
+    - ans-shared-vars/lnx-general-info-env.yml
+    - ans-shared-vars/pwd-credentials.yml
+    - ans-shared-vars/lnx-proxy-env.yml
+#FIXO
+    - ans-shared-vars/lnx-sqs-std.yml
+  roles:
+     - aws-replace
+##FIM NAO ALTERAR!!!!!!######

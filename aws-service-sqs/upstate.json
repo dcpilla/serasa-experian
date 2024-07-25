@@ -1,0 +1,5 @@
+{
+    "save": "@@TFSTATE_SAVE@@",
+    "action": "@@TFSTATE_ACTION@@",
+    "name": "@@APP_NAME@@-@@QUEUE_NAME@@-sqs-queue"
+}

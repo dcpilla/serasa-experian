@@ -1,0 +1,76 @@
+#=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~
+#=~ Bloco Geral para qualquer launch
+#=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~
+
+#=~ Universal
+#=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=
+variable "ip_sg_list_ec2" {
+  default     = ["10.0.0.0/8"]
+}
+
+variable "country" {
+  default     = "{{ country }}"
+}
+
+variable "bu_name" {
+  default     = "{{ bu_name[bu] }}"
+}
+
+variable "assume_role_arn" {
+  description = "Assume Role ARN"
+  default     = "arn:aws:iam::{{ aws_account_id }}:role/BURoleForDevSecOpsCockpitService"
+}
+
+#=~ Tags
+#=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=
+variable "env" {
+  description = "Tag Envirolment"
+  default     = "{{ env }}"
+}
+
+variable "bu" {
+  description = "Tag BU"
+  default     = "{{ tribe }}"
+}
+
+variable "namespace" {
+  type        = string
+  description = "Namespace (e.g. `eg` or `cp`)"
+  default     = "{{ tribe }}"
+}
+
+variable "stage" {
+  type        = string
+  description = "Stage (e.g. `prod`, `dev`, `staging`, `infra`)"
+  default     = "{{ env }}"
+}
+
+#=~ Name: utilizado na tag e no objeto criado
+variable "name" {
+  type        = string
+  description = "Resource Name"
+  default     = "{{ queue_name }}"
+}
+
+#=~ Account Variable
+#=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=
+variable "aws_account_id" {
+  description = "AWS Id Account"
+  default     = "{{ aws_account_id }}"
+}
+
+variable "region" {
+  description = "Region that will be used in AWS"
+  default     = "{{ queue_region }}"
+}
+
+#=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~
+#=~ SQS Variables
+#=~ QUEUE name is set using the tag 'name'
+#=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~
+
+variable "sqs_message_retention_seconds" {
+  type        = number
+  description = "The number of seconds Amazon SQS retains a message"
+  default     = {{ message_retention_seconds }}
+}

@@ -1,0 +1,5 @@
+encrypt  = true
+bucket   = "devsecdevops-terraform-prd-tfstates"
+region   = "sa-east-1"
+key      = "jenkins/@@OM@@.tfstate"
+role_arn = "arn:aws:iam::707064604759:role/BURoleForDevSecOpsCockpitService"

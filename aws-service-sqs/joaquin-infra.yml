@@ -1,0 +1,80 @@
+---
+# Documentação do Desenvolvedor JoaquinX: https://code.experian.local/projects/SCIB/repos/joaquin-x/browse/doc/user_guide_developer.md
+running_in: aws
+itil:
+  request: false
+  changeorder: false
+definition: Este launch cria uma fila SQS
+team_owner: Nike Accelerators Serasa
+manual_time: 250
+notification:
+  onfailure:
+    email:
+      recipients: gleise.teixeira@br.experian.com
+      subject: "JoaquinX falha automacao - aws-service-sqs "
+#  onsuccess:
+#    email:
+#      recipients: gleise.teixeira@br.experian.com
+#      subject: 'JoaquinX sucesso automacao - aws-service-sqs '
+global:
+  aws_account_id:
+    type: text
+    pattern: ^(\d{1,12}|\d{1,12})$
+    description: Nro da conta AWS onde será criado o recurso
+    required: true
+    answer: null
+    validationEndpoint: '/catalog-jenkins/v1/validate/aws_account'
+  country:
+    type: options
+    options: US;CA;BR;UK;DE;IE;FR;SE;BH;ZA;IN;CN;SG;AU;KR;JP;IT
+    description: Defina o país
+    required: true
+    answer: null
+  region:
+    type: options
+    options: sa-east-1;us-east-1
+    description: "Selecione a região da conta."
+    required: true
+    answer: null
+  bu:
+    type: options
+    options: Decision_Analytics;Marketing_Services;EITS_Enterprise;Credit_Services;Experian_Consumer_Services;Automotive_Services
+    description: Defina a unidade de negócio
+    required: true
+    answer: null
+  app_name:
+    type: text
+    pattern: ^[0-9a-z_-]{1,15}$
+    description: "Insira o nome da aplicacao. Máximo de 15 chars."
+    required: true
+    answer: null
+  queue_name:
+    type: text
+    pattern: ^[0-9a-z_-]{1,50}$
+    description: "Insira o nome da queue. Máximo de 50 chars."
+    required: true
+    answer: null
+  message_retention:
+    type: text
+    pattern: ^[0-9]{3,7}$
+    description: "Defina o tempo de retenção em segundos. Máximo de 1209600. Padrão 345600."
+    required: true
+    answer: null
+  tfstate_save:
+    type: options
+    options: no
+    description: "Você quer salvar o estado do Terraform ?"
+    required: true
+    answer: null
+  tfstate_action:
+    type: options
+    options: apply
+    description: "Você quer aplicar a mudança diretamente (apply) ou quer verificar (plan) ?"
+    required: true
+    answer: null
+before_plan:
+  - replace ans-shared-vars/lnx-general-info-env.yml,ans-shared-vars/lnx-sqs-std.yml,main.tf.j2,playbook-01.yml,kms-config.py,kms-sqs-policy.json,upstate.json,config-s3-default.tfbackend,config-s3-forsave.tfbackend
+plan:
+  - infra vars
+  - bash infra upstate
+  - bash config-kms.sh

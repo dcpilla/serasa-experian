@@ -1,0 +1,4 @@
+encrypt  = true
+bucket   = "@@AWS_ACCOUNT_ID@@-catalog-terraform-states"
+region   = "sa-east-1"
+key      = "aws-service-sqs/@@APP_NAME@@-@@QUEUE_NAME@@-sqs-queue.tfstate"

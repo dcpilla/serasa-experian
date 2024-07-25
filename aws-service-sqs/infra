@@ -1,0 +1,179 @@
+#!/bin/bash
+
+# /**
+# *
+# * Este arquivo é parte do projeto AWS Service SQS (Service Catalog Launch) Serasa Experian 
+# *
+# * @package        AWS Service SQS (Service Catalog Launch)
+# * @name           infra
+# * @version        1.0.0
+# * @change         - [ADD] Script que controla o fluxo de execução com terraform
+# * @author         DevSecOps Architecture Brazil
+# * @contribution   
+# * @dependencies   /usr/local/bin/ansible-playbook      
+# *                 /usr/local/bin/terraform
+# *                 ansible.cfg
+# *                 .ansible/vault
+# *                 centos-release-scl-rh
+# *                 python38-python
+# *                 pip
+# * @references     https://code.experian.local/projects/SCIB/repos/joaquin-x/browse/bin/infra
+# * @date           16-Mar-2021
+# **/  
+
+set -e
+
+#Path Variable
+dir=$pwd
+#Terraform Binary Path
+export ANSIBLE_VAULT_PASSWORD_FILE=~/.ansible/vault
+TERRAFORM="/usr/local/bin/terraform"
+#Terraform-Inventory Binary Path
+TERRAFORM_INVENTORY="/usr/local/bin/terraform-inventory"
+ANSIBLE_PLAYBOOK="/usr/local/bin/ansible-playbook"
+ANSIBLE_CONFIG="ansible.cfg"
+JQ="/usr/local/bin/jq"
+
+
+# /**
+# * runTerraformSaving
+# * Método executa os steps para criar os recursos e salvar o tfstate
+# * @version 1.0.0
+# * @author  Gleise Teixeira <Gleise.Teixeira@br.experian.com>
+# **/
+runTerraformSaving(){
+	ACTION=$(cat upstate.json | $JQ -r '.action')
+
+	echo "Inicializing Terraform"
+	if [[ ! -f "config-s3-forsave.tfbackend" ]]; then
+		echo "File config-s3-forsave.tfbackend is missing. Aborting."
+		exit 1
+	fi	
+	$TERRAFORM init -backend-config=config-s3-forsave.tfbackend
+
+	if [[ $ACTION == "plan" ]]; then
+		echo "Planning Terraform Plan"
+		$TERRAFORM $ACTION
+	elif [[ $ACTION == "apply" ]]; then
+		echo "Appling Terraform Plan"
+		$TERRAFORM $ACTION -auto-approve
+	else
+		echo "The '.action' in file 'upstate.json' is not 'plan' nor 'apply'. Please, revise your code."
+	fi
+}
+
+# /**
+# * Start
+# */
+
+case $1 in
+   vars)
+        cd "$dir"
+        #call Ansible for Terraform
+        $ANSIBLE_PLAYBOOK playbook-01.yml -i spobrcatalog
+        ;;
+   up)
+		echo "Apply Terraform Plan"
+		cd "$dir"
+        #Inicia o Terraform
+		$TERRAFORM init
+		#Implementa a Infra Estrutura
+		$TERRAFORM apply -auto-approve
+		#Efetua o Download do terraform state
+		$TERRAFORM show -json > terraform.tfstate
+		#Provisionamento da Infra Estrutura
+		$TERRAFORM_INVENTORY -inventory > hosts
+		#Tratamento para playbook
+		chmod +x inventory_fix.sh
+		sh inventory_fix.sh
+		#call Ansible
+		echo "Aguardando Inicio da Instancia - 5 Minutos"
+		sleep 300
+		hostip=$($TERRAFORM output -json ipv4_address | $JQ -r '.[]')
+		IFS=' ' read -ra hosts <<< $hostip
+		for i in "${hosts[@]}"; do
+  		  while ! ssh -o "StrictHostKeyChecking no" -o BatchMode=yes -i ~/.ssh/id_rsa_ansible -fN ansible@$i >/dev/null 2>&1; do
+    		echo "Instancia ainda nao esta pronta. Tentando novamente em 5 minutos"
+    		sleep 300
+  		  done
+		done
+		$ANSIBLE_PLAYBOOK playbook-02.yml -i hosts
+		;;
+  upt)
+		echo "Apply Terraform Plan"
+		cd "$dir"
+        #Inicia o Terraform
+		$TERRAFORM init
+		#Implementa a Infra Estrutura
+		$TERRAFORM apply -auto-approve
+		;;
+  upa)
+		echo "Apply Terraform Plan"
+		cd "$dir"
+		#call Ansible
+		echo "Aguardando Inicio da Instancia - 5 Minutos"
+		$ANSIBLE_PLAYBOOK playbook-02.yml -i hosts
+		;;
+  upstate)
+		echo "Checking if the tfstate needs to be save"
+		cd "$dir"
+		if [[ ! -f "upstate.json" ]]; then
+			echo "File upstate.json is missing. Aborting."
+			exit 1
+		fi
+		SAVE=$(cat upstate.json | $JQ -r '.save')
+		
+		if [[ $SAVE == "yes" ]]; then
+			runTerraformSaving
+		else
+			if [[ ! -f "config-s3-default.tfbackend" ]]; then
+				echo "File config-s3-default.tfbackend is missing. Aborting."
+				exit 1
+			fi
+			#Inicia o Terraform
+			$TERRAFORM init -backend-config=config-s3-default.tfbackend
+			#Implementa a Infra Estrutura
+			$TERRAFORM apply -auto-approve
+		fi
+		;;
+   k8s)
+		echo "Apply Terraform Plan"
+		cd "$dir"
+        #Inicia o Terraform
+		$TERRAFORM init
+		#Implementa a Infra Estrutura
+		$TERRAFORM apply -auto-approve
+		#Efetua o Download do terraform state
+		$TERRAFORM show -json > terraform.tfstate
+		#Provisionamento da Infra Estrutura
+		$TERRAFORM_INVENTORY -inventory > hosts
+		#Tratamento para playbook
+		chmod +x inventory_fix.sh
+		./inventory_fix.sh
+		#call Ansible
+		echo "Aguardando Inicio da Instancia - 5 Minutos"
+		sleep 300
+		$ANSIBLE_PLAYBOOK playbook-02.yml -i hosts
+		cd ans-shared-roles/kubespray
+		$ANSIBLE_PLAYBOOK -i inventory/serasa/hosts.yml --become cluster.yml
+		cd -
+		$ANSIBLE_PLAYBOOK playbook-k8s-deploy.yml -i hosts
+		;;
+  down)
+   		echo "Destroy Terraform Plan"
+		cd "$dir"
+        $TERRAFORM init
+        if ! terraformDestroy=$($TERRAFORM destroy -auto-approve); then
+            echo "Ocorreu um erro ao destruir a role criada pela automacao, porem nao ha problema. Caso prefira, acesse o console e exclua a role manualmente."
+		    exit 0
+		else
+		    echo "A infraestrutura criada pelo launch foi destruida com sucesso! :)"
+		fi
+				rm -f terraform.tfstate
+				rm -f hosts
+		;;
+  *)
+		echo "Please, Inform up, upt, upa, upstate or down"
+		;;
+
+  esac

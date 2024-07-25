@@ -1,0 +1,38 @@
+# basedo no módulo https://registry.terraform.io/modules/terraform-aws-modules/sqs/aws/latest
+
+#=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~
+#=~ Bloco Geral para qualquer launch
+#=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~
+provider "aws" {
+  region = var.region
+  endpoints {
+    sts = "https://sts.sa-east-1.amazonaws.com"
+  }
+
+  assume_role {
+    role_arn = var.assume_role_arn
+  }
+}
+
+terraform {
+  backend "s3" {}
+}
+
+#=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~
+#=~ SQS
+#=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~
+
+module "simple_queue" {
+  source  = "terraform-aws-modules/sqs/aws"
+  version = "3.3.0"
+
+  name                      = var.name
+  message_retention_seconds = var.sqs_message_retention_seconds
+
+  tags = {
+    Name     = var.name
+    Env      = var.env
+    Location = var.country
+    BU       = var.bu_name
+  }
+}
