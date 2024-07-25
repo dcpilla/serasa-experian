@@ -1,0 +1,8 @@
+---
+# tasks file for kafka-queue
+- name: Perf Kafka Test to Create Elasticsearch Index
+  shell: /etc/kafka/bin/kafka-producer-perf-test.sh --topic {{ kafka_topic }} --num-records 500000 --record-size 100 --throughput -1 --producer-props acks=1 bootstrap.servers=localhost:9092
+  become: true
+- name: Perf Kafka Test to Create Elasticsearch Index
+  shell: /etc/kafka/bin/kafka-producer-perf-test.sh --topic {{ kafka_metric }} --num-records 500000 --record-size 100 --throughput -1 --producer-props acks=1 bootstrap.servers=localhost:9092
+  become: true

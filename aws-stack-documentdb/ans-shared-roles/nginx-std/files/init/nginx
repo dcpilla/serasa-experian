@@ -1,0 +1,28 @@
+#!/bin/sh
+# chkconfig: - 90 25
+echo -n 'nginx service $1 \n'
+
+case "$1" in
+start)
+    /usr/sbin/nginx
+;;
+
+stop)
+    /usr/sbin/nginx -s stop
+;;
+
+restart)
+    /usr/sbin/nginx -s stop
+    sleep 1
+    /usr/sbin/nginx
+;;
+
+reload)
+    /usr/sbin/nginx -s reload
+;;
+
+*)
+echo "Usage: `basename $0` {start|stop|restart|reload}"
+
+;;
+esac

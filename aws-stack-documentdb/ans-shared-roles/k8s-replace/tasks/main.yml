@@ -1,0 +1,9 @@
+- name: Replace kubespray template
+  template:
+    src: "{{ lookup('env', 'PWD') }}/ans-shared-roles/kubespray/inventory/serasa/group_vars/all/all.yml.j2"
+    dest: "{{ lookup('env', 'PWD') }}/ans-shared-roles/kubespray/inventory/serasa/group_vars/all/all.yml"
+    owner: jenkins
+    group: jenkins
+  become: yes
+  become_user: jenkins
+

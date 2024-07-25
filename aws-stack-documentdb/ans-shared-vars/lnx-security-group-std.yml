@@ -1,0 +1,6 @@
+---
+# QUEUE name has a limit of 80 chars at AWS
+security_group_name: "@@SG_NAME@@"
+protocol: "@@PROTOCOL@@"
+port: "@@PORT@@"
+cidr_block: "@@CIDR_BLOCK@@"

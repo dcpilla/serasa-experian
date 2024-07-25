@@ -1,0 +1,32 @@
+- defaultTab: nodes
+  description: ''
+  executionEnabled: true
+  loglevel: INFO
+  name: curator-snapshot-@@KAFKA_TOPIC@@
+  nodeFilterEditable: false
+  nodefilters:
+    dispatch:
+      excludePrecedence: true
+      keepgoing: false
+      rankOrder: ascending
+      successOnEmptyNodeFilter: false
+      threadcount: '1'
+    filter: spobrnikeEKZLGClogstashdev1
+  nodesSelectedByDefault: true
+  plugins:
+    ExecutionLifecycle: null
+  schedule:
+    month: '*'
+    time:
+      hour: '00'
+      minute: '10'
+      seconds: '0'
+    weekday:
+      day: '*'
+    year: '*'
+  scheduleEnabled: true
+  sequence:
+    commands:
+    - exec: sudo /usr/local/bin/curator --config /etc/curator/config.yaml /etc/curator/create-snapshot-@@KAFKA_TOPIC@@.yaml
+    keepgoing: false
+    strategy: node-first

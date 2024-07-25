@@ -1,0 +1,40 @@
+#{{ app_host_vhost }} reverse proxy file
+upstream {{ app_host_name }} {
+    server {{ app_host_ip }}:{{ app_host_port }};
+}
+ 
+server {
+    listen              443 ssl;
+    ssl_certificate     /etc/nginx/ssl/nginx.crt;
+    ssl_certificate_key /etc/nginx/ssl/nginx.key;
+    server_name         {{ app_host_vhost }};
+    access_log          /var/log/nginx_{{ app_host_vhost }}_access.log main;
+    error_log           /var/log/nginx_{{ app_host_vhost }}_error.log debug;
+ 
+    location / {
+        auth_request        /auth-proxy;
+        proxy_pass          http://{{ app_host_name }};
+	    proxy_set_header 	Host $host;
+	    proxy_set_header 	X-Real-IP $remote_addr;
+	    proxy_set_header 	X-Forwarded-For $proxy_add_x_forwarded_for;
+	    proxy_set_header 	X-Forwarded-Proto $scheme;
+	    proxy_set_header    Authorization "";
+        proxy_hide_header   Authorization;
+    }
+     location = /auth-proxy {
+        internal;
+        proxy_pass http://127.0.0.1:8888;
+        proxy_cache auth_cache;
+        proxy_cache_key "$http_authorization$cookie_nginxauth";
+        proxy_cache_valid 200 403 10m;
+        proxy_pass_request_body off;
+        proxy_set_header Content-Length "";
+        proxy_set_header X-Ldap-URL      "ldap://10.96.215.11:389";
+        proxy_set_header X-Ldap-BaseDN   "OU=General Accounts,OU=Accounts,dc=serasa,dc=intranet";
+        proxy_set_header X-Ldap-BindDN    "{{ ldap_system_user }}@serasa.intranet";
+        proxy_set_header X-Ldap-BindPass "{{ ldap_system_password }}";
+        proxy_set_header X-Ldap-Template "(SAMAccountName=%(username)s)";
+        proxy_set_header X-CookieName "nginxauth";
+        proxy_set_header Cookie nginxauth=$cookie_nginxauth;
+    }
+}

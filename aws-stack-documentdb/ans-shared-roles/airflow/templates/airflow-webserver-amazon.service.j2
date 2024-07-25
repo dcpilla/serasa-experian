@@ -1,0 +1,17 @@
+[Unit]
+Description=Airflow webserver daemon
+After=network.target postgresql.service mysql.service redis.service rabbitmq-server.service
+
+[Service]
+Environment="AIRFLOW_HOME={{ airflow_home_dir }}"
+Environment="PATH=$PATH:$HOME:/usr/local/bin"
+User=root
+Group=root
+Type=simple
+ExecStart=/usr/local/bin/airflow webserver -p 80
+Restart=on-failure
+RestartSec=5s
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

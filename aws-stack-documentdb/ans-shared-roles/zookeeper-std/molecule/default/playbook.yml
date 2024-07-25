@@ -1,0 +1,9 @@
+---
+- name: zookeeper
+  hosts: all
+  become: true
+  vars:
+    zookeeper_id: 1
+
+  roles:
+    - role: alvarobacelar.zookeeper

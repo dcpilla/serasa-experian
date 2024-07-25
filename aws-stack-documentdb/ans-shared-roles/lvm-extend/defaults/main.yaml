@@ -1,0 +1,7 @@
+---
+
+# Package containing LVM tools
+lvm_extend_pkg: lvm2
+vg_name: rootvg
+lv: var
+pvs: nvme1n1

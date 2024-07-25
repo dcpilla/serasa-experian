@@ -1,0 +1,17 @@
+domain: .serasa.intranet
+ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible
+sprefix_hostname: "{{ prefix_stack_hostname }}"
+stack_name: "{{ prefix_stack_name }}"
+aws_region: sa-east-1
+env: uat
+tribe: nike
+backend: secdevops-terraform-uat-tfstates
+vpi_id: vpc-00c61c19ae789d5df
+subnet:
+  a: subnet-0599b906a7b0dadb5
+  b: subnet-0fb54f70b07fa4abf
+  c: subnet-06bea0be5fc76bc10
+kms_id: 23496924-d2c9-4d6b-b685-e7bf35c15a8e
+aws_account_id: 890800587550
+##Identity_ssh
+ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible

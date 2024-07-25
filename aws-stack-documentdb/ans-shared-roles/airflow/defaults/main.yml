@@ -1,0 +1,91 @@
+---
+# defaults file for airflow
+
+airflow_packages:
+  - async
+  - celery
+  - crypto
+#  - devel
+#  - devel_hadoop
+  - hdfs
+  - password
+  - postgres
+  - psycopg2
+  - s3
+  - ssh
+
+airflow_rest_api_plugin_install: false
+airflow_rest_api_plugin_version: "v1.0.9"
+airflow_rest_api_plugin_url: "https://github.com/teamclairvoyant/airflow-rest-api-plugin/archive/v{{ airflow_rest_api_plugin_version }}.zip"
+airflow_rest_api_plugin_token: ""
+
+
+# List of global options. If this is empty the default options of the
+# distribution are used.
+logrotate_options: []
+
+# Path to the include files
+logrotate_include_dir: /etc/logrotate.d
+
+# Package name to install logrotate.
+logrotate_package: logrotate
+
+# Enable global configuration handling
+logrotate_global_config: true
+
+# Enable hourly rotation with cron.
+logrotate_use_hourly_rotation: false
+
+# Logrotate for wtmp
+logrotate_wtmp_enable: false
+logrotate_wtmp:
+  logs:
+    - /var/log/wtmp
+  options:
+    - missingok
+    - monthly
+    - create 0664 root utmp
+    - rotate 1
+
+# Logrotate for btmp
+logrotate_btmp_enable: false
+logrotate_btmp:
+  logs:
+    - /var/log/btmp
+  options:
+    - missingok
+    - monthly
+    - create 0660 root utmp
+    - rotate 1
+
+# More log files can be added that will log rotate.
+# An example of multiple log rotate applications with available settings:
+# logrotate_applications:
+#   - name: name-your-log-rotate-application
+#     definitions:
+#       - logs:
+#           - /var/log/apt/term.log
+#           - /var/log/apt/history.log
+#         options:
+#           - rotate 12
+#           - monthly
+#           - missingok
+#           - notifempty
+#           - compress
+
+logrotate_applications:
+  - name: airflow
+    definitions:
+      - logs:
+          - /opt/airflow/logs/dag_processor_manager/*.log
+          - /opt/airflow/logs/scheduler/*/*/*.log
+        options:
+          - rotate 3
+          - daily
+          - missingok
+          - notifempty
+          - compress
+        postrotate:
+          - /opt/airflow/logscript.sh > /var/tmp/airflow-rotate-execution.log
+  
+#logrotate_applications: []

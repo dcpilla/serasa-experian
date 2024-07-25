@@ -1,0 +1,143 @@
+- name: Ansible create serasa kubespray inventory file
+  file:
+    path: "{{ ansible_home }}/.kube"
+    state: directory
+    owner: ansible
+    group: ansible
+    mode: '0700'
+
+- name: copy kubeadmin file to ansible home
+  copy:
+    remote_src: true
+    src: /etc/kubernetes/admin.conf
+    dest: "{{ ansible_home }}/.kube/config"
+    owner: ansible
+    group: ansible
+    mode: '0700'
+  become: true
+
+- name: Copy kibana file to ansible home  
+  template:
+    src: kibana-value.yaml.j2
+    dest: "{{ ansible_home }}/kibana-value.yaml"
+    owner: ansible
+    group: ansible
+    mode: '0700'
+
+- name: Copy Grafana file to ansible home  
+  template:
+    src: grafana-value.yaml.j2
+    dest: "{{ ansible_home }}/grafana-value.yaml"
+    owner: ansible
+    group: ansible
+    mode: '0700'
+
+- name: Copy efs file to ansible home  
+  template:
+    src: efs-value.yaml.j2
+    dest: "{{ ansible_home }}/efs-value.yaml"
+    owner: ansible
+    group: ansible
+    mode: '0700'
+
+- name: Copy jaeger file to ansible home  
+  template:
+    src: jaeger-value.yaml.j2
+    dest: "{{ ansible_home }}/jaeger-value.yaml"
+    owner: ansible
+    group: ansible
+    mode: '0700'
+
+- name: Copy kube-prometheus file to ansible home  
+  template:
+    src: kube-prometheus-stack-value.yaml.j2
+    dest: "{{ ansible_home }}/kube-prometheus-stack-value.yaml"
+    owner: ansible
+    group: ansible
+    mode: '0700'
+
+- name: Copy blackbox file to ansible home  
+  template:
+    src: blackbox-exporter-value.yaml.j2
+    dest: "{{ ansible_home }}/blackbox-exporter-value.yaml"
+    owner: ansible
+    group: ansible
+    mode: '0700'
+
+- name: Copy elasticsearch file to ansible home  
+  template:
+    src: elasticsearch-exporter-value.yaml.j2
+    dest: "{{ ansible_home }}/elasticsearch-exporter-value.yaml"
+    owner: ansible
+    group: ansible
+    mode: '0700'
+
+- name: Copy influxdb file to ansible home  
+  template:
+    src: influxdb-value.yaml.j2
+    dest: "{{ ansible_home }}/influxdb-value.yaml"
+    owner: ansible
+    group: ansible
+    mode: '0700'
+
+- name: Copy kafka file to ansible home  
+  template:
+    src: kafka-exporter-value.yaml.j2
+    dest: "{{ ansible_home }}/kafka-exporter-value.yaml"
+    owner: ansible
+    group: ansible
+    mode: '0700'
+
+- name: add helm repos google appis
+  command: /usr/local/bin/helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+
+- name: add helm repos google appis jeager
+  command: /usr/local/bin/helm repo add jaegertracing https://jaegertracing.github.io/helm-charts
+
+- name: add kibana deploy
+  command: /usr/local/bin/helm install kibana-k8s stable/kibana -f /home/ansible/kibana-value.yaml -n default
+
+- name: add efs deploy
+  command: /usr/local/bin/helm install efs-storage stable/efs-provisioner -f /home/ansible/efs-value.yaml -n default
+
+- name: waiting for efs Provisioner
+  command: sleep 120
+  
+- name: add grafana deploy
+  command: /usr/local/bin/helm install grafana stable/grafana -f /home/ansible/grafana-value.yaml -n default
+
+- name: add jaeger namespace
+  command: /usr/local/bin/kubectl create namespace trace
+
+- name: add jaeger deploy
+  command: /usr/local/bin/helm install jaeger jaegertracing/jaeger -f /home/ansible/jaeger-value.yaml -n trace
+
+- name: add kube-prometheus deploy
+  command: /usr/local/bin/helm install prometheus  prometheus-community/kube-prometheus-stack -f /home/ansible/kube-prometheus-stack-value.yaml -n default
+
+- name: add kafka-exporter deploy
+  command: /usr/local/bin/helm install kafka prometheus-community/prometheus-kafka-exporter -f /home/ansible/kafka-exporter-value.yaml -n default
+
+- name: add blackbox-exporter deploy
+  command: /usr/local/bin/helm install blackbox-exporter prometheus-community/prometheus-blackbox-exporter -f /home/ansible/blackbox-exporter-value.yaml -n default
+
+- name: add elasticsearch-exporter deploy
+  command: /usr/local/bin/helm install elasticsearch prometheus-community/prometheus-elasticsearch-exporter -f /home/ansible/elasticsearch-exporter-value.yaml -n default
+
+- name: add influxdb deploy
+  command: /usr/local/bin/helm upgrade --install influxdb influxdata/influxdb -f /home/ansible/influxdb-value.yaml --set influxdb.service.nodePorts.http=31314 -n default
+
+
+
+
+
+
+#REVISAR
+#- name: upgrade pip
+#  command: pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org --upgrade --force-reinstall pip --proxy {{ proxy_address }}
+#- name: Install docker-compose
+#  command: pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org docker docker-compose pyyaml ipaddress awscli botocore s3transfer boto3 --force-reinstall --ignore-installed ipaddress --proxy {{ proxy_address }}
+
+#- name: upgrade files.
+#  command: cd "{{ lookup('env', 'PWD') }}"; pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org -r kubespray/requirements.txt --proxy {{ proxy_address }}
+#/usr/bin/pip3.6 install --trusted-host pypi.org --trusted-host files.pythonhosted.org -r requirements.txt --use-feature=2020-resolver

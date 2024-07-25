@@ -1,0 +1,4 @@
+---
+elasticsearch_host: "{{ elasticsearch_dns }}"
+elasticsearch_port: 443
+kafka_topic: serasa

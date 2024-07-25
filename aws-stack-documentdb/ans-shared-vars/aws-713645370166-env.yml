@@ -1,0 +1,24 @@
+domain: .serasa.intranet
+ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible
+prefix_hostname: "{{ prefix_stack_hostname }}"
+stack_name: "{{ prefix_stack_name }}"
+aws_region: sa-east-1
+elasticsearch_port: 443
+zookeeper_port : 2181
+env: prd
+tribe: dtst
+vpi_id: vpc-095fc8f764c3e599d
+subnet:
+  a: subnet-091c45e1f271fb5df
+  b: subnet-0753054a4c4c888b7
+kms_id: 79857787-a433-4ae1-8843-0c22be80ee6b
+aws_account_id: 713645370166
+elasticsearch_host: vpc-dtst-dl-j75cjovwyzsdsknwf3jdwno2cq.sa-east-1.es.amazonaws.com
+kafka_servers: 10.99.204.121:9092,10.99.204.47:9092,10.99.204.7:9092,10.99.204.110:9092
+zookeeper_lb: ELKZKG-zookeeper-nlb-6cbf264f2fcc161d.elb.sa-east-1.amazonaws.com
+k8s_efs_dns_name: fs-a9369da4.efs.sa-east-1.amazonaws.com
+ami_id: "{{ ami_id_rhel7 }}"
+ami_id_rhel7: ami-0079d0f7320c240ae
+ami_id_rhel8:
+##Identity_ssh
+ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible

@@ -1,0 +1,30 @@
+---
+# Include variables and define needed variables.
+- name: Stop Nginx
+  service:
+    name: nginx
+    state: stopped
+- name: Setting vhost without LDAP
+  template: >
+    src=rproxy.conf.j2
+    dest="/etc/nginx/conf.d/{{ app_host_vhost }}.conf"
+    owner=nginx
+    group=nginx
+    mode=0755
+  when: not ldap
+- name: Setting vhost with LDAP
+  template: >
+    src=rproxy-ldap.conf.j2
+    dest="/etc/nginx/conf.d/{{ app_host_vhost }}.conf"
+    owner=nginx
+    group=nginx
+    mode=0755
+  when: ldap
+- name: Start Nginx
+  service:
+    name: nginx
+    state: started
+- name: restart nginx-ldap
+  service:
+    name: nginx-ldap
+    state: restarted

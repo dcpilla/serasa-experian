@@ -1,0 +1,10 @@
+output {
+if [@metadata][kafka][topic]== "{{ kafka_metric }}" {
+  		elasticsearch {
+    			hosts => "{{ elasticsearch_host }}:{{ elasticsearch_port }}"
+    			ssl => true
+			    codec => json
+    			index => "{{ kafka_metric }}-%{+YYYY.MM.dd}"
+  }
+}
+}

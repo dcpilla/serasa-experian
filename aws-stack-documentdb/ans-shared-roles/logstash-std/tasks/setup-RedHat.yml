@@ -1,0 +1,43 @@
+---
+- name: Add Elasticsearch GPG key.
+  rpm_key:
+    key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+- name: define Hostname
+  hostname: 
+    name: "{{ hostname }}"
+
+- name: Add Logstash repository.
+  template:
+    src: logstash.repo.j2
+    dest: /etc/yum.repos.d/logstash.repo
+    mode: 0644
+
+- name: Create logstash broker data directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0644
+  with_items: "{{ logstash_dir }}"
+
+- name: Install Logstash.
+  package:
+    name: logstash-7.8.0-1.noarch
+    state: present 
+
+- name: Install cronie.
+  package:
+    name: cronie
+    state: present
+
+- name: permission systemd User root
+  lineinfile:
+    path: /etc/systemd/system/logstash.service
+    regexp: '^User='
+    line: User=root
+
+- name: permission systemd Group root
+  lineinfile:
+    path: /etc/systemd/system/logstash.service
+    regexp: '^Group='
+    line: Group=root

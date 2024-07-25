@@ -1,0 +1,5 @@
+---
+elasticsearch_host: vpc-nike-sandbox-ekzlgc-ttbsbz7356nk4zymn46e7pnvwa.sa-east-1.es.amazonaws.com
+elasticsearch_port: 443
+kafka_servers: 10.99.145.147:9092,10.99.145.21:9092,10.99.145.123:9092
+kafka_topic: serasa

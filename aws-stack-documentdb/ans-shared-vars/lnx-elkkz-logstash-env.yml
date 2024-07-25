@@ -1,0 +1,8 @@
+elasticsearch_host: https://ELASTICSEARCH_DNS
+elasticsearch_port: 443
+kafka_topic: experian-serasa
+zookeeper_lb: Z_URL
+elasticsearch_port: 443
+zookeeper_port : 2181
+kafka_topic: serasa-logs
+kafka_metric: serasa-metrics

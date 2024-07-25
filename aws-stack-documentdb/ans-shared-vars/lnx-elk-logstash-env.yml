@@ -1,0 +1,4 @@
+---
+elasticsearch_host: https://ELASTICSEARCH_DNS
+elasticsearch_port: 443
+kafka_topic: experian-serasa

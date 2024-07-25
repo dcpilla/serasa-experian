@@ -1,0 +1,19 @@
+domain: .br.experian.eeca
+prefix_hostname: "{{ prefix_stack_hostname }}"
+stack_name: "{{ prefix_stack_name }}"
+aws_region: sa-east-1
+env: prod
+tribe: pme
+vpi_id: vpc-0b4530eabf3b0d599
+subnet:
+    a: subnet-0f5be25a2ffc4e589
+    b: subnet-07b93a1a8e95e9e49
+kms_id: 723a3526-94e3-4986-8b63-5b7b2204e287
+aws_account_id: 535753273025
+ami_id: "{{ ami_id_amzlnx2 }}"
+ami_id_rhel7: ami-0079d0f7320c240ae
+ami_id_rhel8: ami-0b6b2d979772de8e6
+ami_id_amzlnx2: ami-0373f4061a063a3cd
+ami_id_pmemongodb: ami-0dc0fa493ec54cb39
+##Identity_ssh
+ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible

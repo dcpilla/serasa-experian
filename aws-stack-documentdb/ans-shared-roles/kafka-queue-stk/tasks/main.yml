@@ -1,0 +1,8 @@
+---
+# tasks file for kafka-queue
+- name: create kafka queue
+  shell: /etc/kafka/bin/kafka-topics.sh --zookeeper {{ zookeeper_lb }}:{{ zookeeper_port }} --create --topic {{ kafka_topic }} --partitions 3 --replication-factor 3
+  become: true
+- name: create kafka queue
+  shell: /etc/kafka/bin/kafka-topics.sh --zookeeper {{ zookeeper_lb }}:{{ zookeeper_port }} --create --topic {{ kafka_metric }} --partitions 3 --replication-factor 3
+  become: true

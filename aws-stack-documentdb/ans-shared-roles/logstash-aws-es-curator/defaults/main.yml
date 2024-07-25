@@ -1,0 +1,12 @@
+kafka_topic: ms-titans-qa
+env: snd
+tribe: nike
+elasticsearch_host: vpc-nike-sandbox-ekzlgc-ttbsbz7356nk4zymn46e7pnvwa.sa-east-1.es.amazonaws.com
+elasticsearch_port: 443
+full_snapshot: false
+unit_to_s3: 30
+s3_unit_time:
+unit_to_delete: 1
+delete_unit_time: days
+cron_backup_minutes: 00
+cron_backup_hours: 04

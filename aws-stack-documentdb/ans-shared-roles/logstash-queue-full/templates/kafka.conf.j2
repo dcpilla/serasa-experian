@@ -1,0 +1,7 @@
+input {
+  kafka {
+    bootstrap_servers => "{% for host in groups['kafka_broker'] %}{% if loop.index > 1%},{% endif %}{{ host }}:{{ port_kafka }}{% endfor %}"
+    topics => "{{ kafka_topic }}"
+    codec => json
+    }
+}

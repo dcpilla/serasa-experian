@@ -1,0 +1,22 @@
+---
+# defaults file for cassandra
+
+cassandra_cluster_name: ""
+cassandra_seeds: []
+
+cassandra_num_tokens: 256
+cassandra_disk_failure_policy: "die"
+cassandra_commit_failure_policy: "die"
+cassandra_data_base_directory: "/data/cassandra/"
+cassandra_data_file_directories: 
+  - "data"
+cassandra_saved_caches_directory: "saved_caches"
+cassandra_hints_directory_directory: "hints"
+cassandra_commitlog_directory: "/data/cassandra/commitlog"
+
+cassandra_partitioner: "Murmur3Partitioner"
+cassandra_config_dir_base: "/etc/cassandra/conf"
+cassandra_disk_queue_scheduler: "deadline"
+
+cassandra_jvm_xms: "16G"
+cassandra_jvm_xmx: "16G"

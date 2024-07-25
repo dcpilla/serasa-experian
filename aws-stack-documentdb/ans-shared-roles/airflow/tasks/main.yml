@@ -1,0 +1,78 @@
+---
+# tasks file for airflow
+- fail:
+    msg: "Please define the desired version of apache-airflow (https://airflow.apache.org/)"
+  when: airflow_version == ""
+
+- fail:
+    msg: "Please define URL for the DB backend"
+  when: airflow_db_url == ""
+
+- fail:
+    msg: "Please define the password for the SVC Airflow DB backend"
+  when: airflow_db_pass == ""
+
+- fail:
+    msg: "Please define the fernet key for the DB backend"
+  when: airflow_db_fernet_key == ""
+
+- name: Create mount dir
+  file:
+    path: "{{ airflow_home_dir }}"
+    state: directory
+    owner: "root"
+    group: "root"
+    mode: 0755
+
+- name: Chown Airflow home dir
+  file:
+    path: "{{ airflow_home_dir }}"
+    mode: 0755
+    state: directory
+    owner: root
+    group: root
+
+- name: Create Airflow log dir
+  file:
+    path: "{{ airflow_log_dir }}"
+    mode: 0755
+    state: directory
+    owner: root
+    group: root
+
+- name: Create Airflow dags dir
+  file:
+    path: "{{ airflow_home_dir }}/dags"
+    mode: 0755
+    state: directory
+    owner: root
+    group: root
+
+- name: Create Airflow plugins dir
+  file:
+    path: "{{ airflow_home_dir }}/plugins"
+    mode: 0755
+    state: directory
+    owner: root
+    group: root
+  when: airflow_rest_api_plugin_install == true
+
+- name: Add IUS Repository
+  yum_repository:
+    name: ius
+    description: IUS for Enterprise Linux 7 - $basearch
+    baseurl: https://repo.ius.io/7/$basearch/
+    gpgcheck: yes
+    enabled: yes
+    repo_gpgcheck: no 
+    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-IUS-7
+
+- name: Define Hostname
+  hostname: 
+    name: "{{ hostname }}"
+
+- include_tasks: setup-RedHat.yml
+  when: ansible_distribution == 'RedHat' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- include_tasks: setup-Amazon.yml
+  when: ansible_distribution == 'Amazon' and ansible_distribution_major_version|int == 2

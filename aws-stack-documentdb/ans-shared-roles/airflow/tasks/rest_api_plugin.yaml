@@ -1,0 +1,82 @@
+- fail:
+    msg: 'Please define the desired version of Airflow REST API Plugin (https://github.com/teamclairvoyant/airflow-rest-api-plugin)'
+  when: airflow_rest_api_plugin_version == ""
+
+- fail:
+    msg: 'Please define desired API authentication token (X-API-Key)'
+  when: airflow_rest_api_plugin_token == ""
+
+- name: Check if Airflow REST API Plugin is present
+  stat:
+    path: "{{ airflow_home_dir }}/plugins/rest_api_plugin.py"
+  register: airflow_rest_api_plugin_status
+
+- name: Check Airflow REST API Plugin version
+  shell: "grep -i -m 1 __version__ {{ airflow_home_dir }}/plugins/rest_api_plugin.py"
+  register: airflow_rest_api_plugin_installed_version
+  when: airflow_rest_api_plugin_status.stat.exists
+  changed_when: false
+
+- set_fact:
+    airflow_rest_api_plugin_skip: "{{ airflow_rest_api_plugin_installed_version.stderr | regex_search(airflow_rest_api_plugin_version) != ''}}"
+  when: airflow_rest_api_plugin_status.stat.exists
+
+- set_fact:
+    airflow_rest_api_plugin_skip: false
+  when: not airflow_rest_api_plugin_status.stat.exists
+
+- name: Create Airflow plugins/templates dir
+  file:
+    path: "{{ airflow_home_dir }}/plugins/templates"
+    mode: 0755
+    state: directory
+    owner: airflow
+    group: airflow
+
+- name: Download Airflow REST API Plugin package
+  unarchive:
+    src: "{{ airflow_rest_api_plugin_url }}"
+    dest: /tmp
+    exclude:
+      - "README.md"
+      - "RELEASE_PROCEDURE.md"
+      - "LICENSE"
+    group: root
+    owner: root
+    mode: 0644
+    remote_src: yes
+  when: not airflow_rest_api_plugin_skip
+
+- name: Copy Airflow REST API Plugin files to plugins dir
+  copy:
+    src: "/tmp/airflow-rest-api-plugin-{{ airflow_rest_api_plugin_version }}/plugins/{{ item }}"
+    dest: "{{ airflow_home_dir }}/plugins/{{ item }}"
+    owner: airflow
+    group: airflow
+    mode: 0644
+    remote_src: yes
+  loop:
+    - rest_api_plugin.py
+    - templates/
+  when: not airflow_rest_api_plugin_skip
+  notify:
+    - Restart airflow-webserver
+
+- name: Set Airflow REST API Plugin dirs permissions
+  file:
+    path: "{{ airflow_home_dir }}/plugins/{{ item }}"
+    owner: airflow
+    group: airflow
+    mode: 0755
+    state: directory
+  loop:
+    - templates
+    - templates/rest_api_plugin
+  when: not airflow_rest_api_plugin_skip
+
+- name: Clear tmp files
+  file:
+    path: "{{ item }}"
+    state: absent 
+  loop:
+    - "/tmp/airflow-rest-api-plugin-{{ airflow_rest_api_plugin_version }}"

@@ -1,0 +1,17 @@
+- name: Replace main.tf template
+  template:
+    src: "{{ lookup('env', 'PWD') }}/main.tf.j2"
+    dest: "{{ lookup('env', 'PWD') }}/main.tf"
+    owner: jenkins
+    group: jenkins
+  become: yes
+  become_user: jenkins
+
+- name: Replace vars.tf template
+  template:
+    src: "{{ lookup('env', 'PWD') }}/vars.tf.j2"
+    dest: "{{ lookup('env', 'PWD') }}/vars.tf"
+    owner: jenkins
+    group: jenkins
+  become: yes
+  become_user: jenkins

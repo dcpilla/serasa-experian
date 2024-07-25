@@ -1,0 +1,11 @@
+client:
+  hosts: {{ elasticsearch_host }}
+  port: {{ elasticsearch_port }}
+  use_ssl: True
+  aws_region: sa-east-1
+  aws_sign_request: True
+  ssl_no_validate: False
+  timeout: 60
+
+logging:
+  loglevel: INFO

@@ -1,0 +1,18 @@
+---
+# defaults file for cassandra-exporter
+
+cassandra_exporter_version: "2.3.0"
+
+cassandra_listen_address: "0.0.0.0"
+cassandra_listen_port: "8080"
+cassandra_exporter_binary_url: "https://github.com/criteo/cassandra_exporter/releases/download/{{cassandra_exporter_version}}/cassandra_exporter-{{cassandra_exporter_version}}-all.jar"
+
+cassandra_exporter_user: "cassandra-exporter"
+cassandra_exporter_group: "cassandra-exporter"
+
+cassandra_exporter_jmx_user: ""
+cassandra_exporter_jmx_password: ""
+
+cassandra_exporter_root_dir: "/opt/cassandra_exporter"
+cassandra_exporter_dist_dir: "{{ cassandra_exporter_root_dir }}/dist"
+cassandra_exporter_config_dir: "{{ cassandra_exporter_root_dir }}/config"

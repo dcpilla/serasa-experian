@@ -1,0 +1,4 @@
+#Kafka
+zookeeper_port : 2181
+zookeeper_lb: EKZLGC-zookeeper-nlb-430270682605e4ca.elb.sa-east-1.amazonaws.com
+kafka_topic: serasa

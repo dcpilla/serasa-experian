@@ -1,0 +1,7 @@
+- name: Teste de URL's utilizadas nas automacoes
+  uri:
+    status_code: [200, 403] 
+    validate_certs: false
+    url: "{{ item }}"
+  with_items: "{{ lookup('file', '../templates/repolist').split('\n') }}"
+  ignore_errors: yes

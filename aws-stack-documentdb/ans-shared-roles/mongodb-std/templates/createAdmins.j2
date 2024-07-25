@@ -1,0 +1,17 @@
+// Create administrative users
+
+use admin;
+if(!db.getUser("{{ mongodb_user_admin_name }}")){
+	db.createUser( {
+	    user: "{{ mongodb_user_admin_name }}",
+	    pwd:  "{{ mongodb_user_admin_password }}",
+	    roles: [ { role: "userAdminAnyDatabase", db: "admin" } ]
+	});
+}
+if(!db.getUser("{{ mongodb_root_admin_name }}")){
+	db.createUser( {
+	    user: "{{ mongodb_root_admin_name }}",
+	    pwd: "{{ mongodb_root_admin_password }}",
+	    roles: [ { role: "root", db: "admin" } ]
+	});
+}

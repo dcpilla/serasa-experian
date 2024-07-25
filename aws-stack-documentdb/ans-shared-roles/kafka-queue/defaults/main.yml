@@ -1,0 +1,4 @@
+---
+# defaults file for kafka-queue
+kafka_topic: serasa
+zookeeper_lb: example.com

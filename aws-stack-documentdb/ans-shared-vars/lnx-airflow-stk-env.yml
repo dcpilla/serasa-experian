@@ -1,0 +1,16 @@
+app_name: airflow
+hostname: "{{ country }}A{{ cloud_region[aws_region] }}{{ acc_env[env] }}APU{{ bu_name[bu] }}{{(groups.airflow.index(inventory_hostname) + 1)}}"
+airflow_version: "@@AIRFLOW_VERSION@@"
+airflow_home_dir: "/opt/airflow"
+airflow_log_bkp_s3: "/opt/airflow/logs/"
+airflow_log_dir: "/var/log/airflow"
+airflow_attached_ebs: "/dev/nvme1n1"
+airflow_db_url: RDS_ENDPOINT
+airflow_db_database: "@@DB_NAME@@"
+airflow_db_user: "@@ADMIN_USER@@"
+airflow_db_pass: "@@ADMIN_PASSWORD@@"
+airflow_db_port: "5432"
+airflow_aws_region: "{{ aws_region }}"
+bucket_name: BUCKET_NAME_S3
+airflow_db_fernet_key: "@@AIRFLOW_DB_FERNET_KEY@@"
+airflow_rest_api_plugin_token: "@@AIRFLOW_REST_API_PLUGIN_TOKEN@@"

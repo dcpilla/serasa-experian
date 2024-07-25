@@ -1,0 +1,24 @@
+kibana_version: "7.x"
+app_name: kibana
+kibana_package: kibana-oss
+kibana_package_state: present
+
+kibana_service_state: started
+kibana_service_enabled: true
+
+kibana_config_template: kibana.yml.j2
+kibana_config_file_path: /etc/kibana/kibana.yml
+
+kibana_server_port: 5601
+kibana_server_host: "0.0.0.0"
+hostname: "{{ prefix_stack_hostname }}{{ prefix_stack_name }}{{ app_name }}{{(groups.kibana.index(inventory_hostname) + 1)}}"
+kibana_elasticsearch_url: "https://ELASTICSEARCH_DNS:443"
+kibana_elasticsearch_username: ""
+kibana_elasticsearch_password: ""
+app_host_name: kibana_server
+app_host_ip: 127.0.0.1
+app_host_port: 5601
+app_host_vhost: "{{ hostname }}.serasa.intranet"
+ldap_system_user: "{{ ldap_bind_user }}"
+ldap_system_password: "{{ ldap_bind_pass }}"
+ldap: true

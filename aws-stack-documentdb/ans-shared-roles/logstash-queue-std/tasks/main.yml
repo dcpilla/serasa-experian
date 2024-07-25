@@ -1,0 +1,9 @@
+---
+- name: Create Logstash configuration files.
+  template:
+    src: "kafka-elasticsearch.conf.j2"
+    dest: "/etc/logstash/conf.d/kafka-elasticsearch-{{ kafka_topic }}.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart logstash

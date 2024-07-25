@@ -1,0 +1,2 @@
+app_name: @@APP_NAME@@
+hostname: "{{ country }}A{{ cloud_region[aws_region] }}{{ acc_env[env] }}APU{{ bu_name[bu] }}{{(groups.@@APP_NAME@@.index(inventory_hostname) + 1)}}"

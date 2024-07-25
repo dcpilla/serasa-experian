@@ -1,0 +1,8 @@
+---
+# tasks file for proxy
+- name: Change Proxy in /etc/yum.conf
+  lineinfile:
+    path: /etc/yum.conf
+    regexp: '^proxy='
+    line: proxy={{ proxy_address }}
+  become: yes

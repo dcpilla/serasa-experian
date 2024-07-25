@@ -1,0 +1,14 @@
+---
+- debug: msg="current host expected value:{{ groups.replica0[0] }} - current host current value:{{ inventory_hostname }}"
+
+- name: copy createAdmin script
+  template:
+    src: createAdmins.j2
+    dest: /tmp/createAdmins.j2
+    backup: true
+    owner: root
+    group: root
+    mode: 0644
+
+- name: create administrator users
+  shell: mongo < /tmp/createAdmins.j2

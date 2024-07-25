@@ -1,0 +1,168 @@
+## TAGs
+variable "env" {
+  description = "Name of environment"
+  type        = string
+  default     = "@@ENV@@"
+}
+
+variable "env_map" {
+  type    = map(string)
+
+  default = {
+    stg     = "stg"
+    dev     = "dev"
+    uat     = "uat"
+    sandbox = "sbx"
+    prod    = "prd"
+  }
+}
+
+variable "bu" {
+  description = "BU Name"
+  type        = string
+  default     = "@@BU@@"
+}
+
+variable "project"{
+  description = "Tag Project"
+  default = "@@PROJECT@@"
+}
+
+variable "category_new" {
+  description = "Tag Category"
+  default = "@@CATEGORY_NEW@@"
+}
+
+variable "category_data" {
+  description = "Tag Category"
+  default = "@@CATEGORY_DATA@@"
+}
+
+variable "data_type" {
+  description = "Tag Type"
+  default = "@@DATA_TYPE@@"
+}
+
+variable "cost_string" {
+  description = "Cost String"
+  default     = "@@COSTSTRING@@"
+}
+
+variable "app_id" {
+  description = "App ID or Gearr"
+  default     = "@@APPID@@"
+}
+
+variable "tags" {
+  description = "Aditional Tags"
+  type        = map
+  default     = {}
+}
+
+####Account Variable######
+variable "aws_account_id" {
+  description = "AWS Account id"
+  type        = string
+  default     = "@@AWS_ACCOUNT_ID@@"
+}
+
+variable "region" {
+  description = "Region that will be used in AWS"
+  default = "@@AWS_REGION@@"
+}
+
+variable "port" {
+    description = "Open port in SG for DB communication"
+    type = number
+    default = 27017
+}
+
+variable "cluster_name" {
+    description = "Name of database"
+    type = string
+    default = "@@CLUSTER_NAME@@"
+}
+
+variable "master_username" {
+    description = "(Required unless a snapshot_indentifier is provided) Username for the master DB user"
+    type = string
+    default = "root"
+}
+
+variable "retention_period" {
+    description = "Number of days to retain backups for"
+    type = string
+    default = "7"
+}
+
+variable "preferred_backup_window" {
+    description = "Daily time range during which the backups happen"
+    type = string
+    default = "00:00-01:00"
+}
+
+variable "skip_final_snapshot" {
+    description = "Determines whether a final DB snapshot is create befor the DB cluster is deleted"
+    type = string
+    default = true
+}
+
+variable "apply_immediately" {
+    description = "Specifies whether any modifications are applied immediately, or during the next maintenance window."
+    type = string
+    default = true
+}
+
+variable "storage_encrypted" {
+    description = "Specifies whether the DB cluster is encrypted"
+    type = string
+    default = true
+}
+
+variable "kms_key_id" {
+    description = "KMS Encrypt Key ARN"
+    type = string
+    default = "arn:aws:kms:@@AWS_REGION@@:@@AWS_ACCOUNT_ID@@:key/{{ kms_id }}"
+}
+
+variable "snapshot_identifier" {
+    description = "Specifies whether or not to create cluster from a snapshot. You can use either the name or ARN when specifying a DB cluster snapshot"
+    type = string
+    default = ""
+}
+
+variable "engine" {
+    description = "The name of the database engine to be use for this DB cluster. Defaults to 'docdb'. Valid values: 'docdb'"
+    type = string
+    default = "docdb"
+}
+
+variable "engine_version" {
+    description = "The version number of the database engine to use"
+    type = string
+    default = "@@ENGINE_VERSION@@"
+}
+
+variable "enabled_cloudwatch_logs_exports" {
+     description = "List of log types to export to cloudwatch. The following log type are supported: audit, error, general, slowquery"
+     type = list(string)
+     default = ["audit", "profiler"] 
+}
+
+variable "instance_class" {
+    description = "The instance class to user"
+    type = string
+    default = "@@INSTANCE_CLASS@@"
+}
+
+variable "cluster_size" {
+    description = "Number of DB instances to create in the cluster"
+    type = string
+    default = "@@CLUSTER_SIZE@@"
+}
+
+variable "tls_enabled" {
+    description = "When true cluster using TLS for communication"
+    type = bool
+    default = true
+}

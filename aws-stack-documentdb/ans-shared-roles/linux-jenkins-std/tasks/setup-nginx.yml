@@ -1,0 +1,94 @@
+#nginx Installation
+- name: Nginx copy sourcecode tar files to servers
+  copy:
+    src: '{{ item }}'
+    dest: /opt/download/
+    owner: root
+    group: root
+    mode: '0777'
+  with_fileglob:
+    - source_code/*
+- name: Nginx Ensure group "nginx" exists
+  group:
+    name: nginx
+    state: present
+- name: Nginx Add the user 'nginx' for nginx app.
+  user:
+    name: nginx
+    comment: Nginx User
+    group: nginx
+- name: Nginx Create a nginx Directory
+  file:
+    path: '{{ item }}'
+    state: directory
+    user: nginx
+    group: nginx
+    mode: '0755'
+  with_fileglob:
+    - /etc/nginx
+    - /etc/nginx/conf.d
+    - /etc/nginx/ssl
+- name: Nginx Install pcre
+  shell: cd /opt/download ; tar -zxf pcre-8.44.tar.gz; cd pcre-8.44/ ; ./configure; make; make install
+- name: Nginx Install zlib
+  shell: cd /opt/download ; tar -zxf zlib-1.2.11.tar.gz; cd zlib-1.2.11; ./configure; make; make install
+- name: Nginx Install nginx
+  shell: cd /opt/download ; mkdir -p /etc/nginx/conf.d /etc/nginx/ssl; chown -R nginx:nginx /etc/nginx ; tar -zxf nginx-1.19.2.tar.gz; cd nginx-1.19.2; ./configure --sbin-path=/usr/sbin/nginx --conf-path=/etc/nginx/nginx.conf --pid-path=/var/run/nginx.pid --with-http_ssl_module --with-stream --with-pcre=../pcre-8.44 --with-zlib=../zlib-1.2.11 --with-http_auth_request_module --with-http_auth_request_module --without-http_empty_gif_module --user=nginx --group=nginx; make; make install
+- name: Nginx copy init.d scripts files to servers
+  copy:
+    src: '{{ item }}'
+    dest: /etc/init.d/
+    owner: root
+    group: root
+    mode: '0755'
+  with_fileglob:
+    - init/*
+- name: Nginx copy nginx binary files to servers
+  copy:
+    src: '{{ item }}'
+    dest: /usr/sbin/
+    owner: root
+    group: root
+    mode: '0755'
+  with_fileglob:
+    - binary/*
+- name: Nginx copy config files to servers
+  copy:
+    src: '{{ item }}'
+    dest: /etc/nginx/
+    owner: root
+    group: root
+    mode: '0755'
+  with_fileglob:
+    - conf/*
+- name: Nginx copy to Config File to redirect http to https
+  copy:
+    src: '{{ item }}'
+    dest: /etc/nginx/conf.d/
+    owner: root
+    group: root
+    mode: '0755'
+  with_fileglob:
+    - conf.d/*
+- name: Nginx  to fake SSL Files to Nginx
+  copy:
+    src: '{{ item }}'
+    dest: /etc/nginx/ssl/
+    owner: root
+    group: root
+    mode: '0755'
+  with_fileglob:
+    - ssl/fake/*
+  when: not ssl
+- name: Nginx copy to serasa SSL Files to Nginx
+  copy:
+    src: '{{ item }}'
+    dest: /etc/nginx/ssl/
+    owner: root
+    group: root
+    mode: '0755'
+  with_fileglob:
+    - ssl/serasa/*
+  when: ssl
+- name: Nginx permission /usr/local/nginx
+  shell: chown -R nginx:nginx /usr/local/nginx

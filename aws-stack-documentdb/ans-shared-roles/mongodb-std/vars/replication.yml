@@ -1,0 +1,11 @@
+# It's a 'master' node
+mongodb_login_host: 10.99.145.10
+
+# mongodb_replication_params should be configured on each replica set node
+mongodb_replication_params:
+  - {
+      host_name: 10.99.145.10,
+      host_port: "{{ mongodb_net_port }}",
+      host_type: replica,
+    }
+  # host_type can be replica(default) and arbiter

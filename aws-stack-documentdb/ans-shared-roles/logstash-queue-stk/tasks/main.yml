@@ -1,0 +1,56 @@
+---
+- name: Create Logstash S3 Kafka configuration files.
+  when: "'logstash_@@TRIBE@@_@@ENV@@_s3' in group_names"
+  template:
+    src: "02-kafka-s3.conf.j2"
+    dest: "/etc/logstash/conf.d/02-kafka-s3.conf"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Create Logstash ELS Kafka configuration files.
+  when: "'logstash_@@TRIBE@@_@@ENV@@_els' in group_names"
+  template:
+    src: "02-kafka.conf.j2"
+    dest: "/etc/logstash/conf.d/02-kafka.conf"
+    owner: root
+    group: root
+    mode: 0644    
+
+- name: Create Logstash elasticsearh index configuration files.
+  when: "'logstash_@@TRIBE@@_@@ENV@@_els' in group_names"
+  template:
+    src: "elasticsearch-topic.conf.j2"
+    dest: "/etc/logstash/conf.d/elasticsearch-topic-{{ kafka_topic }}.conf"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Create Logstash elasticsearh index configuration files.
+  when: "'logstash_@@TRIBE@@_@@ENV@@_els' in group_names"
+  template:
+    src: "elasticsearch-metric.conf.j2"
+    dest: "/etc/logstash/conf.d/elasticsearch-metric-{{ kafka_metric }}.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart logstash
+
+- name: Create Logstash S3 index configuration files.
+  when: "'logstash_@@TRIBE@@_@@ENV@@_s3' in group_names"
+  template:
+    src: "s3-metric.conf.j2"
+    dest: "/etc/logstash/conf.d/s3-metric-{{ kafka_metric }}.conf"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Create Logstash S3 index configuration files.
+  when: "'logstash_@@TRIBE@@_@@ENV@@_s3' in group_names"
+  template:
+    src: "s3-topic.conf.j2"
+    dest: "/etc/logstash/conf.d/s3-topic-{{ kafka_topic }}.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart logstash

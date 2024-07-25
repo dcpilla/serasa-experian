@@ -1,0 +1,6 @@
+bucket_name: "@@BUCKET_NAME@@"
+kms_master_key_arn: "@@KMS_MASTER_KEY_ARN@@"
+acl: "@@ACL@@"
+force_destroy: "@@FORCE_DESTROY@@"
+versioning_enabled: "@@VERSIONING_ENABLED@@"
+sse_algorithm: "@@SSE_ALGORITHM@@"

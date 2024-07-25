@@ -1,0 +1,189 @@
+
+---
+#hostname
+app_name: piaas
+hostname: "{{ prefix_stack_hostname }}{{ app_name }}{{ prefix_stack_name }}{{(groups.jenkins.index(inventory_hostname) + 1)}}"
+# Optional method of pinning a specific version of Jenkins and/or overriding the
+# default Jenkins packaging URL.
+# jenkins_version: "1.644"
+# jenkins_pkg_url: "https://www.example.com"
+yum_rhel7_packages:
+  - git
+  - yum-utils
+  - device-mapper-persistent-data
+  - lvm2
+  - epel-release.noarch
+  - python36-jenkins
+  - python36-lxml
+  - perl
+  - gcc
+  - autoconf
+  - automake
+  - make
+  - gcc-c++
+  - libxml2-devel
+  - libcap-devel
+  - libtool
+  - libtool-ltdl-devel
+  - openssl
+  - openssl-devel
+  - openldap-devel
+  - python3-devel.x86_64
+  - libselinux-python3.x86_64
+  - curl
+  - initscripts
+  - libpipeline
+  - python3-pip.noarch
+  - python3.x86_64
+  - python3-devel
+  - python3-libs.x86_64
+  - python3-rpm-generators.noarch
+yum_rhel8_packages:
+  - git
+  - yum-utils
+  - device-mapper-persistent-data
+  - lvm2
+  - epel-release.noarch
+  - python3-jenkins
+  - python3-lxml
+  - perl
+  - gcc
+  - autoconf
+  - automake
+  - make
+  - gcc-c++
+  - libxml2-devel
+  - libcap-devel
+  - libtool
+  - libtool-ltdl-devel
+  - openssl
+  - openssl-devel
+  - openldap-devel
+  - platform-python-devel.x86_64
+  - "{{ 'libselinux-python' if ansible_python['version']['major'] < 3 else 'python3-libselinux' }}"
+  - curl
+  - initscripts
+  - libpipeline
+
+yum_packages_state: present
+git_branch_core: @@GIT_BRANCH_CORE@@
+git_repository_core: @@GIT_REPOSITORY_CORE@@
+git_directory_core: /opt/DevOps
+#nginx VHOST
+app_host_name: jenkins_server
+app_host_ip: 127.0.0.1
+app_host_port: 8080
+app_host_vhost: "@@APP_VHOST_ADDRESS@@"
+# Change this to `latest` to update Jenkins if a newer version is available.
+jenkins_package_state: present
+
+jenkins_prefer_lts: false
+
+jenkins_connection_delay: 5
+jenkins_connection_retries: 60
+jenkins_home: /opt/infratransac/jenkins
+jenkins_hostname: localhost
+jenkins_http_port: 8080
+jenkins_jar_location: /opt/jenkins-cli.jar
+jenkins_url_prefix: ""
+jenkins_java_options: "-Djenkins.install.runSetupWizard=false"
+
+# Plugin list can use the plugin name, or a name/version dict.
+jenkins_plugins:
+  - blueocean
+  - workflow-cps-global-lib
+  - jquery-detached
+  - handlebars
+  - git-client
+  - pipeline-model-definition
+  - build-user-vars-plugin
+  - credentials-binding
+  - matrix-auth
+  - workflow-multibranch
+  - plain-credentials
+  - pipeline-graph-analysis
+  - branch-api
+  - workflow-support
+  - pipeline-model-api
+  - ace-editor
+  - pipeline-stage-tags-metadata
+  - antisamy-markup-formatter
+  - pipeline-rest-api
+  - ldap
+  - command-launcher
+  - jackson2-api
+  - momentjs
+  - mailer
+  - workflow-aggregator
+  - pipeline-milestone-step
+  - workflow-basic-steps
+  - git
+  - groovy
+  - bouncycastle-api
+  - junit
+  - pipeline-stage-view
+  - snakeyaml-api
+  - pipeline-model-extensions
+  - workflow-cps-global-lib-http
+  - matrix-project
+  - script-security
+  - workflow-step-api
+  - workflow-scm-step
+  - trilead-api
+  - cloudbees-folder
+  - pipeline-stage-step
+  - workflow-cps
+  - lockable-resources
+  - credentials
+  - workflow-durable-task-step
+  - workflow-job
+  - jsch
+  - structs
+  - jdk-tool
+  - pipeline-input-step
+  - apache-httpcomponents-client-4-api
+  - scm-api
+  - git-server
+  - workflow-api
+  - windows-slaves
+  - display-url-api
+  - ssh-credentials
+  - ansicolor
+  - pipeline-build-step
+  - durable-task
+  - parameterized-trigger
+  - active-directory
+
+
+jenkins_plugins_state: present
+jenkins_plugin_updates_expiration: 86400
+jenkins_plugin_timeout: 30
+jenkins_plugins_install_dependencies: true
+jenkins_updates_url: "https://updates.jenkins.io"
+
+jenkins_admin_username: @@JENKINS_ADMIN_USERNAME@@
+jenkins_admin_password: @@JENKINS_ADMIN_PASSWORD@@
+jenkins_admin_password_file: ""
+
+jenkins_process_user: jenkins
+jenkins_process_group: "{{ jenkins_process_user }}"
+
+jenkins_init_changes:
+  - option: "JENKINS_ARGS"
+    value: "--prefix={{ jenkins_url_prefix }}"
+  - option: "{{ jenkins_java_options_env_var }}"
+    value: "{{ jenkins_java_options }}"
+
+# If Jenkins is behind a proxy, configure this.
+jenkins_proxy_host: "{{ yum_proxy_address }}"
+jenkins_proxy_port: "{{ proxy_port_address }}"
+jenkins_proxy_noproxy:
+  - "127.0.0.1"
+  - "localhost"
+  - "bitbucketglobal.experian.local"
+  - "10.*"
+  - "*.experian.local"
+  - "*.experian.com"
+  - "*.amazonaws.com"
+  - "*.serasa.intranet"
+ssl: @@SSL@@

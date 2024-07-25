@@ -1,0 +1,7 @@
+---
+- name: kafka_broker
+  hosts: all
+  become: true
+
+  roles:
+    - role: alvarobacelar.kafka

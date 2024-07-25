@@ -1,0 +1,57 @@
+actions: 
+  1: 
+    action: snapshot
+    description: "Snapshot {{ kafka_topic }}- prefixed indices older than 1 day (based on index creation_date) with the default snapshot name pattern of '{{ kafka_topic }}-%Y%m%d%H%M%S'.  Wait for the snapshot to complete.  Do not skip the repository filesystem access check.  Use the other options to create the snapshot."
+    filters: 
+    - filtertype: pattern
+      kind: prefix
+      value: {{ kafka_topic }}-
+    - filtertype: age
+      source: name
+      direction: older
+      timestring: '%Y.%m.%d'
+      unit: days
+      unit_count: 1
+    options: 
+      disable_action: false
+      ignore_unavailable: false
+      include_global_state: true
+      name: {{ kafka_topic }}-%Y.%m.%d
+      partial: false
+      repository: essb-{{ env }}-es-snapshot-{{ tribe }}-{{ env }}-{{ kafka_topic }}
+      skip_repo_fs_check: false
+      wait_for_completion: true
+  2:
+    action: delete_indices
+    description: >-
+      Delete indices older than {{ unit_to_s3 }} {{ s3_unit_time }} based on index {{ kafka_topic }}
+    options:
+       ignore_empty_list: True
+       disable_action: False
+    filters:
+    - filtertype: pattern
+      kind: prefix
+      value: {{ kafka_topic }}-
+    - filtertype: age
+      source: name
+      direction: older
+      timestring: '%Y.%m.%d'
+      unit: {{ s3_unit_time }}
+      unit_count: '{{ unit_to_s3 }}'
+  3:
+    action: delete_snapshots
+    description: >-
+      Delete snapshots from the selected repository older than  {{ unit_to_delete }} {{ delete_unit_time }}
+      (based on creation_date), for 'snapshot' prefixed snapshots.
+    options:
+      repository: essb-{{ env }}-es-snapshot-{{ tribe }}-{{ env }}-{{ kafka_topic }}
+      disable_action: False
+    filters:
+    - filtertype: pattern
+      kind: prefix
+      value: {{ kafka_topic }}-
+    - filtertype: age
+      source: creation_date
+      direction: older
+      unit: {{ delete_unit_time }}
+      unit_count: '{{ unit_to_delete }}'

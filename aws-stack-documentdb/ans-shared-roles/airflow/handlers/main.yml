@@ -1,0 +1,12 @@
+---
+# handlers file for airflow
+
+- name: Restart airflow-webserver
+  service:
+    name: airflow-webserver.service
+    state: restarted 
+
+- name: Restart airflow-scheduler
+  service:
+    name: airflow-scheduler.service
+    state: restarted 

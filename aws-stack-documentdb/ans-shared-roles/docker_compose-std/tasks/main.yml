@@ -1,0 +1,12 @@
+---
+- include: packages-apt.yml
+  when: ansible_pkg_mgr == "apt"
+
+- include: packages-yum.yml
+  when: ansible_pkg_mgr == "yum"
+
+- name: upgrade pip
+  command: pip3 install --upgrade --force-reinstall pip --proxy {{ proxy_address }}
+
+- name: Install docker-compose
+  command: pip3 install docker docker-compose pyyaml ipaddress awscli botocore s3transfer boto3 --force-reinstall --ignore-installed ipaddress --proxy {{ proxy_address }}

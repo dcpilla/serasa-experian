@@ -1,0 +1,113 @@
+---
+# Include variables and define needed variables.
+
+- name: Enable repo rhel-7-server-rhui-optional-rpms
+  shell: yum-config-manager --enable rhel-7-server-rhui-optional-rpms
+
+- name: Enable Repo rhel-7-server-rhui-extras-rpms
+  shell: yum-config-manager --enable rhel-7-server-rhui-extras-rpms
+
+- name: Ensure packages for build nginx is installed on RHEL.
+  yum:
+    name: "{{ nginx_packages }}"
+    state: "{{ nginx_packages_state }}"
+
+- name: upgrade pip3
+  shell: pip3 install --upgrade --force-reinstall pip --proxy {{ proxy_address }}
+  
+- name: Install Python3 Modules
+  shell: pip-3 install python-ldap pyyaml ipaddress awscli botocore s3transfer boto3 --force-reinstall --ignore-installed ipaddress --proxy {{ proxy_address }}
+
+- name: copy sourcecode tar files to servers
+  copy:
+    src: '{{ item }}'
+    dest: /opt/download/
+    owner: root
+    group: root
+    mode: '0777'
+  with_fileglob:
+    - source_code/*
+- name: Ensure group "nginx" exists
+  group:
+    name: nginx
+    state: present
+- name: Add the user 'nginx' for nginx app.
+  user:
+    name: nginx
+    comment: Nginx User
+    group: nginx
+- name: Create a nginx Directory
+  file:
+    path: '{{ item }}'
+    state: directory
+    user: nginx
+    group: nginx
+    mode: '0755'
+  with_fileglob:
+    - /etc/nginx
+    - /etc/nginx/conf.d
+    - /etc/nginx/ssl
+- name: Install pcre
+  shell: cd /opt/download ; tar -zxf pcre-8.44.tar.gz; cd pcre-8.44/ ; ./configure; make; make install
+- name: Install zlib
+  shell: cd /opt/download ; tar -zxf zlib-1.2.11.tar.gz; cd zlib-1.2.11; ./configure; make; make install
+- name: Install nginx
+  shell: cd /opt/download ; mkdir -p /etc/nginx/conf.d /etc/nginx/ssl; chown -R nginx:nginx /etc/nginx ; tar -zxf nginx-1.19.2.tar.gz; cd nginx-1.19.2; ./configure --sbin-path=/usr/sbin/nginx --conf-path=/etc/nginx/nginx.conf --pid-path=/var/run/nginx.pid --with-http_ssl_module --with-stream --with-pcre=../pcre-8.44 --with-zlib=../zlib-1.2.11 --with-http_auth_request_module --with-http_auth_request_module --without-http_empty_gif_module --user=nginx --group=nginx; make; make install
+- name: copy init.d scripts files to servers
+  copy:
+    src: '{{ item }}'
+    dest: /etc/init.d/
+    owner: root
+    group: root
+    mode: '0755'
+  with_fileglob:
+    - init/*
+- name: copy nginx-ldap binary files to servers
+  copy:
+    src: '{{ item }}'
+    dest: /usr/sbin/
+    owner: root
+    group: root
+    mode: '0755'
+  with_fileglob:
+    - binary/*
+- name: copy config files to servers
+  copy:
+    src: '{{ item }}'
+    dest: /etc/nginx/
+    owner: root
+    group: root
+    mode: '0755'
+  with_fileglob:
+    - conf/*
+- name: copy to Config File to redirect http to https
+  copy:
+    src: '{{ item }}'
+    dest: /etc/nginx/conf.d/
+    owner: root
+    group: root
+    mode: '0755'
+  with_fileglob:
+    - conf.d/*
+- name: copy to SSL Files to Nginx
+  copy:
+    src: '{{ item }}'
+    dest: /etc/nginx/ssl/
+    owner: root
+    group: root
+    mode: '0755'
+  with_fileglob:
+    - ssl/*
+- name: Create Autosigned certificate
+  shell: chown -R nginx:nginx /usr/local/nginx
+# Figure out what version of Apache is installed.
+- name: Ensure nginx has selected state and enabled on boot.
+  service:
+    name: nginx
+    state: started
+    enabled: true
+- name: Ensure nginx-ldap has selected state and enabled on boot.
+  service:
+    name: nginx-ldap
+    state: started
+    enabled: true

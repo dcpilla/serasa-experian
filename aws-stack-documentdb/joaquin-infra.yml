@@ -1,0 +1,118 @@
+---
+# Documentação do Desenvolvedor JoaquinX: https://code.experian.local/projects/SCIB/repos/joaquin-x/browse/doc/user_guide_developer.md
+running_in: aws 
+itil: 
+  request: true
+  changeorder: false
+definition: Cria um cluster de DocumentDB
+team_owner: Tribe SRE CS - Cross
+manual_time: 30
+bu: Credit_Services 
+notification:
+  onfailure:
+    email:
+      recipients: srecscross@br.experian.com
+      subject: 'JoaquinX falha na automação - aws-stack-documentdb '
+  onsuccess:
+    email: 
+      recipients: srecscross@br.experian.com
+      subject: 'JoaquinX sucesso na automação - aws-stack-documentdb '
+  disable_in_qa: true
+
+global:
+  aws_account_id:
+    type: text 
+    pattern: ^(\d{1,12}|\d{1,12})$
+    description : Qual o ID da conta AWS?
+    required: true
+    answer: null
+    validationEndpoint: '/catalog-jenkins/v1/validate/aws_account'
+  aws_region:
+    type: options
+    options: sa-east-1;us-east-1
+    description: Região onde o serviço está implantado
+    required: true
+    answer: null
+  bu:
+    type: options 
+    options: Decision_Analytics;Marketing_Services;EITS_Enterprise;Credit_Services;Experian_Consumer_Services;Automotive_Services;DataLab
+    description: Defina a unidade de negócio
+    required: true
+    answer: null
+  env:
+    type: options
+    options: dev;uat;sandbox;prod
+    description: Environment
+    required: true
+    answer: null
+  project:
+    type: text
+    pattern: ^[0-9a-zA-Z]{1,20}$
+    description: Nome do projeto
+    required: true
+    answer: null
+  cluster_name:
+    type: text 
+    description : Defina o nome do cluster
+    required: true
+    answer: null
+  engine_version:
+    type: options 
+    options: 5.0.0;4.0.0;3.6.0
+    description: Versão da Engine, padrão é 5.0.0
+    required: true
+    answer: null
+  instance_class:
+    type: options 
+    options: db.t4g.medium;db.r6g.large;db.r6g.xlarge;db.r6g.2xlarge;db.r6g.4xlarge;db.r6g.8xlarge
+    description: Tamanho da classe da instancia
+    required: true
+    answer: null
+  cluster_size:
+    type: options 
+    options: 1;2;3
+    description : Quantidade de instancias do cluster
+    required: true
+    answer: null
+  TFSTATENAME:
+    type: text
+    pattern: ^[0-9a-z\_-]{1,50}$
+    description: Nome do TFState que será usado para criar / atualizar seus recursos.
+    required: true
+    answer: null
+  CostString:
+    type: text 
+    pattern: ^\d{4}\.[a-zA-Z]{2}\.\d{3}\.\d{6}$
+    description: Informe o seu centro de custo. Caso nao o possua, entre em contato com seu gestor.
+    required: true
+    answer: null
+  AppID:
+    type: text 
+    pattern: ^\d{1,5}$
+    description: Informe o gearr ID ao qual pertencerá esse recurso
+    required: true
+    answer: null
+  category_new:
+    type: options 
+    options: Dados_produtivos;Homologacao;Desenvolvimento;Desenvolvimento_modelos;Sandbox;Embarcado;Logs;Cache;Metadados_tecnicos_operacionais;Backup
+    description: Defina a categoria do novo ativo de dados.
+    required: true
+    answer: null
+  data_type:
+    type: options 
+    options: PF;PJ;PF/PJ;N/A
+    description: Informe o tipo de dado a ser armazenado. Responda apenas caso tenha inserido DADOS PRODUTIVOS na questão anterior. Caso contrário selecione N/A.
+    required: true
+    answer: null
+  category_data:
+    type: text
+    pattern: ^(cadastral|comportamental|negativo|positivo|transacional|financeiro|NA)(?:(?:_(cadastral|comportamental|negativo|positivo|transacional|financeiro|NA))*|(?:(cadastral|comportamental|negativo|positivo|transacional|financeiro|NA))+)$
+    description: Informe as categorias dos dados no banco, separados por underscore. Use uma ou mais das opcoes a seguir cadastral_comportamental_negativo_positivo_transacional_financeiro_NA.
+    required: true
+    answer: null
+before_plan:
+  - replace providers.tf,data.tf,main.tf.j2,vars.tf.j2,playbook-01.yml
+plan:
+  - ./helpers/venv.sh 3.10
+  - infra vars 
+  - infra upt

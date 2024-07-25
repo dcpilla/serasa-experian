@@ -1,0 +1,14 @@
+output {
+    if [@metadata][kafka][topic]== "{{ kafka_topic }}" {
+       s3 {
+          region => "sa-east-1"
+          bucket => "observability-{{ env }}-{{ kafka_topic|lower }}"
+          prefix => "logs/%{+YYYY}/%{+MM}/%{+dd}"
+          validate_credentials_on_root_bucket => false
+          size_file => 2048
+          time_file => 5
+          codec => "json"
+          canned_acl => "private"
+       }
+    }
+}

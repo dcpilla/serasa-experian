@@ -1,0 +1,7 @@
+---
+#
+app_name: "@@APP_NAME@@"
+instance_count: "@@INSTANCE_COUNT@@"
+ebs_volume_size: "@@EBS_VOLUME_SIZE@@"
+instance_type: "@@INSTANCE_TYPE@@"
+security_group: "@@SECURITY_GROUP@@"

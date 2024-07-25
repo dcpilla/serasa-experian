@@ -1,0 +1,33 @@
+bu: "@@BU@@"
+country: "@@COUNTRY@@"
+
+cloud_region:
+   sa-east-1: SA1
+   us-east-1: EA1
+   us-east-2: EA2
+   us-west-1: WA1
+   us-west-2: WA2
+   ap-south-1: S1
+   ap-southeast-1: SE1
+   ap-southeast-2: SE2
+   ca-central-1: CE1
+   cn-north-1: N1
+   cn-northwest-1: NW1
+
+acc_env:
+   snd: S
+   prod: P
+   prd: P
+   uat: U
+   dev: D
+   test: T
+   dr: X
+   demo: M
+
+bu_name:
+   Decision_Analytics: DA
+   Marketing_Services: MS
+   EITS_Enterprise: ES
+   Credit_Services: CS
+   Experian_Consumer_Services: EC
+   Automotive_Services: AS

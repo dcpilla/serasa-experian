@@ -1,0 +1,3 @@
+- name: Define Hostname
+  hostname: 
+    name: "{{ hostname }}"

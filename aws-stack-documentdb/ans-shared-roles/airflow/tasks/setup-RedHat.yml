@@ -1,0 +1,148 @@
+- name: Install Python3 and pip dependencies
+  yum:
+    name: "{{ item }}"
+    state: present
+    enablerepo: rhel-server-rhui-rhscl-7-rpms
+  loop:
+    - rh-python38-python.x86_64
+    - rh-python38-python-pip
+    - rh-python38-python-devel.x86_64
+    - postgresql-devel
+    - gcc
+    - gcc-c++
+    - cyrus-sasl-devel
+    - libffi-devel
+    - openldap-devel
+
+- name: Add extras repository
+  yum_repository:
+    name: extras
+    description: CentOS 7 Extras
+    baseurl: http://mirror.centos.org/centos/7/extras/x86_64/
+    gpgcheck: no
+
+- name: Install libev-libevent-devel and pip dependencies from EXTRAS Repository
+  yum:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - libev-libevent-devel
+
+- name: Copy python env
+  template:
+    src: "python-redhat.sh.j2"
+    dest: "/etc/profile.d/python.sh"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install cassandra and cryptogragy pip packages
+  pip:
+    executable: /opt/rh/rh-python38/root/usr/bin/pip3
+    name: "{{ item }}"
+    state: present
+    umask: "0022"
+    extra_args: --index-url=https://pypi.datalabserasaexperian.com.br/repository/pypi-all/simple
+  loop:
+    - cassandra-driver
+    - cryptography
+    - crypto
+    - psycopg2
+    - python-ldap
+
+- name: Copy constraints
+  template:
+    src: "constraints-{{ airflow_version }}.txt"
+    dest: "{{ airflow_home_dir }}/constraints.txt"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install Airflow
+  pip:
+    executable: /opt/rh/rh-python38/root/usr/bin/pip3
+    name: "apache-airflow[{{ airflow_packages | join(',') }}]"
+    version: "{{ airflow_version }}"
+    state: present
+    umask: "0022"
+    extra_args: --constraint /opt/airflow/constraints.txt --index-url=https://pypi.datalabserasaexperian.com.br/repository/pypi-all/simple
+
+- name: Copy airflow.cfg
+  template:
+    src: "airflow.cfg.j2"
+    dest: "{{ airflow_home_dir }}/airflow.cfg"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - Restart airflow-webserver
+    - Restart airflow-scheduler
+
+- name: Changing perm of "dest=/opt/rh/rh-python38/root/usr/local/bin/airflow", adding "+x"
+  file: dest=/opt/rh/rh-python38/root/usr/local/bin/airflow mode=a+x
+
+- name: Init/Upgrade db
+  shell: source /opt/rh/rh-python38/enable; export AIRFLOW_HOME={{ airflow_home_dir }} && umask 0022 && /opt/rh/rh-python38/root/usr/local/bin/airflow db init
+  args:
+    chdir: "{{ airflow_home_dir }}"
+    executable: "/bin/bash"
+  environment:
+    AIRFLOW__CORE__EXECUTOR: "LocalExecutor"
+    SQLALCHEMY_DATABASE_URI: "postgresql+psycopg2://{{ airflow_db_user }}:{{ airflow_db_pass }}@{{ airflow_db_url }}:{{ airflow_db_port }}/{{ airflow_db_database }}"
+  become: yes
+  become_user: root
+
+- name: Copy airflow-webserver.service
+  template:
+    src: "airflow-webserver-redhat.service.j2"
+    dest: "/etc/systemd/system/airflow-webserver.service"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - Restart airflow-webserver
+
+- name: Copy airflow-scheduler.service
+  template:
+    src: "airflow-scheduler-redhat.service.j2"
+    dest: "/etc/systemd/system/airflow-scheduler.service"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - Restart airflow-scheduler
+
+- import_tasks: rest_api_plugin.yaml
+  when: airflow_rest_api_plugin_install == true
+
+- name: Enable and start airflow-scheduler
+  service:
+    name: airflow-scheduler.service
+    enabled: yes
+    state: started
+
+- name: Enable and start airflow-webserver
+  service:
+    name: airflow-webserver.service
+    enabled: yes
+    state: started
+- name: create logrotate airflow configuration file
+  become: true
+  template:
+    src: 'etc/logrotate.d/application.j2'
+    dest: '/etc/logrotate.d/{{ item.name }}'
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - '{{ logrotate_applications }}'
+  tags:
+    - configuration
+
+- name: Create the logscript.sh
+  template:
+    src: "logscript.sh.j2"
+    dest: "/opt/airflow/logscript.sh"
+    owner: root
+    group: root
+    mode: 0755

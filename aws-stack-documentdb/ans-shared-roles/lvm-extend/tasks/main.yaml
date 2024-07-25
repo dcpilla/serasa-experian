@@ -1,0 +1,16 @@
+---
+
+- name: Install LVM tools
+  package:
+    name: "{{ lvm_extend_pkg }}"
+- name: Create or resize a volume group rootvg.
+  lvg:
+    vg: "{{ vg_name }}"
+    pvs: "/dev/nvme0n1p3,/dev/{{ pv_disk }}"
+- name: Extend the logical volume to take all remaining space of the PVs and resize the underlying filesystem
+  lvol:
+    vg: "{{ vg_name }}"
+    lv: "{{ lv_name }}"
+    pvs: "/dev/nvme0n1p3, /dev/{{ pv_disk }}"
+    size: 100%FREE
+    resizefs: true

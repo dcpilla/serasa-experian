@@ -1,0 +1,19 @@
+---
+nginx_packages:
+  - perl
+  - gcc
+  - autoconf
+  - automake
+  - make
+  - gcc-c++
+  - libxml2-devel
+  - libcap-devel
+  - libtool
+  - libtool-ltdl-devel
+  - openssl
+  - openssl-devel
+  - openldap-devel
+  - python3-devel
+  - python3-pip
+
+nginx_packages_state: present

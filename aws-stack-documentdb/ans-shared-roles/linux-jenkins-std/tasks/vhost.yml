@@ -1,0 +1,14 @@
+---
+- name: Setting jenkins Vhost
+  template: >
+    src=rproxy.conf.j2
+    dest="/etc/nginx/conf.d/{{ app_host_vhost }}.conf"
+    owner=nginx
+    group=nginx
+    mode=0755
+
+- name: Nginx Ensure nginx has selected state and enabled on boot.
+  service:
+    name: nginx
+    state: started
+    enabled: true

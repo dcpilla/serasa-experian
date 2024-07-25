@@ -1,0 +1,25 @@
+#create Indice Snapshot
+- name: Create curator indice snapshot configuration files.
+  template:
+    src: "create-snapshot.yaml.j2"
+    dest: "/etc/curator/create-snapshot-{{ kafka_topic }}.yaml"
+    owner: root
+    group: root
+    mode: 0644
+  become: yes
+  when: not full_snapshot
+  
+- name: Create snapshot indice repository configuration files.
+  template:
+    src: "es-cluster-snapshot-registry-repository.py.j2"
+    dest: "/etc/curator/es-cluster-snapshot-{{ kafka_topic }}-registry-repository.py"
+    owner: root
+    group: root
+    mode: 0644
+  become: yes
+  when: not full_snapshot
+
+- name: Register Snapshot Repository
+  command: /usr/bin/python3.6 /etc/curator/es-cluster-snapshot-{{ kafka_topic }}-registry-repository.py
+  when: not full_snapshot
+  become: yes

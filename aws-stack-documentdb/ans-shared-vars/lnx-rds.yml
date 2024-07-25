@@ -1,0 +1,15 @@
+engine: @@ENGINE@@
+cluster_size: @@CLUSTER_SIZE@@
+admin_user: @@ADMIN_USER@@
+admin_password: @@ADMIN_PASSWORD@@
+db_name: @@DB_NAME@@
+cluster_name: @@CLUSTER_NAME@@
+db_instance: @@DB_INSTANCE_TYPE@@
+
+cluster_family:
+  aurora-postgresql: aurora-postgresql13
+  aurora-mysql: aurora-mysql5.7
+
+db_port:
+  aurora-postgresql: 5432
+  aurora-mysql: 3306

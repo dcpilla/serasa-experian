@@ -1,0 +1,16 @@
+docker_compose_version: 1.8.0
+docker_compose_sha256sum: ebc6ab9ed9c971af7efec074cff7752593559496d0d5f7afb6bfd0e0310961ff
+docker_compose_cache_valid_time: 84600
+docker_storage_persistent: /example/example
+path_fylesystem: /opt/docker/volume
+app_name: docker
+hostname: "{{ prefix_stack_hostname }}{{ app_name }}{{ prefix_stack_name }}{{(groups.docker.index(inventory_hostname) + 1)}}"
+
+lvm_volumes:
+    - vg_name: vgapp
+      lv_name: app01
+      disk: nvme1n1
+      filesystem: xfs
+      mount: /opt/docker/volume
+##Identity_ssh
+ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible

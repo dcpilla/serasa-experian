@@ -1,0 +1,3 @@
+##Variaveis de Serviços que usam proxy ( ec2)
+ssh_username: @@SSH_USERNAME@@
+ssh_username_key: "@@SSH_USERNAME_KEY@@"

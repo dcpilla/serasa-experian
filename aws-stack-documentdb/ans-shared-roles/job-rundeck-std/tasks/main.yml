@@ -1,0 +1,29 @@
+---
+
+#Role for Rundeck snd
+- name: create job on rundeck snd
+  uri:
+    url: https://{{ rundeck_snd }}/api/35/project/observability/jobs/import
+    method: POST
+    body: "{{ lookup('file','job-snd.yml') }}"
+    body_format: json
+    headers:
+      Content-Type: "application/yaml"
+      X-Rundeck-Auth-Token: "{{ token_rundeck_snd }}"
+      Accept: application/json
+    status_code: 200
+  when: rundeck_env == 'snd'
+
+#Role for Rundeck prd
+- name: create job on rundeck prd
+  uri:
+    url: https://{{ rundeck_prd }}/api/35/project/observability/jobs/import
+    method: POST
+    body: "{{ lookup('file','job-prd.yml') }}"
+    body_format: json
+    headers:
+      Content-Type: "application/yaml"
+      X-Rundeck-Auth-Token: "{{ token_rundeck_prd }}"
+      Accept: application/json
+    status_code: 200
+  when: rundeck_env == 'prd' 

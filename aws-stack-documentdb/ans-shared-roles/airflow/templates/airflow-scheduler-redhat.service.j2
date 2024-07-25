@@ -1,0 +1,16 @@
+[Unit]
+Description=Airflow scheduler daemon
+After=network.target postgresql.service
+
+[Service]
+Environment="AIRFLOW_HOME={{ airflow_home_dir }}"
+Environment="PATH=$PATH:$HOME:/opt/rh/rh-python38/root/usr/local/bin/"
+User=root
+Group=root
+Type=simple
+ExecStart=/opt/rh/rh-python38/root/usr/local/bin/airflow scheduler
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

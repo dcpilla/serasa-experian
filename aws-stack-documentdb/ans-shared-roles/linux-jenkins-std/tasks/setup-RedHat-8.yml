@@ -1,0 +1,132 @@
+---
+- name: Change Proxy in /etc/yum.conf
+  lineinfile:
+    path: /etc/yum.conf
+    regexp: '^proxy='
+    line: proxy={{ proxy_address }}
+  become: yes
+  
+- name: purge old docker packages
+  yum:
+    name:
+      - docker
+      - docker-client
+      - docker-client-latest
+      - docker-common
+      - docker-latest
+      - docker-latest-logrotate
+      - docker-logrotate
+      - docker-engine
+    state: absent
+    lock_timeout: 900
+
+- name: Epel rpm Repository
+  copy:
+    src: rpm/8/epel-release-latest-8.noarch.rpm
+    dest: /tmp/
+    owner: root
+    group: root
+    mode: '0777'
+
+- name: Install Epel Repository
+  command: dnf install /tmp/epel-release-latest-8.noarch.rpm -y
+
+- name: add docker-ce repository (RHEL8)
+  yum_repository:
+    name: docker-ce
+    description: Docker Repository
+    baseurl: https://download.docker.com/linux/centos/8/$basearch/stable
+    gpgkey: https://download.docker.com/linux/centos/gpg
+    gpgcheck: yes
+    file: docker
+
+- name: Ansible Create Yum extras Repo File for RHEL 8
+  copy:
+    dest: "/etc/yum.repos.d/extras.repo"
+    content: |
+      [extras]
+      name=CentOS-$releasever - Extras
+      baseurl=http://mirror.centos.org/centos/8/extras/$basearch/os/
+      gpgcheck=0    
+
+- name: Ensure RHEL8 Packages Installed.
+  package:
+    name: "{{ yum_rhel8_packages }}"
+    state: present
+    lock_timeout: 900
+    enablerepo: "epel"
+
+- name: upgrade pip
+  command: pip-3 install --upgrade --force-reinstall pip --proxy {{ proxy_address }}
+
+- name: Install docker-compose
+  command: pip-3 install docker-compose pyyaml ipaddress awscli botocore s3transfer boto3 --force-reinstall --ignore-installed ipaddress --proxy {{ proxy_address }}
+
+## Docker Configuration
+- name: create docker config dir
+  file:
+    path: /etc/docker
+    state: directory
+
+- name: create docker daemon systemd directory
+  file:
+    path: /etc/systemd/system/docker.service.d
+    state: directory
+- name: Ansible create file with content example
+  copy:
+    dest: "/etc/systemd/system/docker.service.d/http-proxy.conf"
+    content: |
+      [Service]
+      Environment="HTTP_PROXY={{ proxy_address }}"
+      Environment="HTTPS_PROXY={{ proxy_address }}"
+      Environment="NO_PROXY={{ docker_no_proxy }}"
+
+- name: configure daemon.json
+  blockinfile:
+    path: /etc/docker/daemon.json
+    create: yes
+    block: |
+      {
+      }
+- name: remove comments from file /etc/docker/daemon.json
+  command: sed -i '/^[ \t]*#/d' /etc/docker/daemon.json
+  become: yes
+### End Docker Configation
+
+
+- name: Ensure Jenkins repo is installed.
+  get_url:
+    url: "{{ jenkins_repo_url }}"
+    dest: /etc/yum.repos.d/jenkins.repo
+  when: jenkins_repo_url | default(false)
+
+- name: Add Jenkins repo GPG key.
+  rpm_key:
+    state: present
+    key: "{{ jenkins_repo_key_url }}"
+  when: jenkins_repo_url | default(false)
+
+- name: Download specific Jenkins version.
+  get_url:
+    url: "{{ jenkins_pkg_url }}/jenkins-{{ jenkins_version }}-1.1.noarch.rpm"
+    dest: "/tmp/jenkins-{{ jenkins_version }}-1.1.noarch.rpm"
+  when: jenkins_version is defined
+
+- name: Check if we downloaded a specific version of Jenkins.
+  stat:
+    path: "/tmp/jenkins-{{ jenkins_version }}-1.1.noarch.rpm"
+  register: specific_version
+  when: jenkins_version is defined
+
+- name: Install our specific version of Jenkins.
+  package:
+    name: "/tmp/jenkins-{{ jenkins_version }}-1.1.noarch.rpm"
+    state: present
+  when: jenkins_version is defined and specific_version.stat.exists
+  notify: configure default users
+
+- name: Ensure Jenkins is installed.
+  package:
+    name: jenkins
+    state: "{{ jenkins_package_state }}"
+  notify: configure default users

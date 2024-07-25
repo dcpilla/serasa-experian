@@ -1,0 +1,79 @@
+- name: Ansible create serasa kubespray inventory file
+  file:
+    path: "{{ kubespray_inventory_file }}"
+    state: touch
+
+- name: add tag ALL
+  lineinfile:
+    path: "{{ kubespray_inventory_file }}"
+    line: "[all]"
+
+- name: add Server to tag ALL
+  lineinfile:
+    path: "{{ kubespray_inventory_file }}"
+    line: "{{ hostvars[item]['ansible_hostname'] }} ansible_host={{ hostvars[item]['ansible_all_ipv4_addresses'][0] }} ansible_user=ansible"
+  with_items:
+    - "{{ groups['k8s'] }}"
+
+- name: add tag kube-master
+  lineinfile:
+    path: "{{ kubespray_inventory_file }}"
+    line: "[kube-master]"
+
+- name: add Server to tag KUBE-MASTER
+  lineinfile:
+    path: "{{ kubespray_inventory_file }}"
+    line: "{{ hostvars[item]['ansible_hostname'] }}"
+  with_items:
+    - "{{ groups['k8s'] }}"
+
+- name: add tag ETCD
+  lineinfile:
+    path: "{{ kubespray_inventory_file }}"
+    line: "[etcd]"
+
+- name: add Server to tag ETCD
+  lineinfile:
+    path: "{{ kubespray_inventory_file }}"
+    line: "rline{{ hostvars[item]['ansible_hostname'] }}"
+    state: present  
+  with_items:
+    - "{{ groups['k8s'] }}"
+
+- name: add tag kube-node
+  lineinfile:
+    path: "{{ kubespray_inventory_file }}"
+    line: "[kube-node]"
+
+- name: add Server to tag KUBE-NODE
+  lineinfile:
+    path: "{{ kubespray_inventory_file }}"
+    line: "rmline{{ hostvars[item]['ansible_hostname'] }}"
+    state: present  
+  with_items:
+    - "{{ groups['k8s'] }}"
+
+- name: add tag k8s-cluster:children
+  lineinfile:
+    path: "{{ kubespray_inventory_file }}"
+    line: "[k8s-cluster:children]"
+
+- name: add  kube-master tag k8s-cluster:children
+  lineinfile:
+    path: "{{ kubespray_inventory_file }}"
+    line: "kube-master"
+- name: add  kube-node tag k8s-cluster:children
+  lineinfile:
+    path: "{{ kubespray_inventory_file }}"
+    line: "kube-node"
+
+- name: Replace Word
+  replace:
+    path: "{{ kubespray_inventory_file }}"
+    regexp: "rmline"
+    replace: ""
+- name: Replace Word
+  replace:
+    path: "{{ kubespray_inventory_file }}"
+    regexp: "rline"
+    replace: ""

@@ -1,0 +1,19 @@
+#Localhost
+proxy_ip_address: "10.96.215.26"
+
+yum_proxy_address: "{{ proxy_ip_address }}"
+proxy_port_address: 3128
+#Não Alterar
+proxy_env:
+  http_proxy: "http://{{ yum_proxy_address }}:{{ proxy_port_address }}"
+  https_proxy: "http://{{ yum_proxy_address }}:{{ proxy_port_address }}"
+  ftp_proxy: "http://{{ yum_proxy_address }}:{{ proxy_port_address }}"
+  no_proxy: "localhost,127.0.0.1,10.0.0.0/8,*serasa.intranet,*experian.local,bitbucketglobal.experian.local"
+proxy_address: "http://{{ yum_proxy_address }}:{{ proxy_port_address }}"
+docker_proxy_address: "{{ yum_proxy_address }}:{{ proxy_port_address }}"
+docker_no_proxy: "localhost,127.0.0.1,10.0.0.0/8,*serasa.intranet,*experian.local,bitbucketglobal.experian.local"
+no_proxy: "localhost,127.0.0.1,10.0.0.0/8,*serasa.intranet,*experian.local,bitbucketglobal.experian.local"
+http_proxy: "http://{{ yum_proxy_address }}:{{ proxy_port_address }}"
+https_proxy: "http://{{ yum_proxy_address }}:{{ proxy_port_address }}"
+ftp_proxy: "http://{{ yum_proxy_address }}:{{ proxy_port_address }}"
+no_proxy: "localhost,127.0.0.1,10.0.0.0/8,*serasa.intranet,*experian.local,bitbucketglobal.experian.local"

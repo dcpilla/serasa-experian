@@ -1,0 +1,81 @@
+---
+
+- name: Enable Main EPEL repo.
+  ini_file:
+    path: "/etc/yum.repos.d/epel.repo"
+    section: epel
+    option: enabled
+    value: 1
+    mode: 0644
+
+- name: Establish some role-related facts
+  set_fact:
+    mongodb_major_version: "{{ mongodb_version[0:3] }}"
+
+- name: Download Mongodb
+  get_url:
+    url: https://repo.mongodb.org/yum/redhat/7/mongodb-org/4.2/x86_64/RPMS/mongodb-org-server-4.2.8-1.el7.x86_64.rpm
+    dest: /tmp/mongodb-org-server-4.2.8-1.el7.x86_64.rpm
+    use_proxy: yes
+  #when: ansible_pkg_mgr in ['yum', 'dnf']
+
+- name: Install Mongodb
+  yum:
+    name: /tmp/mongodb-org-server-4.2.8-1.el7.x86_64.rpm
+    state: present
+  register: _install_packages
+  until: _install_packages is succeeded
+  retries: 5
+  delay: 2
+  #notify: restart grafana
+
+- name: Download Mongo Shell
+  get_url:
+    url: https://repo.mongodb.org/yum/redhat/7/mongodb-org/4.2/x86_64/RPMS/mongodb-org-shell-4.2.8-1.el7.x86_64.rpm
+    dest: /tmp/mongodb-org-shell-4.2.8-1.el7.x86_64.rpm
+    use_proxy: yes
+  #when: ansible_pkg_mgr in ['yum', 'dnf']
+
+- name: Install Mongo Shell
+  yum:
+    name: /tmp/mongodb-org-shell-4.2.8-1.el7.x86_64.rpm
+    state: present
+  register: _install_packages
+  until: _install_packages is succeeded
+  retries: 5
+  delay: 2
+  
+- name: Install numactl package
+  yum:
+    name: 
+      - numactl
+      - "@development"
+    state: present
+    lock_timeout: "{{ yum_lock_timeout }}"
+  when: mongodb_use_numa | bool
+
+- name: Install PyMongo package
+  yum:
+    name: python-pymongo
+    state: present
+    lock_timeout: "{{ yum_lock_timeout }}"
+  when: not mongodb_pymongo_from_pip
+
+- name: Install PIP
+  yum:
+    name:
+      - python34-devel.x86_64
+      - python34-pip.noarch
+    lock_timeout: "{{ yum_lock_timeout }}"
+  when: mongodb_pymongo_from_pip | bool
+
+- name: Install PyMongo from PIP
+  pip:
+    name: pymongo
+    state: "{{ mongodb_pymongo_pip_version is defined | ternary('present', 'latest') }}"
+    version: "{{ mongodb_pymongo_pip_version | default(omit) }}"
+  #when: mongodb_pymongo_from_pip | bool
+
+- name: Install PyMongo from PIP
+  command: pip3.4 install --upgrade --force-reinstall pymongo --proxy {{ proxy_address }}
+  

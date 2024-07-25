@@ -1,0 +1,3 @@
+---
+# defaults file for proxy
+proxy_address: "{{ ldap_proxy_user }}:{{ ldap_proxy_pass }}@10.96.215.26"

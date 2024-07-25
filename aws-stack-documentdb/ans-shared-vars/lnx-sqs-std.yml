@@ -1,0 +1,6 @@
+---
+# QUEUE name has a limit of 80 chars at AWS
+app_name: "@@APP_NAME@@"
+queue_name: "{{ app_name }}-@@QUEUE_NAME@@-{{ env }}-sqs-queue"
+queue_region: "@@REGION@@"
+message_retention_seconds: "@@MESSAGE_RETENTION@@"

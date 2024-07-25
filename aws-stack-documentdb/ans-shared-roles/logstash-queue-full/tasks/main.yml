@@ -1,0 +1,25 @@
+---
+- name: Create Logstash kafka configuration files.
+  template:
+    src: "kafka.conf.j2"
+    dest: "/etc/logstash/conf.d/kafka.conf"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Create Logstash elasticsearh index configuration files.
+  template:
+    src: "elasticsearch-topic.conf.j2"
+    dest: "/etc/logstash/conf.d/elasticsearch-topic-{{ kafka_topic }}.conf"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Create Logstash elasticsearh index configuration files.
+  template:
+    src: "elasticsearch-metric.conf.j2"
+    dest: "/etc/logstash/conf.d/elasticsearch-metric-{{ kafka_metric }}.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart logstash

@@ -1,0 +1,117 @@
+- name: Ensure configuration directory exists.
+  file:
+    path: /etc/curator
+    state: directory
+    mode: 0755
+  when: full_snapshot
+
+- name: Ansible Create Yum extras Repo File for RHEL 7
+  copy:
+    dest: "/etc/yum.repos.d/extras.repo"
+    content: |
+      [extras]
+      name=CentOS-$releasever - Extras
+      baseurl=http://mirror.centos.org/centos/7/extras/x86_64/
+      gpgcheck=0    
+  when: full_snapshot
+
+- name: Ensure RHEL7 epel repo Installed.
+  package: 
+    name: epel-release
+    state: present
+  when: full_snapshot
+
+- name: Enable repo rhel-7-server-rhui-optional-rpms
+  shell: yum-config-manager --enable rhel-7-server-rhui-optional-rpms
+  when: full_snapshot
+
+- name: Enable Repo rhel-7-server-rhui-extras-rpms
+  shell: yum-config-manager --enable rhel-7-server-rhui-extras-rpms
+  when: full_snapshot
+
+- name: Ensure RHEL7 Packages Installed.
+  yum:
+    name: "{{ yum_escurator_rhel7_packages }}"
+    state: present
+    lock_timeout: 900
+    enablerepo: "epel"
+  when: full_snapshot
+
+- name: upgrade pip
+  command: pip-3 install --upgrade --force-reinstall pip --proxy {{ proxy_address }}
+  when: full_snapshot
+
+- name: pip Install add-ons for elasticsearcch curator
+  command: pip-3 install pyyaml ipaddress requests awscli requests-aws4auth argparse botocore s3transfer boto3 HTMLParser elasticsearch-curator==5.4.1 --force-reinstall --ignore-installed ipaddress --proxy {{ proxy_address }}
+  when: full_snapshot
+
+#Create aws credentials File
+- name: Ensure configuration directory exists.
+  file:
+    path: /root/.aws
+    state: directory
+    mode: 0700
+  when: full_snapshot
+
+- name: Create Curator configuration files.
+  template:
+    src: "credentials.j2"
+    dest: "/root/.aws/credentials"
+    owner: root
+    group: root
+    mode: 0600
+  when: full_snapshot
+
+- name: Ensure configuration directory exists.
+  file:
+    path: /etc/curator
+    state: directory
+    mode: 0755
+  when: full_snapshot
+
+#Create Curator File
+- name: Create Curator configuration files.
+  template:
+    src: "config.yaml.j2"
+    dest: "/etc/curator/config.yaml"
+    owner: root
+    group: root
+    mode: 0644
+  when: full_snapshot
+
+#Create Snapshot all
+- name: Create curator snapshot-all configuration files.
+  template:
+    src: "create-snapshot-all.yaml.j2"
+    dest: "/etc/curator/snapshot-all.yaml"
+    owner: root
+    group: root
+    mode: 0644
+  when: full_snapshot
+
+- name: Create snapshot-all repository configuration files.
+  template:
+    src: "es-cluster-snapshot-all-registry-repository.py.j2"
+    dest: "/etc/curator/es-cluster-snapshot-all-registry-repository.py"
+    owner: root
+    group: root
+    mode: 0644
+  become: yes
+  when: full_snapshot
+
+- name: Create Snapshot Repository
+  command: /usr/bin/python3.6 /etc/curator/es-cluster-snapshot-all-registry-repository.py
+  when: full_snapshot
+  become: yes
+
+- name: Create Cron Entry snapshot-all
+  cron:
+    name: Create Snapshot snapshot-all
+    minute: 10
+    hour: 00
+    user: root
+    job: "/usr/local/bin/curator --config /etc/curator/config.yaml /etc/curator/snapshot-all.yaml"
+    cron_file: curator-snapshot-all
+    state: present
+  when: full_snapshot
+  become: yes

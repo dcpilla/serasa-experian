@@ -1,0 +1,2 @@
+---
+kubespray_inventory_file: "{{ lookup('env', 'PWD') }}/ans-shared-roles/kubespray/inventory/serasa/hosts.yml"

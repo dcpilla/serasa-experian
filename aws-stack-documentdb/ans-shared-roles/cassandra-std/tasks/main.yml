@@ -1,0 +1,113 @@
+---
+# tasks file for cassandra
+- fail:
+    msg: 'Please define the desired name of the Cassandra cluster'
+  when: cassandra_cluster_name == ""
+
+- fail:
+    msg: 'Please define the seeds of the Cassandra cluster'
+  when: cassandra_seeds | length == 0  
+
+- name: Add cassandra repo
+  yum_repository:
+    name: "cassandra"
+    baseurl: "https://www.apache.org/dist/cassandra/redhat/311x/"
+    description: "Apache Cassandra"
+    enabled: true
+    gpgcheck: true
+    gpgkey: "https://www.apache.org/dist/cassandra/KEYS"
+    repo_gpgcheck: true
+    group: "root"
+    mode: 0644
+    owner: "root"
+    priority: "8"
+    state: present    
+
+- name: Set systcl parameters 
+  sysctl:
+    name: "{{ item.parameter }}"
+    value: "{{ item.value }}"
+    sysctl_set: true
+  loop:
+    - {parameter: net.core.rmem_max, value: 16777216}
+    - {parameter: net.core.wmem_max, value: 16777216}
+    - {parameter: net.core.rmem_default, value: 16777216}
+    - {parameter: net.core.wmem_default, value: 16777216}
+    - {parameter: net.core.optmem_max, value: 40960}
+    - {parameter: net.ipv4.tcp_rmem, value: '4096 65536 16777216'}
+    - {parameter: net.ipv4.tcp_wmem, value: '4096 87380 16777216'}
+    - {parameter: net.ipv4.tcp_keepalive_time, value: 60}
+    - {parameter: net.ipv4.tcp_keepalive_probes, value: 3}
+    - {parameter: net.ipv4.tcp_keepalive_intvl, value: 10}
+    - {parameter: vm.max_map_count, value: 1048575}
+
+- name: Install Cassandra and dependencies
+  yum:
+    name: "{{ item }}"
+    state: latest
+  loop:
+    - "java-1.8.0-openjdk"
+    - "python2"
+    - "cassandra"
+  
+- name: Setting JAVA_HOME
+  shell: export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.262.b10-0.el7_8.x86_64
+
+- name: Setting Path JAVA_HOME
+  shell: export PATH=$PATH:$JAVA_HOME/bin
+
+- name: Create data directories
+  file:
+    path: "{{ cassandra_data_base_directory }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+    recurse: true
+
+- name: Create data directories
+  file:
+    path: "{{ cassandra_data_base_directory }}{{ item }}"
+    state: directory
+    owner: cassandra
+    group: cassandra
+    mode: 0755
+    recurse: true    
+  loop: "{{ cassandra_data_file_directories + [cassandra_saved_caches_directory, cassandra_hints_directory_directory] }}"
+    
+- name: Create commitlog directory
+  file:
+    path: "{{ cassandra_commitlog_directory }}"
+    state: directory
+    owner: cassandra
+    group: cassandra
+    mode: 0755
+    recurse: true
+
+- name: Copy cassandra.yaml
+  template:
+    src: "cassandra.yaml.j2"
+    dest: "{{ cassandra_config_dir_base }}/cassandra.yaml"
+  notify:
+    - Restart cassandra
+
+- name: Copy jvm.options
+  template:
+    src: "jvm.options.j2"
+    dest: "{{ cassandra_config_dir_base }}/jvm.options"
+  notify:
+    - Restart cassandra
+
+- name: Copy cassandra-env.sh
+  template:
+    src: "cassandra-env.sh.j2"
+    dest: "{{ cassandra_config_dir_base }}/cassandra-env.sh"
+  notify:
+    - Restart cassandra
+
+- name: Enable and start cassandra
+  systemd:
+    name: cassandra.service
+    state: started
+    enabled: true
+    daemon_reload: true

@@ -1,0 +1,8 @@
+---
+app_host_name: kibana_server
+app_host_ip: nlb.xpto.aws.com
+app_host_port: 5601
+app_host_vhost: kianadev.serasa.intranet
+ldap_system_user: teste
+ldap_system_password: teste
+ldap: true
