@@ -1,0 +1,87 @@
+---
+# Documentação do Desenvolvedor JoaquinX: https://code.experian.local/projects/SCIB/repos/joaquin-x/browse/doc/user_guide_developer.md
+running_in: aws
+itil: 
+  request: false
+  changeorder: false
+definition: This launcher publishes static web applications externally through S3, CloudFront and Incapsula.
+team_owner: DeX and Engineering Team
+manual_time: 960
+notification:
+  onfailure:
+    email:
+      recipients: architecturebr@br.experian.com
+      subject: 'JoaquinX Automation Fail - aws-external-frontend'
+  disable_in_qa: true
+global:
+  aws_account_id:
+    type: text 
+    description : Qual o ID da conta AWS? (e.g. 1234567891234)
+    required: true
+    answer: null
+    validationEndpoint: '/catalog-jenkins/v1/validate/aws_account'
+  environment:
+    type: options 
+    options: sbx;uat;prod
+    description: "Defina o ambiente de execucao: Sandbox, UAT ou Produção."
+    required: true
+    answer: null
+  business_unit:
+    type: options 
+    options: Decision_Analytics;Marketing_Services;Credit_Services;Data_Strategy;Datalab;ECS;EITS;PME;Agro;Tech4Corp;Nike
+    description: Defina a unidade de negocio.
+    required: true
+    answer: null
+  app_gearr_id:
+    type: text 
+    pattern: ^[0-9]+$
+    description: Qual o Gearr ID? Exemplo, 1234
+    required: true
+    answer: null
+  app_name:
+    type: text 
+    pattern: ^[0-9a-z_\-]{3,30}$
+    description: Qual o nome da aplicacao? (e.g. experian-reports-web)
+    required: true
+    answer: null
+  app_type:
+    type: options
+    options: WEB;MFE
+    description: Informe se a aplicação será Web ou um Micro Frontend
+    required: true
+    answer: null
+  certificate_domain:
+    type: options
+    options: .serasaexperian.com.br;.serasaempreendedor.com.br;.serasa.com.br
+    description: Dominio do certificado informado
+    required: false
+    answer: null
+  certificate_arn:
+    type: text 
+    pattern: arn:[\w+=/,.@-]+:[\w+=/,.@-]+:[\w+=/,.@-]*:[0-9]+:[\w+=,.@-]+(/[\w+=,.@-]+)*
+    description: Qual o ARN do certificado do dominio a ser configurado?
+    required: true
+    answer: null
+  domain_name:
+    type: text 
+    pattern: ^[a-z\-]{0,}\..*(\.com\.br)$
+    description: Preencha quando necessário personalizar. Padrão é <app-name>-<environment>.<certificate_domain>
+    required: false
+    answer: null
+  cost_center:
+    type: text 
+    pattern: ^(1800\.BR\.)[0-9]{3}\.[0-9]{6}$
+    description: Defina o centro de custo da aplicacao. (e.g. 1800.BR.123.123456)
+    required: true
+    answer: null
+  project_name:
+    type: text 
+    pattern: ^[0-9a-zA-Z_\-]{1,}$
+    description: Qual o projeto ou business services da sua aplicação?
+    required: true
+    answer: null
+before_plan:
+  - replace variables.tf,provider.tf
+plan:
+  - terraform init
+  - terraform apply -auto-approve
