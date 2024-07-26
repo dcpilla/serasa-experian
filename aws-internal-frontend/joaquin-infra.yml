@@ -1,0 +1,87 @@
+---
+# Documentação do Desenvolvedor JoaquinX: https://code.experian.local/projects/SCIB/repos/joaquin-x/browse/doc/user_guide_developer.md
+running_in: aws
+itil:
+  request: false
+  changeorder: false
+definition: This launcher publishes static web applications internally using S3, VPC Endpoint and Route 53.
+team_owner: DeX and Engineering Team
+manual_time: 960
+notification:
+  onfailure:
+    email:
+      recipients: architecturebr@br.experian.com
+      subject: "JoaquinX Automation Fail - aws-internal-frontend"
+  disable_in_qa: true
+global:
+  aws_account_id:
+    type: text
+    description: Qual o ID da conta AWS? (e.g. 1234567891234)
+    required: true
+    answer: null
+    validationEndpoint: "/catalog-jenkins/v1/validate/aws_account"
+  aws_region:
+    type: options
+    options: sa-east-1;us-east-1
+    description: Qual a região da conta AWS? (e.g. sa-east-1)
+    required: true
+    answer: null
+  environment:
+    type: options
+    options: dev;sbx;uat;prod
+    description: "Defina o ambiente de execucao: Desenvolvimento, Sandbox, UAT ou Produção."
+    required: true
+    answer: null
+  business_unit:
+    type: options
+    options: Decision_Analytics;Marketing_Services;Credit_Services;Data_Strategy;Datalab;ECS;EITS;PME;Agro;Tech4Corp;Nike
+    description: Qual a unidade de negocio?
+    required: true
+    answer: null
+  app_gearr_id:
+    type: text
+    pattern: ^[0-9]+$
+    description: Qual o Gearr ID? (e.g. 12345)
+    required: true
+    answer: null
+  app_name:
+    type: text
+    pattern: ^[0-9a-z_\-]{3,28}$
+    description: Qual o nome da aplicacao? (e.g. experian-developer-portal)
+    required: true
+    answer: null
+  certificate_domain:
+    type: text
+    pattern: ^((?!-)[A-Za-z0-9\-]{1,63}(?<!-)\.)+[A-Za-z]{2,6}$
+    description: Qual o dominio do certificado informado? (e.g. integrationplatform-uat.br.experian.eeca)
+    required: true
+    answer: null
+  certificate_arn:
+    type: text
+    pattern: arn:[\w+=/,.@-]+:[\w+=/,.@-]+:[\w+=/,.@-]*:[0-9]+:[\w+=,.@-]+(/[\w+=,.@-]+)*
+    description: Qual o ARN do certificado do dominio a ser configurado?
+    required: true
+    answer: null
+  domain_name:
+    type: text
+    pattern: ^((?!-)[A-Za-z0-9\-]{1,63}(?<!-)\.)+[A-Za-z]{2,6}$
+    description: Preencha quando necessário personalizar. Padrão é <app-name>-<environment>.<certificate_domain>
+    required: false
+    answer: null
+  cost_center:
+    type: text
+    pattern: ^(1800\.BR\.)[0-9]{3}\.[0-9]{6}$
+    description: Defina o centro de custo da aplicacao. (e.g. 1800.BR.123.123456)
+    required: true
+    answer: null
+  project_name:
+    type: text
+    pattern: ^[0-9a-zA-Z_\-]{1,}$
+    description: Qual o projeto ou business services da sua aplicação?
+    required: true
+    answer: null
+before_plan:
+  - replace variables.tf,provider.tf
+plan:
+  - terraform init
+  - terraform apply -auto-approve
