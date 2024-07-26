@@ -1,0 +1,54 @@
+---
+# Documentação do Desenvolvedor JoaquinX: https://code.experian.local/projects/SCIB/repos/joaquin-x/browse/doc/user_guide_developer.md
+itil: 
+  request: false
+  changeorder: false
+definition: Este launch cria VPC endpoint
+team_owner: Insira o nome da tribe/squad responsável pela automação. Consulte documentação https://code.experian.local/projects/SCIB/repos/joaquin-x/browse/doc/user_guide_developer.md
+manual_time: Insira o tempo aproximado, em minutos, que esta automação levaria se fosse feita de forma manual. Consulte documentação https://code.experian.local/projects/SCIB/repos/joaquin-x/browse/doc/user_guide_developer.md
+notification:
+  onfailure:
+    email:
+      recipients: SRECSCross@br.experian.com
+      subject: 'JoaquinX falha automacao - aws-create-vpc-endpoint '
+#  onsuccess:
+#    email:
+#      recipients: SRECSCross@br.experian.com
+#      subject: 'JoaquinX sucesso automacao - aws-create-vpc-endpoint '
+#  onsuccess:
+#    teams:
+#      team_id: <INSERT YOUR TEAM ID>
+#      channel_id: <INSERT YOUR CHANNEL ID>
+#  onfailure:
+#    teams:
+#      team_id: <INSERT YOUR TEAM ID>
+#      channel_id: <INSERT YOUR CHANNEL ID>
+  disable_in_qa: true
+global:
+  var1:
+    type: text 
+    description : Defina seus parametros consulte documentação https://code.experian.local/projects/SCIB/repos/joaquin-x/browse/doc/user_guide_developer.md
+    required: true
+    answer: null
+  var2:
+    type: text 
+    description : Defina seus parametros consulte documentação https://code.experian.local/projects/SCIB/repos/joaquin-x/browse/doc/user_guide_developer.md
+    required: true
+    answer: null
+  var3:
+    type: text 
+    description : Defina seus parametros consulte documentação https://code.experian.local/projects/SCIB/repos/joaquin-x/browse/doc/user_guide_developer.md
+    required: true
+    answer: null
+  varN:
+    type: text 
+    description : Defina seus parametros consulte documentação https://code.experian.local/projects/SCIB/repos/joaquin-x/browse/doc/user_guide_developer.md
+    required: true
+    answer: null
+before_plan:
+  - replace file1, file2, file3, fileN
+plan:
+  - ./apply1.sh
+  - ./apply2.sh
+  - ./apply3.sh
+  - ./applyN.sh
