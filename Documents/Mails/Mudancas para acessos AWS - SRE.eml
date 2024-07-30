@@ -1,0 +1,1661 @@
+Received: from PH0PR13MB5364.namprd13.prod.outlook.com (2603:10b6:510:fe::8)
+ by PH7PR13MB5502.namprd13.prod.outlook.com with HTTPS; Thu, 15 Dec 2022
+ 17:59:49 +0000
+Received: from BL3PR13MB5211.namprd13.prod.outlook.com (2603:10b6:208:342::7)
+ by PH0PR13MB5364.namprd13.prod.outlook.com (2603:10b6:510:fe::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5924.12; Thu, 15 Dec
+ 2022 17:59:48 +0000
+Received: from BL3PR13MB5211.namprd13.prod.outlook.com
+ ([fe80::90cd:6c5b:5e56:ad78]) by BL3PR13MB5211.namprd13.prod.outlook.com
+ ([fe80::90cd:6c5b:5e56:ad78%8]) with mapi id 15.20.5924.012; Thu, 15 Dec 2022
+ 17:59:48 +0000
+From: "Rojas, Luis" <Luis.Rojas@experian.com>
+To: "Lemes, Dieizon" <Dieizon.Lemes@br.experian.com>, "Santana, Caleb"
+	<Caleb.Santana@br.experian.com>, "Feloni, Daniel"
+	<daniel.feloni@br.experian.com>, "Bernardes, Danilo"
+	<Danilo.Bernardes@br.experian.com>, "Correa, Gabriel"
+	<Gabriel.Correa@br.experian.com>, "Domingues, Willian"
+	<Willian.Domingues@br.experian.com>, "Falleiros, Luis"
+	<Luis.Falleiros@br.experian.com>, "BSilva, Bruno"
+	<Bruno.DaSilva@br.experian.com>, "Pilla, Deivid"
+	<Deivid.Pilla@br.experian.com>, "Rossetto, Lucas"
+	<Lucas.Rossetto@br.experian.com>, "Vitorino, Diego"
+	<Diego.Vitorino@br.experian.com>, "Matoso, Cleber"
+	<Cleber.Matoso@br.experian.com>, "Santos, Cleber Jesus"
+	<Cleber.JSantos@br.experian.com>, "Vieira, Alex"
+	<Alex.Vieira@br.experian.com>, "Simao, Sandro"
+	<Sandro.Simao@br.experian.com>, "Crispin, William"
+	<William.Crispin@br.experian.com>, "Lopes, Guilherme"
+	<Guilherme.Lopes@br.experian.com>, "Manzano, Andre"
+	<Andre.Manzano@br.experian.com>, "Marcal, Erik"
+	<Erik.Marcal@br.experian.com>, "Aloia, Joao" <Joao.Aloia@br.experian.com>,
+	"Bertochi, Luiz" <Luiz.Bertochi@br.experian.com>, "Da Silva, Barbara"
+	<Barbara.DaSilva@br.experian.com>, "Kanamaru, Bruna"
+	<Bruna.Kanamaru@br.experian.com>, "Martins2, Joao"
+	<Joao.Martins2@br.experian.com>, "Pereira, Rafael"
+	<Rafael.Pereira@br.experian.com>, "Ribeiro, Carlos"
+	<Carlos.Ribeiro@br.experian.com>, "Rodrigues, Diego"
+	<Diego.Rodrigues@br.experian.com>, "Teixeira, Gleise"
+	<Gleise.Teixeira@br.experian.com>, "Yann, Huang"
+	<Yann.Huang@br.experian.com>, "Huke, Breno" <Breno.Huke@br.experian.com>,
+	"Walcow, Nelson" <Nelson.Walcow@br.experian.com>, "Leite, Joao"
+	<Joao.Leite2@br.experian.com>, "Almeida, Estevao"
+	<Estevao.Almeida@br.experian.com>, "Daud, Gustavo"
+	<Gustavo.Daud@br.experian.com>, "Moreira, Rodrigo"
+	<Rodrigo.Moreira@br.experian.com>, "Peroto, Jose"
+	<Jose.Peroto@br.experian.com>, "Santos, Heber"
+	<Heber.Santos@br.experian.com>, "Machado, Jefferson"
+	<Jefferson.Machado@br.experian.com>, "Silva, Ailton"
+	<Ailton.Silva@br.experian.com>, "Cesar, Caio" <Caio.Cesar@br.experian.com>,
+	"Romero, Bruno" <Bruno.Romero@br.experian.com>, "Lima, Wilson"
+	<Wilson.Lima@br.experian.com>, "Silva, Gabriel Ryan Nobrega"
+	<Gabriel.RSilva@br.experian.com>, "Bahia, Alessandro"
+	<Alessandro.Bahia@br.experian.com>, "Castro, Paulo"
+	<Paulo.Castro@br.experian.com>, "Veloso, Reinaldo"
+	<Reinaldo.Veloso@br.experian.com>, "Viana, Cleyton"
+	<Cleyton.Viana@br.experian.com>, "Held, Lucas" <Lucas.Held@br.experian.com>,
+	"Sodre, Joferson" <Joferson.Sodre@br.experian.com>, "OliveiraMatos, Julio"
+	<Julio.OliveiraMatos@br.experian.com>, "Vicente, Emerson"
+	<Emerson.Vicente@br.experian.com>, "Ventrizi, Alex"
+	<Alex.Ventrizi@br.experian.com>, "Lira, Eduardo"
+	<Eduardo.Lira@br.experian.com>, "Borges, Jose" <Jose.Borges@br.experian.com>,
+	"Adametes, Henrique" <Henrique.Adametes@br.experian.com>, "Mendes, Jose"
+	<jose.mendes@br.experian.com>
+CC: "Santos, Kaue" <Kaue.Santos@br.experian.com>
+Subject: Mudancas para acessos AWS - SRE
+Thread-Topic: Mudancas para acessos AWS - SRE
+Thread-Index: AdkPN5CHCBM0txe6Sse5e2BSB9FL8A==
+Importance: high
+X-Priority: 1
+Date: Thu, 15 Dec 2022 17:59:47 +0000
+Message-ID:
+	<BL3PR13MB5211903D6960240D206B4BD4E1E19@BL3PR13MB5211.namprd13.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Exchange-Organization-AuthAs: Internal
+X-MS-Exchange-Organization-AuthMechanism: 04
+X-MS-Exchange-Organization-AuthSource: BL3PR13MB5211.namprd13.prod.outlook.com
+X-MS-Exchange-Organization-ComplianceLabelId:
+	dbcf840f-8665-4f5b-a7e0-9e2c2dc15bfb
+X-MS-Has-Attach: yes
+X-MS-Exchange-Organization-Network-Message-Id:
+	4a253083-c9ba-4b04-280b-08dadec627bb
+X-MS-Exchange-Organization-SCL: -1
+X-MS-TNEF-Correlator:
+X-MS-Exchange-Organization-RecordReviewCfmType: 0
+x-ms-publictraffictype: Email
+x-forefront-antispam-report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:-1;SRV:;IPV:NLI;SFV:SKI;H:BL3PR13MB5211.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:;DIR:INB;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=experian.com;
+x-microsoft-antispam: BCL:0;
+x-ms-traffictypediagnostic: BL3PR13MB5211:EE_|PH0PR13MB5364:EE_
+x-ms-office365-filtering-correlation-id: 4a253083-c9ba-4b04-280b-08dadec627bb
+x-ms-exchange-crosstenant-originalarrivaltime: 15 Dec 2022 17:59:47.7345 (UTC)
+x-ms-exchange-crosstenant-fromentityheader: Hosted
+x-ms-exchange-crosstenant-id: be67623c-1932-42a6-9d24-6c359fe5ea71
+x-ms-exchange-crosstenant-network-message-id:
+	4a253083-c9ba-4b04-280b-08dadec627bb
+x-ms-exchange-transport-crosstenantheadersstamped: PH0PR13MB5364
+x-ms-exchange-transport-endtoendlatency: 00:00:01.8426354
+x-ms-exchange-crosstenant-mailboxtype: HOSTED
+x-ms-exchange-crosstenant-userprincipalname:
+	ye6fJBAPwUGKW2joSJxdnwveIwWWVi7zVczsiYW1HYAl3HtzRiru3+7fQZlRdP0e5wygM3CHclXo4kWzCVpQiQ==
+x-ms-exchange-processed-by-bccfoldering: 15.20.5924.012
+x-ms-exchange-crosstenant-authsource: BL3PR13MB5211.namprd13.prod.outlook.com
+x-ms-exchange-crosstenant-authas: Internal
+X-Microsoft-Antispam-Mailbox-Delivery:
+	ucf:0;jmr:0;auth:0;dest:I;ENG:(910001)(944506478)(944626604)(920097)(425001)(930097);
+X-Microsoft-Antispam-Message-Info:
+	kzNB1XPprE3ODvojZCc5LboqKy2l1yaLjVZeBP/wFQ23B9tQaDX17yA6HqSIy9fbRhX7LdX1419cWCZFOXjx4TZiIBNnBH7IlFAlsDTEBQ1hJS1GVddCvivztk4oMBV6R+k7d1KBS1v6oXOeuMXWzTIC+Lu5PuafQVdDKLVgzSZSzxfPa+pKH81KqBBZIullkoS141IjLYtdvOBNNIJ5DINuWEKEYXBu/nre+GVR/BMVL1ANFTsVlDHwyM9X0KodppsNmZgvbxGr7tGDQKFTbjXyS3+wvluUvhzwtpe4ax7ZClF8CsylQkDtshmSAiAJxgBZtITx2e11x2alStH6GG4qcNo6cGRyHpQSxpsJYi34dnK+GGS11P1HN7smpBl4NfB7L5cjB1EEmT73cZQ0du9av9wDh2ioSK9g5HDVGadpDE2FxcQyAY28y6ygUE9mgykAJWr8OO3zSjx3tqP0W/bjzW9WKm7IYOSmizT8Wt0fkhuKjfGF0kyfKKfL5TSm9xMc0zWwTi9hwoocf4NWWYXteWH4py/luwz2JYDXyUuuUiAUHuibipDT8ugHXj9IiMqSq9JWVBW2k7HWAfpb2Sq3nTlBwsFPoiy8h5qcGW/wYRX23wk5ddcnjerftMScProgV/WGFYohMUWBrWYEu94X+OJ/DYK9X4A5G23kKVYD9ahc596kQ1tbyXpryRQYaHOGV/afb2TBroJEaKsTBkXyt2rIOQ6GbIwdFtYAy5sgK5yaWkM2L/U5jpcELP+0Vb3z21oflARP1eiI7jJxSL1MUbCi4gAzdF5nFPZdKOo=
+Content-Type: multipart/related;
+	boundary="_004_BL3PR13MB5211903D6960240D206B4BD4E1E19BL3PR13MB5211namp_";
+	type="multipart/alternative"
+MIME-Version: 1.0
+
+--_004_BL3PR13MB5211903D6960240D206B4BD4E1E19BL3PR13MB5211namp_
+Content-Type: multipart/alternative;
+	boundary="_000_BL3PR13MB5211903D6960240D206B4BD4E1E19BL3PR13MB5211namp_"
+
+--_000_BL3PR13MB5211903D6960240D206B4BD4E1E19BL3PR13MB5211namp_
+Content-Type: text/plain; charset="us-ascii"
+
+Boa tarde pessoal,
+
+Espero estejam muito bem.
+
+Como voces ja sabiam, temos tido varias conversas sobre re criar o proceso de AWS, agora esta todo alinhado para seguir segundo as indicacoes de abaixo:
+
+Como parte da re criacao do proceso, irao ser criados varios roles automaticamente como padrao para uma maior facilidade na hora da solicitacao de acessos:
+
+Roles a serem criados:
+
+  *   BUAdministratorRole (ja e criado)
+  *   DBA (novo role a ser criado)
+  *   ReadOnly (novo role a ser criado)
+  *   DevSustain (novo role a ser criado)
+
+
+  *   AD Group Naming convention:
+APP-eec-{{ clouds[cloud].acronym }}#{{ account_id[-12:] }}#{{ role_name }}
+
+
+  *   AD Group Description:
+AWS [RoleType] Role linked with AppID _[GearID] and Account Name [AccountName] [Space+ADGroupName+Space]
+
+
+  *   AD Group Notes:
+BUAdministratorRole/DBA/DevSustain:
+Provides high privilege Access as [RoleType] to EEC [CloudType] Account [Account#] Access should be restricted to [RoleScope] Users for [Environment] environment
+ReadOnly:
+Provides Access as ReadOnly to EEC [CloudType] Account [Account#] Access should be restricted to [RoleScope] Users for [Environment] environment
+
+
+  *   Niveis de aprovacao:
+BUAdministratorRole:
+3 niveis --> Lider direto + AWSAccountOwner + C96032A (Bruno Motta)
+DBA:
+3 niveis --> Lider direto + AWSAccountOwner + C96032A (Bruno Motta)
+ReadOnly:
+2 niveis --> Lider direto + AWSAccountOwner
+DevSustain:
+3 niveis --> Lider direto + AWSAccountOwner
+
+Cada role vai ter um escopo segundo as configuracoes de abaixo:
+Para o role BUAdministratorRole --> so usuarios SRE e EITS
+Para o role DBA--> so usuarios DBA
+Para o role ReadOnly --> so usuarios Specialists
+Para o role DevSustain --> so usuarios DEV
+
+Como parte deste Implantacao irao ser criados os roles das contas ja existentes, e para os grupos que ja existem apenas serao modificados os campos Description e Notes, para assim manter todos baixo o mesmo padrao
+
+Data da Implantacao em PRD: 31 de Janeiro, 2023
+
+A ideia principal e que voces como SRE, so pecam a criacao do roles diferentes a estes
+
+JASON CODE FOR EACH ROLE:
+BUAdmin
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Resource": "*",
+            "Effect": "Allow",
+            "NotAction": [
+                "iam:*",
+                "organizations:*",
+                "account:*",
+                "ec2:*Address*",
+                "ec2:*ByoipCidr*",
+                "ec2:*Dhcp*",
+                "ec2:*EbsEncryption*",
+                "ec2:*FlowLogs*",
+                "ec2:*Gateway*",
+                "ec2:*NetworkAcl*",
+                "ec2:*Route*",
+                "ec2:*Subnet*",
+                "ec2:*TrafficMirror*",
+                "ec2:*Vpc*",
+                "ec2:*Vpn*",
+                "snowball:*",
+                "directconnect:*"
+            ],
+            "Sid": "PowerUser"
+        },
+        {
+            "Action": [
+                "iam:Generate*",
+                "iam:Get*",
+                "iam:List*",
+                "iam:Simulate*",
+                "iam:*ServiceLinkedRole",
+                "iam:*InstanceProfile",
+                "iam:*ServerCertificate",
+                "ec2:Describe*",
+                "ec2:Get*",
+                "ec2:Search*",
+                "ec2:*PrivateIpAddresses",
+                "organizations:DescribeOrganization",
+                "account:ListRegions"
+            ],
+            "Resource": "*",
+            "Effect": "Allow",
+            "Sid": "PowerUserActions"
+        },
+        {
+            "Condition": {
+                "StringNotEquals": {
+                    "ec2:Owner": [
+                        "363353661606",
+                        "523448326473"
+                    ]
+                }
+            },
+            "Action": [
+                "ec2:RunInstances"
+            ],
+            "Resource": [
+                "arn:aws:ec2:*::image/ami-*",
+                "arn:aws:ec2:*::instance/i-*",
+                "arn:aws:ec2:*::network-interface/eni-*",
+                "arn:aws:ec2:*::security-group/sg-*",
+                "arn:aws:ec2:*::subnet/subnet-*",
+                "arn:aws:ec2:*::volume/vol-*"
+            ],
+            "Effect": "Deny",
+            "Sid": "DenyNonExperianAMIs"
+        },
+        {
+            "Action": "cloudformation:*",
+            "Resource": "arn:aws:cloudformation:us-east-1:523448326473:stack/StackSet-AWS-Landing-Zone-Baseline*",
+            "Effect": "Deny",
+            "Sid": "ProtectLandingZoneBaselines"
+        },
+        {
+            "Condition": {
+                "StringEquals": {
+                    "iam:PermissionsBoundary": "arn:aws:iam::523448326473:policy/BUAdminBasePolicy"
+                }
+            },
+            "Action": [
+                "iam:CreateRole",
+                "iam:AttachRolePolicy",
+                "iam:DeleteRolePolicy",
+                "iam:DetachRolePolicy",
+                "iam:PutRolePolicy"
+            ],
+            "Resource": "arn:aws:iam::523448326473:role/BURoleFor*",
+            "Effect": "Allow",
+            "Sid": "ManageBURoles"
+        },
+        {
+            "Action": [
+                "iam:DeleteRole",
+                "iam:UpdateRole",
+                "iam:UpdateRoleDescription",
+                "iam:TagRole",
+                "iam:UntagRole",
+                "iam:UpdateAssumeRolePolicy"
+            ],
+            "Resource": "arn:aws:iam::523448326473:role/BURoleFor*",
+            "Effect": "Allow",
+            "Sid": "ManageBURoles2"
+        },
+        {
+            "Action": [
+                "iam:CreatePolicy",
+                "iam:DeletePolicy",
+                "iam:CreatePolicyVersion",
+                "iam:DeletePolicyVersion",
+                "iam:SetDefaultPolicyVersion",
+                "iam:TagPolicy"
+            ],
+            "Resource": "arn:aws:iam::523448326473:policy/BUPolicyFor*",
+            "Effect": "Allow",
+            "Sid": "ManageBUPolicies"
+        },
+        {
+            "Condition": {
+                "StringNotLike": {
+                    "aws:ResourceTag/CyberArk-managed": "*"
+                }
+            },
+            "Action": "iam:*AccessKey*",
+           "Resource": "*",
+            "Effect": "Allow",
+            "Sid": "ManageAccessKeys"
+        },
+        {
+            "Condition": {
+                "StringLike": {
+                    "aws:ResourceTag/CyberArk-managed": "*"
+                }
+           },
+            "Action": "iam:*AccessKey*",
+            "Resource": "arn:aws:iam::523448326473:user/${aws:username}",
+            "Effect": "Allow",
+            "Sid": "CyberArkManagedAccesskeys"
+        },
+        {
+            "Action": [
+                "iam:CreateRole",
+                "iam:AttachRolePolicy",
+                "iam:PutRolePolicy"
+            ],
+            "Resource": "arn:aws:iam::523448326473:role/service-role/AWSBackupDefaultServiceRole",
+            "Effect": "Allow",
+            "Sid": "BackupRole"
+        },
+        {
+            "Action": "iam:PassRole",
+            "Resource": [
+                "arn:aws:iam::523448326473:role/aws-service-role/*.amazonaws.com/AWSServiceRoleFor*",
+                "arn:aws:iam::523448326473:role/BURoleFor*",
+                "arn:aws:iam::523448326473:role/eec-aws-ami-factory-instance-role",
+                "arn:aws:iam::523448326473:role/eec-aws-standard-ssm-role",
+                "arn:aws:iam::523448326473:role/eec-aws-standard-ec2-role",
+                "arn:aws:iam::523448326473:role/eec-aws-standard-emr*",
+                "arn:aws:iam::523448326473:role/service-role/AWSBackupDefaultServiceRole"
+            ],
+            "Effect": "Allow",
+            "Sid": "PassRoles"
+        },
+        {
+            "Action": [
+                "iam:CreateOpenIDConnectProvider",
+                "iam:TagOpenIDConnectProvider"
+            ],
+            "Resource": [
+                "arn:aws:iam::523448326473:oidc-provider/oidc.eks.*.amazonaws.com"
+            ],
+            "Effect": "Allow",
+            "Sid": "AllowEKSOIDCProviderCreation"
+        },
+        {
+            "Action": [
+                "iam:UpdateOpenIDConnectProviderThumbprint",
+                "iam:DeleteOpenIDConnectProvider",
+                "iam:TagOpenIDConnectProvider",
+               "iam:UntagOpenIDConnectProvider"
+            ],
+            "Resource": [
+                "arn:aws:iam::523448326473:oidc-provider/oidc.eks.*.amazonaws.com/*"
+            ],
+            "Effect": "Allow",
+            "Sid": "AllowEKSOIDCProviderManagement"
+        }
+    ]
+}
+
+
+
+
+DBA
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "cloudwatch:DeleteAlarms",
+                "cloudwatch:Describe*",
+                "cloudwatch:DisableAlarmActions",
+                "cloudwatch:EnableAlarmActions",
+                "cloudwatch:Get*",
+                "cloudwatch:List*",
+                "cloudwatch:PutMetricAlarm",
+                "datapipeline:ActivatePipeline",
+                "datapipeline:CreatePipeline",
+                "datapipeline:DeletePipeline",
+                "datapipeline:DescribeObjects",
+                "datapipeline:DescribePipelines",
+                "datapipeline:GetPipelineDefinition",
+                "datapipeline:ListPipelines",
+                "datapipeline:PutPipelineDefinition",
+                "datapipeline:QueryObjects",
+                "dynamodb:*",
+                "ec2:DescribeAccountAttributes",
+                "ec2:DescribeAddresses",
+                "ec2:DescribeAvailabilityZones",
+                "ec2:DescribeInternetGateways",
+                "ec2:DescribeSecurityGroups",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeVpcs",
+                "elasticache:*",
+                "iam:ListRoles",
+                "iam:GetRole",
+                "kms:ListKeys",
+                "lambda:CreateEventSourceMapping",
+                "lambda:CreateFunction",
+                "lambda:DeleteEventSourceMapping",
+                "lambda:DeleteFunction",
+                "lambda:GetFunctionConfiguration",
+                "lambda:ListEventSourceMappings",
+                "lambda:ListFunctions",
+                "logs:DescribeLogGroups",
+                "logs:DescribeLogStreams",
+                "logs:FilterLogEvents",
+                "logs:GetLogEvents",
+                "logs:Create*",
+                "logs:PutLogEvents",
+                "logs:PutMetricFilter",
+                "rds:*",
+                "redshift:*",
+                "s3:CreateBucket",
+                "sns:CreateTopic",
+                "sns:DeleteTopic",
+                "sns:Get*",
+                "sns:List*",
+                "sns:SetTopicAttributes",
+                "sns:Subscribe",
+                "sns:Unsubscribe"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:AbortMultipartUpload",
+                "s3:DeleteObject*",
+                "s3:Get*",
+                "s3:List*",
+                "s3:PutAccelerateConfiguration",
+                "s3:PutBucketTagging",
+                "s3:PutBucketVersioning",
+                "s3:PutBucketWebsite",
+                "s3:PutLifecycleConfiguration",
+                "s3:PutReplicationConfiguration",
+                "s3:PutObject*",
+                "s3:Replicate*",
+                "s3:RestoreObject"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "iam:PassRole"
+            ],
+            "Resource": [
+                "arn:aws:iam::*:role/rds-monitoring-role",
+                "arn:aws:iam::*:role/rdbms-lambda-access",
+                "arn:aws:iam::*:role/lambda_exec_role",
+                "arn:aws:iam::*:role/lambda-dynamodb-*",
+                "arn:aws:iam::*:role/lambda-vpc-execution-role",
+                "arn:aws:iam::*:role/DataPipelineDefaultRole",
+                "arn:aws:iam::*:role/DataPipelineDefaultResourceRole"
+            ]
+        }
+    ]
+}
+
+
+
+
+Sustain
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": "ec2:*",
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "elasticloadbalancing:*",
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "cloudwatch:*",
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "autoscaling:*",
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "iam:CreateServiceLinkedRole",
+            "Resource": "*",
+            "Condition": {
+                "StringEquals": {
+                    "iam:AWSServiceName": [
+                        "autoscaling.amazonaws.com",
+                        "ec2scheduled.amazonaws.com",
+                        "elasticloadbalancing.amazonaws.com",
+                        "spot.amazonaws.com",
+                        "spotfleet.amazonaws.com",
+                        "transitgateway.amazonaws.com"
+                    ]
+                }
+            }
+        }
+    ]
+}
+
+
+Me deixem saber se tiverem alguma duvida
+
+Obrigado
+
+
+Luis Rojas
+System Security Administrator Team Lead
+
+Global Security Administration | Experian Global Security Office
+Experian | Heredia | Costa Rica |  Corporate Center El Cafetal
+Ext. 2321362
+Business Cell Phone: +506 8722 8054
+e-mail: luis.rojas@experian.com<mailto:luis.rojas@experian.com>
+
+Please access our global share point site for further information relating to GSA scope, SLA's, FAQ, Help guides, etc.
+https://experian.sharepoint.com/sites/GlobalSecurityAdministrationBrazil/SitePages/Identity-Central-Brazil.aspx
+
+[Signature picture]                 [https://experiancostaricagdc.newsweaver.com/files/1/83928/214699/6102774/afd9c65fb565bda168f6685f/gptw%20badge-01_2.png]
+
+
+--_000_BL3PR13MB5211903D6960240D206B4BD4E1E19BL3PR13MB5211namp_
+Content-Type: text/html; charset="us-ascii"
+
+<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns:m="http://schemas.microsoft.com/office/2004/12/omml" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+<meta name="Generator" content="Microsoft Word 15 (filtered medium)">
+<!--[if !mso]><style>v\:* {behavior:url(#default#VML);}
+o\:* {behavior:url(#default#VML);}
+w\:* {behavior:url(#default#VML);}
+.shape {behavior:url(#default#VML);}
+</style><![endif]--><style><!--
+/* Font Definitions */
+@font-face
+	{font-family:Wingdings;
+	panose-1:5 0 0 0 0 0 0 0 0 0;}
+@font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+@font-face
+	{font-family:Tahoma;
+	panose-1:2 11 6 4 3 5 4 4 2 4;}
+/* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0in;
+	font-size:11.0pt;
+	font-family:"Calibri",sans-serif;}
+a:link, span.MsoHyperlink
+	{mso-style-priority:99;
+	color:#0563C1;
+	text-decoration:underline;}
+p.MsoListParagraph, li.MsoListParagraph, div.MsoListParagraph
+	{mso-style-priority:34;
+	margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:.5in;
+	font-size:10.0pt;
+	font-family:"Calibri",sans-serif;}
+span.EmailStyle19
+	{mso-style-type:personal-compose;
+	font-family:"Calibri",sans-serif;
+	color:windowtext;}
+.MsoChpDefault
+	{mso-style-type:export-only;
+	font-size:10.0pt;
+	font-family:"Calibri",sans-serif;}
+@page WordSection1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.0in 1.0in 1.0in;}
+div.WordSection1
+	{page:WordSection1;}
+/* List Definitions */
+@list l0
+	{mso-list-id:339164993;
+	mso-list-template-ids:-1310145132;}
+@list l0:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l0:level2
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:1.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l0:level3
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:1.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l0:level4
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:2.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l0:level5
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:2.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l0:level6
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:3.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l0:level7
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:3.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l0:level8
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:4.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l0:level9
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:4.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l1
+	{mso-list-id:691614998;
+	mso-list-template-ids:-2082186088;}
+@list l1:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l1:level2
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:1.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l1:level3
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:1.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l1:level4
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:2.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l1:level5
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:2.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l1:level6
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:3.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l1:level7
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:3.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l1:level8
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:4.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l1:level9
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:4.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l2
+	{mso-list-id:1300695637;
+	mso-list-template-ids:293733098;}
+@list l2:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l2:level2
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:1.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l2:level3
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:1.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l2:level4
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:2.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l2:level5
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:2.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l2:level6
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:3.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l2:level7
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:3.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l2:level8
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:4.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l2:level9
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:4.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l3
+	{mso-list-id:1545017052;
+	mso-list-template-ids:1749469758;}
+@list l3:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l3:level2
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:1.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l3:level3
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:1.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l3:level4
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:2.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l3:level5
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:2.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l3:level6
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:3.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l3:level7
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:3.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l3:level8
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:4.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l3:level9
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:4.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l4
+	{mso-list-id:1921255915;
+	mso-list-type:hybrid;
+	mso-list-template-ids:2036624318 67698689 67698691 67698693 67698689 67698691 67698693 67698689 67698691 67698693;}
+@list l4:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l4:level2
+	{mso-level-number-format:bullet;
+	mso-level-text:o;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:"Courier New";}
+@list l4:level3
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0A7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Wingdings;}
+@list l4:level4
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l4:level5
+	{mso-level-number-format:bullet;
+	mso-level-text:o;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:"Courier New";}
+@list l4:level6
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0A7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Wingdings;}
+@list l4:level7
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l4:level8
+	{mso-level-number-format:bullet;
+	mso-level-text:o;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:"Courier New";}
+@list l4:level9
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0A7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Wingdings;}
+@list l5
+	{mso-list-id:1996496750;
+	mso-list-type:hybrid;
+	mso-list-template-ids:2128514420 67698689 67698691 67698693 67698689 67698691 67698693 67698689 67698691 67698693;}
+@list l5:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l5:level2
+	{mso-level-number-format:bullet;
+	mso-level-text:o;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:"Courier New";}
+@list l5:level3
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0A7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Wingdings;}
+@list l5:level4
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l5:level5
+	{mso-level-number-format:bullet;
+	mso-level-text:o;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:"Courier New";}
+@list l5:level6
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0A7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Wingdings;}
+@list l5:level7
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l5:level8
+	{mso-level-number-format:bullet;
+	mso-level-text:o;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:"Courier New";}
+@list l5:level9
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0A7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Wingdings;}
+@list l6
+	{mso-list-id:2100980491;
+	mso-list-template-ids:-1874969186;}
+@list l6:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l6:level2
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:1.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l6:level3
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:1.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l6:level4
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:2.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l6:level5
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:2.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l6:level6
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:3.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l6:level7
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:3.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l6:level8
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:4.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l6:level9
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:4.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+ol
+	{margin-bottom:0in;}
+ul
+	{margin-bottom:0in;}
+--></style><!--[if gte mso 9]><xml>
+<o:shapedefaults v:ext="edit" spidmax="1026" />
+</xml><![endif]--><!--[if gte mso 9]><xml>
+<o:shapelayout v:ext="edit">
+<o:idmap v:ext="edit" data="1" />
+</o:shapelayout></xml><![endif]-->
+</head>
+<body lang="EN-US" link="#0563C1" vlink="#954F72" style="word-wrap:break-word">
+<div class="WordSection1">
+<p class="MsoNormal">Boa tarde pessoal, <o:p></o:p></p>
+<p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class="MsoNormal">Espero estejam muito bem.<o:p></o:p></p>
+<p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class="MsoNormal">Como voces ja sabiam, temos tido varias conversas sobre re criar o proceso de AWS, agora esta todo alinhado para seguir segundo as indicacoes de abaixo:<o:p></o:p></p>
+<p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class="MsoNormal">Como parte da re criacao do proceso, irao ser criados varios roles
+<u>automaticamente</u> como padrao para uma maior facilidade na hora da solicitacao de acessos:<o:p></o:p></p>
+<p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class="MsoNormal">Roles a serem criados:<o:p></o:p></p>
+<ul style="margin-top:0in" type="disc">
+<li class="MsoListParagraph" style="color:black;margin-left:0in;mso-list:l4 level1 lfo3">
+BUAdministratorRole (ja e criado)<o:p></o:p></li><li class="MsoListParagraph" style="color:black;margin-left:0in;mso-list:l4 level1 lfo3">
+DBA (novo role a ser criado)<o:p></o:p></li><li class="MsoListParagraph" style="color:black;margin-left:0in;mso-list:l4 level1 lfo3">
+ReadOnly (novo role a ser criado)<o:p></o:p></li><li class="MsoListParagraph" style="color:black;margin-left:0in;mso-list:l4 level1 lfo3">
+DevSustain (novo role a ser criado)<span style="font-size:11.0pt"><o:p></o:p></span></li></ul>
+<p class="MsoNormal"><span style="color:black"><o:p>&nbsp;</o:p></span></p>
+<ul style="margin-top:0in" type="disc">
+<li class="MsoListParagraph" style="color:black;margin-left:0in;mso-list:l5 level1 lfo6">
+<b><span style="font-size:11.0pt">AD Group Naming convention:</span></b><span style="font-size:11.0pt"><o:p></o:p></span></li></ul>
+<p class="MsoNormal"><span style="color:black">APP-eec-{{ clouds[cloud].acronym }}#{{ account_id[-12:] }}#{{ role_name }}<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="color:black">&nbsp;<o:p></o:p></span></p>
+<ul style="margin-top:0in" type="disc">
+<li class="MsoListParagraph" style="color:black;margin-left:0in;mso-list:l5 level1 lfo6">
+<b><span style="font-size:11.0pt">AD Group Description:</span></b><span style="font-size:11.0pt"><o:p></o:p></span></li></ul>
+<p class="MsoNormal"><span style="color:black">AWS<b> [RoleType] </b>Role linked with AppID _<b>[GearID]
+</b>and Account Name<b> [AccountName] [Space+ADGroupName+Space]</b><o:p></o:p></span></p>
+<p class="MsoNormal"><span style="color:black">&nbsp;<o:p></o:p></span></p>
+<ul style="margin-top:0in" type="disc">
+<li class="MsoListParagraph" style="color:black;margin-left:0in;mso-list:l5 level1 lfo6">
+<b><span style="font-size:11.0pt">AD Group Notes:</span></b><span style="font-size:11.0pt"><o:p></o:p></span></li></ul>
+<p class="MsoNormal"><span style="color:black">BUAdministratorRole/DBA/DevSustain:<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="color:black">Provides high privilege Access as <b>
+[RoleType]</b> to EEC <b>[CloudType]</b> Account <b>[Account#]</b> Access should be restricted to
+<b>[RoleScope]</b> Users for <b>[Environment]</b> environment<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="color:black">ReadOnly:<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="color:black">Provides Access as <b>ReadOnly</b> to EEC
+<b>[CloudType] </b>Account <b>[Account#]</b> Access should be restricted to <b>[RoleScope]
+</b>Users for <b>[Environment] </b>environment<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="color:black">&nbsp;<o:p></o:p></span></p>
+<ul style="margin-top:0in" type="disc">
+<li class="MsoListParagraph" style="color:black;margin-left:0in;mso-list:l5 level1 lfo6">
+<b><span style="font-size:11.0pt">Niveis de aprovacao:</span></b><span style="font-size:11.0pt"><o:p></o:p></span></li></ul>
+<p class="MsoNormal"><span style="color:black">BUAdministratorRole:<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="color:black">3 niveis </span><span style="font-family:Wingdings;color:black">&agrave;</span><span style="color:black"> Lider direto +
+<b>AWSAccountOwner + </b>C96032A (Bruno Motta)<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="color:black">DBA:<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="color:black">3 niveis </span><span style="font-family:Wingdings;color:black">&agrave;</span><span style="color:black"> Lider direto +
+<b>AWSAccountOwner + </b>C96032A (Bruno Motta)<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="color:black">ReadOnly:<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="color:black">2 niveis </span><span style="font-family:Wingdings;color:black">&agrave;</span><span style="color:black"> Lider direto +
+<b>AWSAccountOwner</b><o:p></o:p></span></p>
+<p class="MsoNormal"><span style="color:black">DevSustain:<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="color:black">3 niveis </span><span style="font-family:Wingdings;color:black">&agrave;</span><span style="color:black"> Lider direto +
+<b>AWSAccountOwner</b><o:p></o:p></span></p>
+<p class="MsoNormal"><span style="color:black">&nbsp;</span>&nbsp;<span style="color:black"><o:p></o:p></span></p>
+<p class="MsoNormal"><span style="color:black">Cada role vai ter um escopo segundo as configuracoes de abaixo:<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="color:black">Para o role BUAdministratorRole </span>
+<span style="font-family:Wingdings;color:black">&agrave;</span><span style="color:black"> so usuarios SRE e EITS<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="color:black">Para o role DBA</span><span style="font-family:Wingdings;color:black">&agrave;</span><span style="color:black"> so usuarios DBA<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="color:black">Para o role ReadOnly </span><span style="font-family:Wingdings;color:black">&agrave;</span><span style="color:black"> so usuarios Specialists<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="color:black">Para o role DevSustain </span><span style="font-family:Wingdings;color:black">&agrave;</span><span style="color:black"> so usuarios DEV<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="color:black"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal"><span style="color:black">Como parte deste Implantacao irao ser criados os roles das contas ja existentes, e para os grupos que ja existem apenas serao modificados os campos Description e Notes, para assim manter todos baixo o mesmo padrao<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="color:black"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal">Data da Implantacao em PRD: <u>31 de Janeiro, 2023<o:p></o:p></u></p>
+<p class="MsoNormal"><u><o:p><span style="text-decoration:none">&nbsp;</span></o:p></u></p>
+<p class="MsoNormal">A ideia principal e que voces como SRE, so pecam a criacao do roles diferentes a estes<o:p></o:p></p>
+<p class="MsoNormal"><u><o:p><span style="text-decoration:none">&nbsp;</span></o:p></u></p>
+<p class="MsoNormal"><b>JASON CODE FOR EACH ROLE:</b><o:p></o:p></p>
+<p class="MsoNormal">BUAdmin<o:p></o:p></p>
+<p class="MsoNormal">{<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp; &quot;Version&quot;: &quot;2012-10-17&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp; &quot;Statement&quot;: [<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Resource&quot;: &quot;*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Effect&quot;: &quot;Allow&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;NotAction&quot;: [<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;organizations:*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;account:*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;ec2:*Address*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;ec2:*ByoipCidr*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;ec2:*Dhcp*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;ec2:*EbsEncryption*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;ec2:*FlowLogs*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;ec2:*Gateway*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;ec2:*NetworkAcl*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;ec2:*Route*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;ec2:*Subnet*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;ec2:*TrafficMirror*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;ec2:*Vpc*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;ec2:*Vpn*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;snowball:*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;directconnect:*&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ],<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Sid&quot;: &quot;PowerUser&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; },<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Action&quot;: [<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:Generate*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:Get*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:List*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:Simulate*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:*ServiceLinkedRole&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:*InstanceProfile&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:*ServerCertificate&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;ec2:Describe*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;ec2:Get*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;ec2:Search*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;ec2:*PrivateIpAddresses&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;organizations:DescribeOrganization&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;account:ListRegions&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ],<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Resource&quot;: &quot;*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Effect&quot;: &quot;Allow&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Sid&quot;: &quot;PowerUserActions&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; },<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;{<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Condition&quot;: {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;StringNotEquals&quot;: {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;ec2:Owner&quot;: [<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;363353661606&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;523448326473&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; },<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Action&quot;: [<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;ec2:RunInstances&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ],<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Resource&quot;: [<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;arn:aws:ec2:*::image/ami-*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;arn:aws:ec2:*::instance/i-*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;arn:aws:ec2:*::network-interface/eni-*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;arn:aws:ec2:*::security-group/sg-*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;arn:aws:ec2:*::subnet/subnet-*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;arn:aws:ec2:*::volume/vol-*&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ],<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Effect&quot;: &quot;Deny&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;Sid&quot;: &quot;DenyNonExperianAMIs&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; },<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Action&quot;: &quot;cloudformation:*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Resource&quot;: &quot;arn:aws:cloudformation:us-east-1:523448326473:stack/StackSet-AWS-Landing-Zone-Baseline*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Effect&quot;: &quot;Deny&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&quot;Sid&quot;: &quot;ProtectLandingZoneBaselines&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; },<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Condition&quot;: {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;StringEquals&quot;: {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:PermissionsBoundary&quot;: &quot;arn:aws:iam::523448326473:policy/BUAdminBasePolicy&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; },<o:p></o:p></p>
+<p class="MsoNormal">&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;Action&quot;: [<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:CreateRole&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:AttachRolePolicy&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:DeleteRolePolicy&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:DetachRolePolicy&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:PutRolePolicy&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ],<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Resource&quot;: &quot;arn:aws:iam::523448326473:role/BURoleFor*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Effect&quot;: &quot;Allow&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Sid&quot;: &quot;ManageBURoles&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; },<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Action&quot;: [<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:DeleteRole&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:UpdateRole&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;iam:UpdateRoleDescription&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:TagRole&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:UntagRole&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:UpdateAssumeRolePolicy&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ],<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Resource&quot;: &quot;arn:aws:iam::523448326473:role/BURoleFor*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Effect&quot;: &quot;Allow&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Sid&quot;: &quot;ManageBURoles2&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; },<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Action&quot;: [<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:CreatePolicy&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:DeletePolicy&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:CreatePolicyVersion&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:DeletePolicyVersion&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&quot;iam:SetDefaultPolicyVersion&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:TagPolicy&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ],<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Resource&quot;: &quot;arn:aws:iam::523448326473:policy/BUPolicyFor*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Effect&quot;: &quot;Allow&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Sid&quot;: &quot;ManageBUPolicies&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; },<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Condition&quot;: {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;StringNotLike&quot;: {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;aws:ResourceTag/CyberArk-managed&quot;: &quot;*&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; },<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Action&quot;: &quot;iam:*AccessKey*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;Resource&quot;: &quot;*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Effect&quot;: &quot;Allow&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Sid&quot;: &quot;ManageAccessKeys&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; },<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Condition&quot;: {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;StringLike&quot;: {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;aws:ResourceTag/CyberArk-managed&quot;: &quot;*&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Action&quot;: &quot;iam:*AccessKey*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Resource&quot;: &quot;arn:aws:iam::523448326473:user/${aws:username}&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Effect&quot;: &quot;Allow&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Sid&quot;: &quot;CyberArkManagedAccesskeys&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; },<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Action&quot;: [<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;iam:CreateRole&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:AttachRolePolicy&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:PutRolePolicy&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ],<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Resource&quot;: &quot;arn:aws:iam::523448326473:role/service-role/AWSBackupDefaultServiceRole&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Effect&quot;: &quot;Allow&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Sid&quot;: &quot;BackupRole&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; },<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Action&quot;: &quot;iam:PassRole&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Resource&quot;: [<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;arn:aws:iam::523448326473:role/aws-service-role/*.amazonaws.com/AWSServiceRoleFor*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;arn:aws:iam::523448326473:role/BURoleFor*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;arn:aws:iam::523448326473:role/eec-aws-ami-factory-instance-role&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;arn:aws:iam::523448326473:role/eec-aws-standard-ssm-role&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;arn:aws:iam::523448326473:role/eec-aws-standard-ec2-role&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;arn:aws:iam::523448326473:role/eec-aws-standard-emr*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;arn:aws:iam::523448326473:role/service-role/AWSBackupDefaultServiceRole&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ],<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Effect&quot;: &quot;Allow&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Sid&quot;: &quot;PassRoles&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; },<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Action&quot;: [<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:CreateOpenIDConnectProvider&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:TagOpenIDConnectProvider&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ],<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Resource&quot;: [<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;arn:aws:iam::523448326473:oidc-provider/oidc.eks.*.amazonaws.com&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ],<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Effect&quot;: &quot;Allow&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Sid&quot;: &quot;AllowEKSOIDCProviderCreation&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; },<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Action&quot;: [<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:UpdateOpenIDConnectProviderThumbprint&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:DeleteOpenIDConnectProvider&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:TagOpenIDConnectProvider&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;iam:UntagOpenIDConnectProvider&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ],<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Resource&quot;: [<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;arn:aws:iam::523448326473:oidc-provider/oidc.eks.*.amazonaws.com/*&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ],<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Effect&quot;: &quot;Allow&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Sid&quot;: &quot;AllowEKSOIDCProviderManagement&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp; ]<o:p></o:p></p>
+<p class="MsoNormal">}<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;<o:p></o:p></p>
+<p class="MsoNormal">DBA<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;<o:p></o:p></p>
+<p class="MsoNormal">{<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp; &quot;Version&quot;: &quot;2012-10-17&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp; &quot;Statement&quot;: [<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Effect&quot;: &quot;Allow&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Action&quot;: [<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;cloudwatch:DeleteAlarms&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;cloudwatch:Describe*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;cloudwatch:DisableAlarmActions&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;cloudwatch:EnableAlarmActions&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;cloudwatch:Get*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;cloudwatch:List*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;cloudwatch:PutMetricAlarm&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;datapipeline:ActivatePipeline&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;datapipeline:CreatePipeline&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;datapipeline:DeletePipeline&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;datapipeline:DescribeObjects&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;datapipeline:DescribePipelines&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;datapipeline:GetPipelineDefinition&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;datapipeline:ListPipelines&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;datapipeline:PutPipelineDefinition&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;datapipeline:QueryObjects&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;dynamodb:*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;ec2:DescribeAccountAttributes&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;ec2:DescribeAddresses&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;ec2:DescribeAvailabilityZones&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;ec2:DescribeInternetGateways&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;ec2:DescribeSecurityGroups&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span lang="ES-CR">&quot;ec2:DescribeSubnets&quot;,</span><o:p></o:p></p>
+<p class="MsoNormal"><span lang="ES-CR">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;ec2:DescribeVpcs&quot;,</span><o:p></o:p></p>
+<p class="MsoNormal"><span lang="ES-CR">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;elasticache:*&quot;,</span><o:p></o:p></p>
+<p class="MsoNormal"><span lang="ES-CR">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>&quot;iam:ListRoles&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:GetRole&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;kms:ListKeys&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;lambda:CreateEventSourceMapping&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;lambda:CreateFunction&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;lambda:DeleteEventSourceMapping&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;lambda:DeleteFunction&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;lambda:GetFunctionConfiguration&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;lambda:ListEventSourceMappings&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;lambda:ListFunctions&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;logs:DescribeLogGroups&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;logs:DescribeLogStreams&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;logs:FilterLogEvents&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;logs:GetLogEvents&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;logs:Create*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;logs:PutLogEvents&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;logs:PutMetricFilter&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;rds:*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;redshift:*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;s3:CreateBucket&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;sns:CreateTopic&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;sns:DeleteTopic&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;sns:Get*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;sns:List*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;sns:SetTopicAttributes&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;sns:Subscribe&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;sns:Unsubscribe&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ],<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Resource&quot;: &quot;*&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; },<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Effect&quot;: &quot;Allow&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Action&quot;: [<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;s3:AbortMultipartUpload&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;s3:DeleteObject*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;s3:Get*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;s3:List*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;s3:PutAccelerateConfiguration&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;s3:PutBucketTagging&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;s3:PutBucketVersioning&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;s3:PutBucketWebsite&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;s3:PutLifecycleConfiguration&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;s3:PutReplicationConfiguration&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;s3:PutObject*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;s3:Replicate*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;s3:RestoreObject&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ],<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Resource&quot;: [<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;*&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; },<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&quot;Effect&quot;: &quot;Allow&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Action&quot;: [<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:PassRole&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ],<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Resource&quot;: [<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;arn:aws:iam::*:role/rds-monitoring-role&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;arn:aws:iam::*:role/rdbms-lambda-access&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;arn:aws:iam::*:role/lambda_exec_role&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;arn:aws:iam::*:role/lambda-dynamodb-*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;arn:aws:iam::*:role/lambda-vpc-execution-role&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;arn:aws:iam::*:role/DataPipelineDefaultRole&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;arn:aws:iam::*:role/DataPipelineDefaultResourceRole&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp; ]<o:p></o:p></p>
+<p class="MsoNormal">}<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;<o:p></o:p></p>
+<p class="MsoNormal">Sustain<o:p></o:p></p>
+<p class="MsoNormal">{<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp; &quot;Version&quot;: &quot;2012-10-17&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp; &quot;Statement&quot;: [<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Action&quot;: &quot;ec2:*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Effect&quot;: &quot;Allow&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Resource&quot;: &quot;*&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; },<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Effect&quot;: &quot;Allow&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Action&quot;: &quot;elasticloadbalancing:*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Resource&quot;: &quot;*&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; },<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Effect&quot;: &quot;Allow&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Action&quot;: &quot;cloudwatch:*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Resource&quot;: &quot;*&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; },<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Effect&quot;: &quot;Allow&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Action&quot;: &quot;autoscaling:*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Resource&quot;: &quot;*&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; },<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Effect&quot;: &quot;Allow&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;Action&quot;: &quot;iam:CreateServiceLinkedRole&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Resource&quot;: &quot;*&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;Condition&quot;: {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;StringEquals&quot;: {<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;iam:AWSServiceName&quot;: [<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;autoscaling.amazonaws.com&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;ec2scheduled.amazonaws.com&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;elasticloadbalancing.amazonaws.com&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;spot.amazonaws.com&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;spotfleet.amazonaws.com&quot;,<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;transitgateway.amazonaws.com&quot;<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<o:p></o:p></p>
+<p class="MsoNormal">&nbsp;&nbsp;&nbsp; ]<o:p></o:p></p>
+<p class="MsoNormal">}<o:p></o:p></p>
+<p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class="MsoNormal">Me deixem saber se tiverem alguma duvida<o:p></o:p></p>
+<p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class="MsoNormal">Obrigado<o:p></o:p></p>
+<p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class="MsoNormal" style="text-autospace:none"><span style="font-size:14.0pt;font-family:&quot;Times New Roman&quot;,serif;color:#1F497D">Luis Rojas<o:p></o:p></span></p>
+<p class="MsoNormal" style="text-autospace:none"><span style="font-size:10.0pt;color:#1F497D">System Security Administrator Team Lead</span><span style="font-size:10.0pt;color:#1F497D"><o:p></o:p></span></p>
+<p class="MsoNormal" style="text-autospace:none"><span style="font-size:10.0pt;color:#1F497D"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal" style="text-autospace:none"><b><span lang="EN-GB" style="font-size:9.0pt;font-family:&quot;Tahoma&quot;,sans-serif;color:navy">Global Security Administration | Experian Global Security Office</span></b><span lang="EN-GB" style="font-size:10.0pt"><o:p></o:p></span></p>
+<p class="MsoNormal" style="text-autospace:none"><span lang="ES-CR" style="font-size:10.0pt;color:#404040">Experian | Heredia | Costa Rica |</span><span lang="ES-CR" style="font-size:9.0pt;font-family:&quot;Arial&quot;,sans-serif;color:black">
+</span><span lang="ES-CR" style="font-size:10.0pt;color:#404040">&nbsp;Corporate Center El Cafetal<o:p></o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB" style="font-size:10.0pt;font-family:&quot;Tahoma&quot;,sans-serif;color:navy">Ext. 2321362<o:p></o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB" style="font-size:10.0pt;font-family:&quot;Tahoma&quot;,sans-serif;color:navy">Business Cell Phone: +506 8722 8054<o:p></o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB" style="font-size:10.0pt;font-family:&quot;Tahoma&quot;,sans-serif;color:navy">e-mail:
+</span><a href="mailto:luis.rojas@experian.com"><span lang="EN-GB" style="font-size:10.0pt;font-family:&quot;Tahoma&quot;,sans-serif;color:#0563C1">luis.rojas@experian.com</span></a><span lang="EN-GB" style="font-size:10.0pt;font-family:&quot;Tahoma&quot;,sans-serif;color:navy"><o:p></o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB" style="font-size:10.0pt;font-family:&quot;Tahoma&quot;,sans-serif;color:navy"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal" style="margin-bottom:5.0pt;text-autospace:none"><span lang="EN-GB" style="font-size:8.0pt;font-family:&quot;Tahoma&quot;,sans-serif;color:navy">Please access our global share point site for further information relating to GSA scope, SLA&#8217;s, FAQ, Help
+ guides, etc.</span><span lang="EN-GB"><o:p></o:p></span></p>
+<p class="MsoNormal"><a href="https://experian.sharepoint.com/sites/GlobalSecurityAdministrationBrazil/SitePages/Identity-Central-Brazil.aspx">https://experian.sharepoint.com/sites/GlobalSecurityAdministrationBrazil/SitePages/Identity-Central-Brazil.aspx</a><span lang="EN-GB" style="font-size:9.0pt;color:#002060">&nbsp;</span><span lang="EN-GB"><o:p></o:p></span></p>
+<p class="MsoNormal"><u><span lang="EN-GB" style="font-size:10.0pt;color:#1F497D"><o:p><span style="text-decoration:none">&nbsp;</span></o:p></span></u></p>
+<p class="MsoNormal"><span lang="EN-GB"><img border="0" width="168" height="54" style="width:1.75in;height:.5625in" id="Picture_x0020_19" src="cid:image001.png@01D90EFB.82A59490" alt="Signature picture">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><span style="font-size:10.0pt;font-family:&quot;Arial&quot;,sans-serif;color:#7E7B7B"><img border="0" width="150" height="79" style="width:1.5625in;height:.8194in" id="_x0000_i1025" src="https://experiancostaricagdc.newsweaver.com/files/1/83928/214699/6102774/afd9c65fb565bda168f6685f/gptw%20badge-01_2.png"></span><span lang="EN-GB"><o:p></o:p></span></p>
+<p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+</div>
+</body>
+</html>
+
+--_000_BL3PR13MB5211903D6960240D206B4BD4E1E19BL3PR13MB5211namp_--
+
+--_004_BL3PR13MB5211903D6960240D206B4BD4E1E19BL3PR13MB5211namp_
+Content-Type: image/png; name="image001.png"
+Content-Description: image001.png
+Content-Disposition: inline; filename="image001.png"; size=5124;
+	creation-date="Thu, 15 Dec 2022 17:59:46 GMT";
+	modification-date="Thu, 15 Dec 2022 17:59:49 GMT"
+Content-ID: <image001.png@01D90EFB.82A59490>
+Content-Transfer-Encoding: base64
+
+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
+
+--_004_BL3PR13MB5211903D6960240D206B4BD4E1E19BL3PR13MB5211namp_--
