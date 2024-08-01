@@ -1,0 +1,5 @@
+---
+#insights_api_url: https://access.redhat.com/r/insights/v3
+insights_api_url: https://cloud.redhat.com/api
+api_insights_username: '{{ vault_api_insights_username }}'
+api_insights_password: '{{ vault_api_insights_password }}'

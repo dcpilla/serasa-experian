@@ -1,0 +1,13 @@
+centrify_experian:
+  domain: br.experian.local
+  kinit_credential: join_deploy_local
+  krb5_config: krb5_local.conf
+  zone: 'br.experian.local/Servers/Servidores Linux/Zonas Centrify/BR.EXPERIAN/BR.EXPERIAN.DEPLOY'
+  parms: 'OU=Deploy,OU=Servers Centrify,OU=Servidores Linux,OU=Servers,DC=br,DC=experian,DC=local'
+
+centrify_serasa:
+  domain: serasacliente.com.br
+  kinit_credential: join_deploy_dmz
+  krb5_config: krb5_dmz.conf
+  zone: 'serasacliente.com.br/Servers/Servidores Linux/Zonas Centrify/SERASA.CLIENTE/SERASA.CLIENTE.DEPLOY'
+  parms: 'OU=Deploy,OU=Servers Centrify,OU=Servidores Linux,OU=Servers,DC=serasacliente,DC=com,DC=br'

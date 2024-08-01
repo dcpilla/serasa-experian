@@ -1,0 +1,111 @@
+---
+- name: block when instance when ip is defined
+  block:
+    - name: get instance when ip is defined
+#      shell: '/usr/local/bin/aws ec2 describe-instances --filters "Name=network-interface.private-ip-address,Values={{ip}}" --profile=sts_cli'
+      shell: '/usr/local/bin/aws ec2 describe-instances --filters "Name=private-ip-address,Values={{ip}}" --region {{account_region}} --profile=sts_cli'
+      register: instance_describe
+
+    - name: debug 1
+      debug: 
+        var: instance_describe
+
+    - name: conver instance_describe to json
+      set_fact:
+        instance_describe: '{{instance_describe.stdout|from_json}}'
+
+    - name: debug 2
+      debug: 
+        var: instance_describe
+    
+    - name: conver instance_describe to json
+      set_fact:
+        instance_describe: '{{instance_describe.Reservations[0].Instances}}'
+
+    - name: debug 3
+      debug: 
+        var: instance_describe
+    
+    
+#    - name: show instance_describe variable
+#      debug:
+#        var: instance_describe
+    
+    - name: set fact to use
+      set_fact:
+        instance_id:    "{{instance_describe[0].InstanceId}}"
+        instance_chave: "{{instance_describe[0].KeyName}}"
+        instance_time:  "{{instance_describe[0].LaunchTime}}"
+        instance_type:  "{{instance_describe[0].InstanceType}}"
+        instance_state: "{{instance_describe[0].State.Name}}"
+        instance_ip:    "{{instance_describe[0].PrivateIpAddress}}"
+        instance_tags:  "{{instance_describe[0].Tags}}"
+        instance_so:    "{{instance_describe[0].PlatformDetails}}"
+          
+    #        instance_: instance_describe[0].
+    #        instance_: instance_describe[0].
+  when: instance_id is not defined
+  
+- name: block  when  id defined
+  block:
+    - name: get instance when  id defined
+      shell: "/usr/local/bin/aws ec2 describe-instances --instance-ids {{instance_id}} --region {{account_region}}  --profile=sts_cli"
+      register: instance_describe
+
+    - name: conver instance_describe to json
+      set_fact:
+        instance_describe: '{{instance_describe.stdout|from_json}}'
+    
+    - name: conver instance_describe to json
+      set_fact:
+        instance_describe: '{{instance_describe.Reservations[0].Instances}}'
+    
+    
+#    - name: show instance_describe variable
+#      debug:
+#        var: instance_describe
+    
+    - name: set fact to use
+      set_fact:
+        instance_id:    "{{instance_describe[0].InstanceId}}"
+        instance_chave: "{{instance_describe[0].KeyName}}"
+        instance_time:  "{{instance_describe[0].LaunchTime}}"
+        instance_type:  "{{instance_describe[0].InstanceType}}"
+        instance_state: "{{instance_describe[0].State.Name}}"
+        instance_ip:    "{{instance_describe[0].PrivateIpAddress}}"
+        instance_tags:  "{{instance_describe[0].Tags}}"
+        instance_so:    "{{instance_describe[0].PlatformDetails}}"
+          
+    #        instance_: instance_describe[0].
+    #        instance_: instance_describe[0].
+  when: ip is not defined
+
+
+
+- name: show resturns of instance_describe
+  debug:
+    msg:
+      - "##########################################"
+      - "#     resturns of instance_describe      #"
+      - "##########################################"
+      - "# Return Variables |     Values          #"
+      - "##########################################"
+      - "# account          | {{account}}"
+      - "# instance_so      | {{instance_so}}"
+      - "# instance_id      | {{instance_id}}"
+      - "# instance_chave   | {{instance_chave}}"
+      - "# instance_time    | {{instance_time}}"
+      - "# instance_type    | {{instance_type}}" 
+      - "# instance_state   | {{instance_state}}"
+      - "# instance_ip      | {{instance_ip}}"
+      - "# instance_tags    | {{instance_tags|replace('}','----')|replace('{',' ')}}"
+      - "#                                        #"
+      - "##########################################"
+      - "##########################################"
+
+#- name: set returns to 
+#  set_fact:  
+
+
+
+### SDG ###

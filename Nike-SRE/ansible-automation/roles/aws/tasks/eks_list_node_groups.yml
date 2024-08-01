@@ -1,0 +1,22 @@
+- name: list node groups of  {{eks_cluster_name}} from {{account}}
+  shell: "/usr/local/bin/aws eks list-nodegroups --cluster-name {{eks_cluster_name}}  --profile sts_cli --region {{account_region}}"
+  register: noude_group_list
+
+- name: convert  noude_group_list to json
+  set_fact:
+     noude_group_list : '{{noude_group_list.stdout| from_json}}'
+ 
+- name: show noude_group_list
+  debug:
+    var: noude_group_list.nodegroups
+
+- name: clear dictonary to create
+  set_fact:
+    nodegroup_with_desiredSize: []
+
+- name: include describe noude_group_list.nodegroups to define eks_nodegroup_describe variable
+  include_tasks: eks_list_node_groups_describe.yml
+  with_items: '{{noude_group_list.nodegroups}}'
+  loop_control:
+    loop_var: eks_nodegroup_name
+    ###SDG###    

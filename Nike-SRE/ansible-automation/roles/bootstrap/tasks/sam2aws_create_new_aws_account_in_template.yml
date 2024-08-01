@@ -1,0 +1,77 @@
+---
+#- name: Ensure roles/bootstrap/templates/saml2aws contains {{account}}
+#  ignore_errors: yes
+#  lineinfile:
+#    path: roles/bootstrap/templates/saml2aws
+#    line: 'name                    = {{account}}'
+#    state: present
+#  check_mode: yes
+#  register: conf
+#  failed_when: (conf is changed) or (conf is failed)
+#
+#- debug:
+#    var: conf
+
+
+- name: check if existe accountd {{account_id}} in template file
+  shell: grep  '{{account_id}}'  roles/bootstrap/templates/saml2aws
+  register: exist_account
+  ignore_errors: yes
+
+- debug:
+    var: exist_account
+
+
+- name: block when not exists account configured
+  block:
+    - name: create new account {{account}} id {{account_id}} region {{account_region}}
+      shell: echo '{{item}}' >> roles/bootstrap/templates/saml2aws
+#      lineinfile:
+#        path: roles/bootstrap/templates/saml2aws
+#        line: '{{item}}'
+      with_items:   
+        - ""
+        - "[{{account}}]"
+        - "name                    = {{account}}"
+        - "app_id                  ="
+        - "url                     = https://experian.okta.com/home/amazon_aws/0oals3mw7qW6Cr2je0x7/272"
+        - "username                = prefix_mail@br.experian.com"
+        - "provider                = Okta"
+        - "mfa                     = PUSH"
+        - "mfa_ip_address          ="
+        - "skip_verify             = false"
+        - "timeout                 = 0"
+        - "aws_urn                 = urn:amazon:webservices"
+        - "aws_session_duration    = 18000"
+        - "aws_profile             = {{account}}"
+        - "resource_id             ="
+        - "subdomain               ="
+        - "role_arn                = arn:aws:iam::{{account_id}}:role/BUAdministratorAccessRole"
+        - "region                  = {{account_region}}"
+        - "http_attempts_count     ="
+        - "http_retry_delay        ="
+        - "credentials_file        ="
+        - "saml_cache              = false"
+        - "saml_cache_file         ="
+        - "target_url              ="
+        - "disable_remember_device = false"
+        - "disable_sessions        = false"
+        - "download_browser_driver = false"
+        - "headless                = false"
+        - "prompter                ="
+        - ""
+
+  when: exist_account.stdout == ''
+
+- name: msg  when exists account configured
+  debug: 
+    msg:
+      - "##############################################"
+      - "##############################################"
+      - "## Account id {{account_id}} already exists   ##"
+      - "##############################################"
+      - "##############################################"
+
+  when: exist_account.stdout != ''
+
+###SDG###

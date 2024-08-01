@@ -1,0 +1,10 @@
+---
+- hosts: localhost
+  environment:
+    https_proxy: https://spobrproxy.serasa.intranet:3128
+    http_proxy: http://spobrproxy.serasa.intranet:3128
+
+  tasks:
+    - import_role:
+        name: snow
+        tasks_from: close_change.yml

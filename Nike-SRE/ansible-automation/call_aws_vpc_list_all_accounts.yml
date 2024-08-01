@@ -1,0 +1,28 @@
+---
+- hosts: localhost
+  gather_facts: no
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    AWS_REGION: sa-east-1
+  become: yes
+  tasks:
+
+    - name: create vpc_list_all
+      set_fact:
+        vpc_list_all: []
+
+    - name: include task to call aws_eks_tlmp.yml
+      include_tasks: aws_vpc_list_all_accounts.yml
+      with_items:
+        - 'dsdev' 
+          #       - '{{accounts}}'
+      loop_control:
+        loop_var: account
+
+
+    - name: show vpc_list_all
+      debug:
+        var: vpc_list_all
+
+### SDG ###

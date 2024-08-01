@@ -1,0 +1,156 @@
+---
+# tasks file for cassandra-exporter
+# See. https://github.com/criteo/cassandra_exporter
+#
+- name: Create cassandra exporter group
+  group:
+    name: "{{ cassandra_exporter_group }}"
+    system: yes
+    state: present
+  tags:
+    - cassandra_exporter
+    - configuration
+
+- name: Create cassandra exporter user
+  user:
+    name: "{{ cassandra_exporter_user }}"
+    system: yes
+    shell: "/sbin/nologin"
+    group: "{{ cassandra_exporter_group }}"
+    createhome: no
+  tags:
+    - cassandra_exporter
+    - configuration
+
+- name: Create cassandra exporter directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ cassandra_exporter_user }}"
+    group: "{{ cassandra_exporter_group }}"
+    mode: 0755
+  with_items:
+    - "{{ cassandra_exporter_root_dir }}"
+    - "{{ cassandra_exporter_dist_dir }}"
+    - "{{ cassandra_exporter_config_dir }}"
+  tags:
+    - cassandra_exporter
+    - configuration
+
+- name: Download cassandra exporter binary
+  get_url:
+    url: "{{ cassandra_exporter_binary_url }}"
+    dest: "{{ cassandra_exporter_dist_dir }}/cassandra-exporter.jar"
+  environment: "{{proxy_env}}"
+  tags:
+    - cassandra_exporter
+    - configuration
+
+- name: Copy cassandra exporter config
+  template:
+    src: "config.yaml.j2"
+    dest: "{{ cassandra_exporter_config_dir }}/config.yaml"
+    mode: 0644
+    owner: "{{ cassandra_exporter_user }}"
+    group: "{{ cassandra_exporter_group }}"
+  notify:
+    - Restart cassandra exporter
+  tags:
+    - cassandra_exporter
+    - configuration
+
+- name: Set cassandra listen address
+  lineinfile:
+    regexp: "^listenAddress"
+    dest:  "{{ cassandra_exporter_config_dir }}/config.yaml"
+    line: "listenAddress: {{ cassandra_listen_address }}"
+  notify:
+    - Restart cassandra exporter
+  tags:
+    - cassandra_exporter
+    - configuration
+
+- name: Set cassandra jmx user
+  lineinfile:
+    regexp: "^user:"
+    dest:  "{{ cassandra_exporter_config_dir }}/config.yaml"
+    line: "user: {{ cassandra_exporter_jmx_user }}"
+  notify:
+    - Restart cassandra exporter
+  tags:
+    - cassandra_exporter
+    - configuration
+
+- name: Set cassandra jmx password
+  lineinfile:
+    regexp: "^password:"
+    dest:  "{{ cassandra_exporter_config_dir }}/config.yaml"
+    line: "password: {{ cassandra_exporter_jmx_password }}"
+  notify:
+    - Restart cassandra exporter
+  tags:
+    - cassandra_exporter
+    - configuration
+
+- name: Copy shell script
+  template:
+    src: cassandra_exporter.sh.j2
+    dest: "{{ cassandra_exporter_dist_dir }}/cassandra_exporter.sh"
+    owner: "{{ cassandra_exporter_user }}"
+    group: "{{ cassandra_exporter_group }}"
+    mode: 0755
+  register: cassandra_exporter_updated
+  notify:
+    - Restart cassandra exporter
+  tags:
+    - cassandra_exporter
+    - configuration
+
+- name: Update group and owner for files
+  file:
+    path: "{{ item }}"
+    state: file
+    owner: "{{ cassandra_exporter_user }}"
+    group: "{{ cassandra_exporter_group }}"
+  with_items:
+    - "{{ cassandra_exporter_dist_dir }}/cassandra-exporter.jar"
+    - "{{ cassandra_exporter_config_dir }}/config.yaml"
+  when: cassandra_exporter_updated is changed
+  tags:
+    - cassandra_exporter
+    - configuration
+
+- name: Create systemd service unit
+  template:
+    src: cassandra-exporter.service.j2
+    dest: /etc/systemd/system/cassandra-exporter.service
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - Reenable cassandra exporter service
+    - Restart cassandra exporter
+  tags:
+    - cassandra_exporter
+    - configuration
+
+- meta: flush_handlers
+
+- name: Ensure cassandra exporter service is enabled and started
+  systemd:
+    name: cassandra-exporter
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  tags:
+    - cassandra_exporter
+    - configuration
+
+- name: Ensure cassandra exporter service is enabled and restarted
+  systemd:
+    name: cassandra-exporter
+    state: restarted
+    daemon_reload: yes
+  tags:
+    - cassandra_exporter
+    - configuration

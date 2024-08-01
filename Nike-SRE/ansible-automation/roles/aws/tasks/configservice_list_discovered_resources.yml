@@ -1,0 +1,50 @@
+---
+- set_fact:
+    py_file: '/home/Check/carrega_dados_{{account}}.py'
+
+- name: Copy python template {{py_file}} to execute inventory
+  become: yes
+  template:
+          #   src: inventory.py
+    src: carrega_dados.py
+    dest: '{{py_file}}'
+    owner: root
+    group: root
+    mode: 0644
+
+- name: execute pyhton {{account}}
+  shell: 'python3.11 {{py_file}} sts_cli'
+#  shell: python3.11  "{{ lookup('template', 'roles/aws/templates/inventory.py') }} sts_cli"
+  ignore_errors: yes
+  register: inventory
+
+- debug: 
+    var: inventory
+
+- name: terminate job end notify
+  block:
+    - name: set fact to notify
+      set_fact:
+        notify_type: mail
+        title: 'Inventory Dash Error'
+        descr: "Inventory Dash Error Current Account {{account}} "
+        msg: 'Error: <br/> {{inventory.stderr_lines}}'
+        msg_to:
+           #- "{{suport_email}}"
+           - alessandro.bahia@br.experian.com
+             #           - davi.tanajura@br.experian.com
+    - name: notify started
+      import_role:
+        name: notify
+
+
+    - meta: end_play
+
+  when: inventory.stderr_lines != []  
+
+- name: remove python
+  file:
+    path: '{{py_file}}'
+    state: absent
+
+###SDG###

@@ -1,0 +1,26 @@
+---
+- hosts: localhost
+  gather_facts: false
+  connection: local
+  tasks:
+    - name: Set host to run standalone
+      add_host:
+        name: '{{ item }}'
+        group: hosts_invent
+      with_items: '{{ hosts_list }}'
+
+
+- hosts: hosts_invent 
+  become: yes
+  gather_facts: true
+  environment:
+    https_proxy: https://spobrproxy.serasa.intranet:3128
+    http_proxy: http://spobrproxy.serasa.intranet:3128  
+  tasks:
+    - debug:
+        var: ansible_distribution_major_version
+
+    - import_role:
+        name: zabbix
+        tasks_from: install_ec2.yml
+  become: yes

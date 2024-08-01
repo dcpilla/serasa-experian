@@ -1,0 +1,76 @@
+---
+- name: Bootstrap Legacy On Primese 
+  block:
+    # Set basic configs
+    - include_role:
+        name: config_machine
+
+    # Set on primese network configs
+    - include_role:
+        name: config_machine
+        tasks_from: network_vmware 
+
+
+    - name: call role ad create group
+      include_role:
+        name: ad
+        tasks_from: create_group.yml
+      with_items:
+        - 'UNX_'
+        - 'UNX-ADM_'
+        
+
+    # Set definitions on sudoers
+    - include_role:
+        name: sudoers
+
+    # When is prod, register on Satellite 6
+    - include_role:
+        name: satellite6 
+
+    # Set basics packages 
+    - include_role:
+        name: yum
+
+    # Install and configure DNS
+    - include_role:
+        name: dns_config 
+      vars:
+        region: onpremise
+    
+    # Install NTP and configure
+    - include_role:
+        name: ntp
+
+    # Install centrify, register in AD ad update hostname in DNS
+    - include_role:
+        name: centrify
+   
+    # Set definitions of users
+    - include_role:
+        name: users_definitions
+
+    # Set Mandatory Agents
+    - include_tasks: mandatory_agents.yml
+
+    # Extra disk
+    - include_role:
+        name: extra_disk_vmware
+    
+    # OOM Exception List
+    - include_role:
+        name: oom_killer_exception
+
+    # Set sshd configs
+    - include_role:
+        name: config_machine
+        tasks_from: config_sshd
+
+    # Create Cyberark account    
+    - include_role:
+        name: cyberark
+        tasks_from: cyberark_bootstrap_lin
+      vars:
+        ansible_become_user: usr_ansible
+        ansible_become_pass: "{{ usr_ansible_pass }}"
+      when: not hostname.startswith('labspobr')

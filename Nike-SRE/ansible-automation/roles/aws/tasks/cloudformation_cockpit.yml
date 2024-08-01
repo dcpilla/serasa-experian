@@ -1,0 +1,17 @@
+---
+- name: Copy template in this host
+  template:
+    src: assume_role_onboarding.yml
+    dest: /tmp/assume_role_onboarding.yml
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Execute Cloudformation
+  shell: "/usr/local/bin/aws cloudformation deploy --template-file /tmp/assume_role_onboarding.yml --stack-name ServiceCatalog --capabilities CAPABILITY_NAMED_IAM --profile=sts_cli"
+  ignore_errors: yes
+  register: CloudformationExecuted
+
+- debug: 
+    var: CloudformationExecuted
+

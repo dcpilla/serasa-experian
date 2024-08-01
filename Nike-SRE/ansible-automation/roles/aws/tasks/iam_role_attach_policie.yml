@@ -1,0 +1,47 @@
+---
+#- name: create policy
+#  shell:  aws iam create-policy --policy-name '{{policy_name}}' --policy-document 'file://{{policy_file}}'
+#  args:
+#    executable: /bin/bash
+#  register: policy_created
+#  ignore_errors: yes
+
+#- name: create Role {{name_role}} and  policie {{name_policy}}
+#  amazon.aws.iam_role:
+#    access_key: "{{ assumed_role_ak }}"
+#    secret_key: "{{ assumed_role_sk }}"
+#    session_token : "{{ assumed_role_token }}"
+#    region: '{{account_region}}'
+#    validate_certs: no
+#    ###
+#
+#    name: '{{name_role}}'
+#    state: present
+#    assume_role_policy_document: "{{ lookup('file', '{{name_policy}}.json') }}"
+#    managed_policies:
+#      - arn:aws:iam::aws:policy/'{{name_policy}}'
+#    tags:
+#      "{{tag}}"
+#
+
+- name: attach policie {{name_policy}} to Role {{name_role}}
+  ignore_errors: yes 
+  amazon.aws.iam_policy:
+    access_key: "{{ assumed_role_ak }}"
+    secret_key: "{{ assumed_role_sk }}"
+    session_token: "{{ assumed_role_token }}"
+    region: '{{account_region}}'
+    validate_certs: no
+    ###
+    iam_type: role #"user" "group" "role"
+    iam_name: '{{name_role}}'
+    policy_name: '{{name_policy}}'
+    policy_json: "{{ lookup('file', 'roles/aws/files/{{name_policy}}.json') }}"
+    state: present   
+  register: policy_created
+
+- name: debug variavel
+  debug:
+    var: policy_created
+
+### SDG ###      

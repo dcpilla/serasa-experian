@@ -1,0 +1,152 @@
+---
+#       ami_name= eec_aws_amzn-lnx*
+#       #       ami_name= eec_aws_eks_amzn-lnx_2_1.24*
+       
+- hosts: spobrnikeworker
+  # hosts: localhost
+  gather_facts: no
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    AWS_REGION: sa-east-1
+  become: yes
+  tasks:
+    - set_fact:
+        file_version: /home/Check/ami-version
+
+    - name: include task to check laste version for ami_name {{ami_name}}
+      include_tasks: ec2_ami_get_last_id.yml
+
+    - name: when have return ami_info_return result of ec2_ami_get_last_id.yml
+      block:
+        - name: read {{ami_name}} file in {{file_version}}
+#         delegate_to: '{{workerexec}}'
+          become: yes
+          shell: "grep '{{ami_name}}'  {{file_version}}"
+#          lineinfile:
+#            path: '{{file_version}}'
+#            line: 'ami_name={{ami_name}}'
+#            state: present
+#          check_mode: yes
+#          register: last_read_compar
+#          failed_when: last_read_compar is changed
+          args:
+            executable: /bin/bash          
+          register: last_read_compar
+          ignore_errors: yes
+    
+        - name: debug last_read_compar
+          debug:
+            var: last_read_compar
+          when: last_read_compar is changed
+    
+
+        - name: define last read values to compar      
+          set_fact:
+            last_read_date_compar: "{{last_read_compar.stdout.split('|')[2].split('=')[1]}}"
+            last_read_ID_compar:   "{{last_read_compar.stdout.split('|')[1].split('=')[1]}}"
+            last_read_name_compar: "{{last_read_compar.stdout.split('|')[3].split('=')[1]}}"
+          when: last_read_compar.stdout != ''
+
+        - name: blcok whem new search
+          block:
+            - name: information-of action
+              debug:
+                msg:
+                  - "##############################################################"
+                  - "## New ami consult - Creating register in {{file_version}} ##"
+                  - "##############################################################"
+              
+            - name:  Creating new register {{ami_name}}  in {{file_version}}
+              become: yes
+              delegate_to: '{{workerexec}}'
+              lineinfile:
+                dest: '{{file_version}}'
+                create: yes
+                line: "ami_name={{ami_name}}|last_image_ID={{last_image_ID}}|last_image_CreationDate={{last_image_CreationDate}}|last_image_name={{last_image_name}}"            
+    
+            - name: define last read values to compar      
+              set_fact:
+                last_read_date_compar: "{{last_image_CreationDate}}"
+                last_read_ID_compar:   "{{last_image_ID}}"
+                last_read_name_compar: "{{last_image_name}}"
+
+          when: last_read_compar.stdout == ''
+
+        - name: debug last read
+          debug:
+            msg:
+              - "########################################################################"
+              - "##                          LAST IMAGE READ                           ##"
+              - "########################################################################"
+              - '## last_read_date_compar= {{last_read_date_compar}}                                  ##'
+              - '## last_read_ID_compar  = {{last_read_ID_compar}}                       ##'
+              - '## last_read_name_compar= {{last_read_name_compar}} ##'
+              - "########################################################################"
+                 #  last_read_name_compar= eec_aws_amzn-lnx_2_1680101442_1.153.82.1928 ##
+
+        - name: check if last read date {{last_read_date_compar}} is smaller current consult date {{last_image_CreationDate}}
+          #          delegate_to: '{{workerexec}}'
+          become: no
+          shell: "echo $((($(date -u -d {{last_image_CreationDate}} +%s) - $(date -u -d {{last_read_date_compar}} +%s)) / 86400))"
+          args:
+            executable: /bin/bash
+          register: diff_date
+          
+        # se a data do arquivo for menor 
+               # trocar informações do arquivo
+               # dispara algum tipo de triger informativo ou ação
+               #
+               #
+        - name: action with diff_date changed current diff_date is {{diff_date}}
+          block:
+            - name: update persistente file
+              #              delegate_to: '{{workerexec}}'
+              become: yes
+              lineinfile:
+                dest: '{{file_version}}'
+                regexp: "^ami_name={{ami_name}}" 
+                state: present
+                line: "ami_name={{ami_name}}|last_image_ID={{last_image_ID}}|last_image_CreationDate={{last_image_CreationDate}}|last_image_name={{last_image_name}}"
+
+            - name: set fact to send email of new image {{last_image_name}}
+              set_fact:
+                email_title: "new release ami publicated<br/>"
+                sub_title: 'This is an automatic process from Nike Program'
+                description: 'New release ami publicated'
+                report_date: "{{ lookup('pipe', 'date -d \"3 hour ago\" +\"%Y-%m-%d %H:%M:%S\"') }}"
+                body: "<br>Process Name: Automatic Check release ami {{ami_name}}<br/>
+                       ################################################################ <br/>
+                       ## Filtered by: {{ami_name}}<br/>
+                       ################################################################ <br/>
+                       ## Last release date: {{last_read_date_compar}}<br/>
+                       ## Last release ID  : {{last_read_ID_compar}}<br/>
+                       ## Last release Name: {{last_read_name_compar}}<br/>
+                       ################################################################ <br/>
+                       ## New release date: {{last_image_CreationDate}}<br/>
+                       ## New release ID : {{last_image_ID}}<br/>
+                       ## New release Name: {{last_image_name}}<br/>
+                       ################################################################"
+        
+            - name: send-email New release AMI
+              #             become: false
+              #      delegate_to: "{{workerexec}}"
+              ignore_errors: yes
+              mail:
+                host: '{{mail_host}}'
+                port: '{{mail_port}}'
+                from: '{{mail_from}}'
+                to:
+                 - '{{suport_email}}'
+#                 - 'alessandro.bahia@br.experian.com'
+                subject: 'new release ami publicated'
+                subtype: html
+                body: "{{ lookup('template', '{{mail_template}}') }}"
+    
+    
+    
+          when: diff_date.stdout|int >= 1
+
+      when: ami_info_return.images  != [] 
+
+### SDG ###

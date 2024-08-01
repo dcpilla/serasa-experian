@@ -1,0 +1,94 @@
+---
+- name: set Instance
+  set_fact:
+#    instance: experian
+    instance: experiantest
+#  instance: experianptnrdev
+
+
+- name: Create request from {{workerexec}}
+  #  delegate_to: '{{workerexec}}'
+  block:
+    #date register
+    - name: Get start date with sambarilove
+      become: false
+      shell: 'date "+%Y-%m-%d %H:%M:%S" -d "8 hour ago"'
+      register: st_day
+    
+    - name: get end day
+      set_fact:
+        end: "{{ lookup('pipe', 'date -d \"7 days \" +\"%Y-%m-%d %H:%M:%S\"') }}"
+    
+    - set_fact:
+        start: '{{st_day.stdout}}'
+        real_start_to_close: '{{st_day.stdout}}'
+#        end: '{{end_day.stdout}}'
+    
+    #end date register
+    
+    - name: create request digital certificate from Brazil Nike SRE {{snow_login_nike}} user sd {{snow_login}}
+      become: false
+      ignore_errors: yes
+      environment:
+        https_proxy: https_proxy=https://spobrproxy:3128
+      uri:
+        url: https://{{instance}}.service-now.com/api/eplc/ritm_brazil_nike/certificado_digital
+        #        user: "{{snow_login}}"
+        #        password: "{{snow_pass}}"
+        user: "{{snow_login_nike}}"
+        password: "{{snow_pass_nike}}"
+        force_basic_auth: yes
+        validate_certs: no
+        method: POST
+        return_content: yes
+        headers:
+         content-type: application/json
+         accept: application/json
+        body_format: json
+        body:
+          short_description: 'teste certificado short description'
+          description: 'teste certificado descriprion'
+          area_demandante: 'Brazil Nike SRE'
+          dominio_site: '*.{{aws_route53_domain}}'
+          cn: '{{aws_route53_domain}}'
+          san: '*.{{aws_route53_domain}}'
+          exposicao_cert: 'u_interno'     #   u_externo |  u_interno
+          tipo_autoridade: 'u_ca_interna'  #"Tipo de Autoridade Certificadora"  u_ca_interna |  u_globalsign
+          tipo_bigip: 'false'
+          tipo_ihs: 'false'
+          tipo_iis: 'false'
+          tipo_waf: 'false'
+          tipo_web: 'true'
+          tipo_outros: 'true'
+          outro_tipo: 'AWS ACM'
+          porta_associada: 'u_https'  #"Porta associada ao Certificado"   u_https |   u_outro
+          outro_porta: 'u_outro'
+          hospedagem: 'u_aws'  #"Hospedagem"   u_aws |  u_on_premise |  u_outros
+          outro_hospedagem: 'u_outros'
+
+      register: req
+      
+    #get change number
+    - debug:
+        var: req
+
+#    - set_fact:
+#        error_processes: req.
+#      when: req.failed
+
+    
+    ## to running this playbook you need this variables
+    ###Variables name####values definition##
+    # chg_template_name    # load from 
+    # chg_justification    # load from
+    #
+    # Returns
+    #   host_ip_infoblox
+  
+
+
+
+
+
+        ###SDG###
+    

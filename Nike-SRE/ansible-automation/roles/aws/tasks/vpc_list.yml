@@ -1,0 +1,100 @@
+---
+- name: get vpc info
+  amazon.aws.ec2_vpc_subnet_info:
+    aws_access_key: "{{ assumed_role_ak }}"
+    aws_secret_key: "{{ assumed_role_sk }}"
+    security_token: "{{ assumed_role_token }}"
+    region: '{{account_region}}'
+    validate_certs: no
+
+    filters:
+      cidr-block: "10.*"
+
+  register: vpc_info
+
+#- debug:
+#    var: vpc_info  
+
+
+#- debug:
+#    var: vpc_info.subnets[0].vpc_id
+
+- name: Set Just the vpc_id in vpcid variable
+  set_fact:
+    vpcid: "{{ vpc_info.subnets | json_query(jmesquery)|unique}}"
+# debug: msg="{{ vpc_info.subnets | json_query(jmesquery)}}"
+  vars:
+    jmesquery: "[*].vpc_id"
+
+
+- name: Set Just the subne_id in vpcid variable filer cidr_block 10.99.13.64/26
+  set_fact:
+    subnet_id: "{{ vpc_info.subnets | json_query(jmesquery)|unique}}"
+# debug: msg="{{ vpc_info.subnets | json_query(jmesquery)}}"
+  vars:
+    jmesquery: "[*].subnet_id"
+
+
+- name: Set instances_fields variable with fields selected
+  set_fact:
+    teste_subnet_id: "{{vpc_info|json_query(jmesquery)|list}}"
+  vars:
+          jmesquery: "subnets[*].{cidr:cidr_block,vpcid:vpc_id,subnet:subnet_id,state:state,subnearn: subnet_arn,zone:availability_zone,ip_free:available_ip_address_count}"
+    #network_interfaces[].private_ip_address   tag_sched:tags.Instance-Scheduler
+
+#- debug:
+#    var: teste_subnet_id
+
+- name: block whe have vpc
+  block:
+    - debug:
+        msg: "{{teste_subnet_id}}"  
+
+    - name: replace
+      set_fact:
+        vpc_id: "{{teste_subnet_id[0].vpcid}}"
+        
+    - debug:
+        var: vpc_id
+  when: teste_subnet_id != []                                                                         
+
+
+- name: get CDIRs
+  shell: "/usr/local/bin/aws ec2 describe-vpcs --region {{account_region}}  --profile=sts_cli"
+  register: cidrs
+
+- name: convert cidrs to json
+  set_fact:
+    cidrs: '{{cidrs.stdout|from_json}}'
+
+- debug:
+    var: cidrs  
+
+- debug:
+    var: cidrs.Vpcs.CidrBlockAssociationSet
+
+- debug:
+    msg:
+      - "###########################"
+      - "# there is no vpc in this #" 
+      - "#  region {{account_region}}       #"
+      - "#  account {{account}}  #"
+      - "##########################"
+  when: teste_subnet_id == []
+
+
+
+
+
+
+
+#- debug:
+#    msg:
+#      - "########################################"
+#      - "########################################"
+#      - "## variable | Value                   ##"
+#      - "##__________|_________________________##"
+#      - "## vpc_id    | {{vpc_id}}##"
+#      - "## subnet_id | {{subnet_id|list}}##"
+#      - "########################################"
+#      - "########################################"

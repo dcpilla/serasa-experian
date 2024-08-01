@@ -1,0 +1,3 @@
+---
+- name: Ensures dnsmasq service is restarted when failure occurs
+  service: name=dnsmasq state=started enabled=yes

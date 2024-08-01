@@ -1,0 +1,161 @@
+---
+- name: set Instance
+  set_fact:
+#    instance: experian
+    instance: experiantest
+#  instance: experianptnrdev
+
+- name: Create request from {{workerexec}}
+  #  delegate_to: '{{workerexec}}'
+  block:
+    #date register
+    - name: Get start date with sambarilove
+      become: false
+      shell: 'date "+%Y-%m-%d %H:%M:%S" -d "8 hour ago"'
+      register: st_day
+    
+    - name: get end day
+      set_fact:
+        end: "{{ lookup('pipe', 'date -d \"7 days \" +\"%Y-%m-%d %H:%M:%S\"') }}"
+
+    - set_fact:
+        start: '{{st_day.stdout}}'
+        real_start_to_close: '{{st_day.stdout}}'
+        #end: '{{end_day.stdout}}'
+    
+    #end date register
+    
+    - name: create request EEC Cloud Account Creation from Brazil Nike SRE {{snow_login_nike}} user sd {{snow_login}}
+      become: false
+      ignore_errors: yes
+      environment:
+        https_proxy: https_proxy=https://spobrproxy:3128
+      uri:
+        url: https://{{instance}}.service-now.com/api/eplc/ritm_brazil_nike/ecc_cloud_acc
+        #        user: "{{snow_login}}"
+        #        password: "{{snow_pass}}"
+        user: "{{snow_login_nike}}"
+        password: "{{snow_pass_nike}}"
+        force_basic_auth: yes
+        validate_certs: no
+        method: POST
+        return_content: yes
+        headers:
+         content-type: application/json
+         accept: application/json
+        body_format: json
+        body:
+          short_description: 'teste short_description account create'
+          description: 'teste description account create'
+          what_support_do_you_need: 'create' #'What do you need?'      create  | migrate | support
+          support_do_you_need: 'Deploy an EITS-managed service' #'What support do you need?'      Deploy an EITS-managed service |   Troubleshoot an issue |   Other
+          cost_center: '{{cost_center}}'
+          itfm_owning_bu: 120f28a3db368b007bd1317ffe961914 #'134 - BR'
+          ownership_region: 'LATAM'
+          major_business_line: 9b005ff5db7c53487bd1317ffe961920 #'EITS'
+          business_unit: 12495fc7db0be20078e83b2ffe961986 # 'EITS'
+          sub_business_unit: 0f21b6431b3b3410be393c66464bcbc3 # 'Nike'
+          app_name: '{{account_name}}'
+          application_owner: 5f943cc7db64f2c0417e3f3ffe961947 #'EMS0072 -Reinaldo Cunha'
+          finance_contact: 9b04b447db64f2c0417e3f3ffe9619a8 #' STG4933 -Luiz Costa'
+          billing_threshold: '10000'
+
+          cloud_service_provider: 'Amazon Web Services(AWS)'
+          cloud_environment_names: '{{env}}' #'sys_id,sys_id,sys_id...' //list
+
+          mig_sup_gearr_id: '{{gearr_id_project}}'
+          cloud_platform: 'Amazon Web Services(AWS)'
+
+          new_acc_type: '{{env}}' #'Cloud Environment Type'          Development |  Production | Sandbox | Staging | Test | UAT
+          gearr_id: '{{gearr_id_project}}'
+          aws_region: 'SA-East-1' #'{{region}}'
+          aws_vpc: 'Yes' # 'Yes/No'
+          new_vpc_avail_zones: 3  #'Number of AWS Availability Zones'
+          aws_netsize: '/24(254 IPs)'
+          #azure_region: 'sys_id'
+          #azure_vnet: 'Azure VNET [Resource Group]'
+          #azure_netsize: 'sys_id'
+          #gcp_region: 'sys_id'
+          #gcp_vpc: 'Yes/No'
+          #gcp_avail_zones: 'Number of GCP Availability Zones'
+          #gcp_netsize: 'sys_id'
+          #oci_region: 'sys_id'
+          #oci_vcn: 'Yes/No'
+          #oci_netsize: 'sys_id'
+          #greenlake_datacenter_location: 'sys_id'
+          #mckinney: 'bool'
+          #allen: 'bool'
+          #allen_network_size: 'sys_id'
+          #database_network: 'bool'
+          #please_provide_database_network: 'sys_id'
+          #greenlake_network: 'New' # 'McKinney Network'        Existing  |    New
+          #greenlake_server_name: 'sys_id,sys_id,sys_id...' //list
+          #greenlake_additional_details: 'string'
+          cloud_account_name: '{{account_name}}'
+          #greenlake_account_name: 'string'
+
+          service_now_assignment: 33fa1dfddbfa40d093b4794039961900 #'Brazil Nike SRE'
+          vulnerability_contact_group: 33fa1dfddbfa40d093b4794039961900 # 'Brazil Nike SRE'
+          patch_contact: 'nikesre@br.experian.com'
+
+          #eks_acknowledge: 'true'
+          #emr: 'true'
+          #rds: 'true'
+          #eks_cluster_build: 'bool'
+
+          require_onprem_con: 'Yes' # 'Will your service require On-Prem Connectivity?'  Yes |  No
+          require_ext_access: 'No'  #'Will your services require external access from outside Experian in the upper environments?'  Yes |  No
+          apigee_integration: 'Yes' #'Apigee Integration' Yes |  No
+          #efs: 'Yes' #'Do you need EFS?'  Yes |  No
+          #domain_name: 'string'
+          request_details_brief_description: "Hello, team!
+
+
+						VPC CIDR range justification: 
+						Since we will be using cockpit EKS in this account we need at least 5 free IPs in each subnet  just to keep it  updated, and we will also have a lot of applications running that will spend this Ips, so if we use a range with fewer IPs, It can affect the business's availability.
+
+
+						Could you please change the finance contact to Andre Silva. I couldn't find in the form, so I selected another person.
+
+
+					Finance Contact Email: 
+						{{finance_contact_email}}
+
+
+						Also, could you please add the secondary CIDR range for EKS and EMR?
+
+
+						Thanks "
+
+
+      register: req
+      
+    #get change number
+    - debug:
+        var: req
+
+
+#    - set_fact:
+#         inc_num: "{{ inc.content | regex_search('INC[0-9]{7}') }}"
+#
+#    - debug:
+#        var: inc_num
+
+#    - set_fact:
+#         chg_num: "{{ change.content | regex_search('CHG[0-9]{7}') }}"
+#
+#    - debug:
+#        var: chg_num
+    
+    ## to running this playbook you need this variables
+    ###Variables name####values definition##
+    # chg_template_name    # load from 
+    # chg_justification    # load from
+    #
+    # Returns
+    #   host_ip_infoblox
+   
+
+
+
+        ###SDG###        

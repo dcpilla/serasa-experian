@@ -1,0 +1,29 @@
+---
+- hosts: localhost 
+  gather_facts: no
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    AWS_REGION: sa-east-1
+  tasks:
+    - name: include task to call role aws task emr_list.yml 
+      include_tasks: aws_emr_list.yml
+      with_items:
+        - '{{accounts}}'
+#        - 'dsdev'
+#        - 'dsprod'
+#        - 'dsstage'
+#        - 'corporatedev'
+#        - 'devhubdev'
+#        - 'devhubprod'
+#        - 'devhubsandbox'
+#        - 'devhubtest'
+#        - 'reportsdev'
+#        - 'reportsprod'
+#        - 'sredev'
+#        - 'ssrmdev'
+#        - 'ssrmprod'
+#        - 'ssrmsandbox'
+##        - 'arcsandbox'
+##        - 'corporateprod'
+                  

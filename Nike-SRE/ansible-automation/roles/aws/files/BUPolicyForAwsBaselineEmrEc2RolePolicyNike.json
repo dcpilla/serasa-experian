@@ -1,0 +1,19 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "lambda:InvokeFunction",
+                "logs:DeleteLogGroup",
+                "lambda:DeleteFunction",
+                "iam:DetachRolePolicy",
+                "elasticmapreduce:DeleteSecurityConfiguration",
+                "cloudformation:List*",
+                "cloudformation:Delete*"
+            ],
+            "Resource": "*",
+            "Effect": "Allow",
+            "Sid": "EMREC2Actions"
+        }
+    ]
+}

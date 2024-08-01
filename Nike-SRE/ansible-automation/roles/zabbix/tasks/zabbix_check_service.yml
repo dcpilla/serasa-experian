@@ -1,0 +1,18 @@
+---
+  - name: check Zabbix Service on rh-6-7
+    shell: service zabbix-agent2 status
+    register: zabbix_status
+    args:
+      warn: False
+    ignore_errors: yes
+
+  - debug:
+      var: zabbix_status
+
+  - set_fact:
+      service_status: not_running
+    when: zabbix_status.stdout is search('inactive')
+
+  - set_fact:
+      service_status: running
+    when: service_status is not defined

@@ -1,0 +1,6 @@
+---
+# CO: 121439
+- import_tasks: foreman_proxy.yml 
+- import_tasks: usr_qualys.yml
+- import_tasks: usr_ansible.yml
+- import_tasks: sist_sndcmdb.yml

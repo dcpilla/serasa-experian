@@ -1,0 +1,5 @@
+---
+- name: Remove the temporary installation directory
+  file:
+    path: '{{ install_path }}'
+    state: absent

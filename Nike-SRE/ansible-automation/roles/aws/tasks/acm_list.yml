@@ -1,0 +1,29 @@
+---
+#- name: obtain all ACM certificates
+#  community.aws.aws_acm_info:
+#    aws_access_key: "{{ assumed_role_ak }}"
+#    aws_secret_key: "{{ assumed_role_sk }}"
+#    security_token: "{{ assumed_role_token }}"
+#
+#  register: list1
+#
+#- debug:
+#    var: list1
+#
+#
+#- debug:
+#        msg: 'arn: {{item.certificate_arn}} '
+#  loop: list1.certificates
+
+
+- name: list acms from account {{account}}
+  shell: /usr/local/bin/aws acm list-certificates --profile=sts_cli
+  register: acms_list
+
+- set_fact:
+    acms_list: '{{acms_list.stdout|from_json}}'
+
+- debug:
+    var: acms_list  
+
+    ###SDG###

@@ -1,0 +1,29 @@
+---
+- name: describe eks {{eks_name}}
+  shell: "/usr/local/bin/aws --profile=sts_cli eks describe-cluster --name='{{eks_name}}' --region={{account_region}}"
+  register: cluster_describe
+
+- name: convert cluster_describe to json
+  set_fact:
+    cluster_describe: '{{cluster_describe.stdout|from_json}}'
+
+- name: debug variable cluster_describe
+  debug:
+    var: cluster_describe
+
+
+- name: creat list or array of eksfields_list
+  set_fact:
+    eksfields_list: "{{eksfields_list|default([])+ [{'eks_name': eks.name, 'eks_arn': eks.arn , 'eks_version': eks.platformVersion, 'eks_image': eks.version, 'eks_tags': eks.tags }] }}"
+  with_items:
+    - '{{cluster_describe.cluster}}'
+  loop_control:
+    loop_var: eks
+  when: cluster_describe is defined 
+
+- name: show eks from account {{account}}
+  debug:
+    var: eksfields_list        
+
+
+### SDG ###    

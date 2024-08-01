@@ -1,0 +1,8 @@
+---
+- import_role:
+    name: aws
+    tasks_from: sts_connection.yml
+
+- import_role:
+    name: aws
+    tasks_from: ecr_list_repository.yml

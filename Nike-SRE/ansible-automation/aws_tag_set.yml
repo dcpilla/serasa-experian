@@ -1,0 +1,23 @@
+---
+- hosts: localhost
+  gather_facts: no
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    AWS_REGION: sa-east-1
+  tasks:    
+    - import_role:
+        name: aws
+        tasks_from: sts_connection
+
+    - include_role: 
+        name: aws
+        tasks_from: tag_set.yml
+      when: resources != 'instance'
+
+    - include_role: 
+        name: aws
+        tasks_from: tag_set_ec2.yml
+      when: resources == 'instance'
+
+### SDG ###  

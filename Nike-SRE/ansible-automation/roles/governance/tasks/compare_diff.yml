@@ -1,0 +1,18 @@
+---
+- name: find {{item}} on {{path_persistent_vulnera}}
+  shell: grep "{{item|regex_replace('^-','')}}" '{{path_persistent_vulnera}}'
+  ignore_errors: yes
+  register: result_compare
+
+- debug:
+    msg:
+      - '############################# saida do grep ########################'    
+      - '{{result_compare}}'
+
+- name: insert new vuln without exist in {{path_persistent_vulnera}}
+  lineinfile:
+    line: '{{item}}'
+    path: '{{path_new_vulnerability}}'
+    state: present
+    create: true
+  when: result_compare.stdout == ''

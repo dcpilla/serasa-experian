@@ -1,0 +1,95 @@
+---
+- name: get sg_id when not defined
+  block:
+    - name: get sg_id when not defined
+      shell: '/usr/local/bin/aws ec2 describe-security-groups --filters Name=group-name,Values={{sg_name}}  --query "SecurityGroups[*].{Name:GroupName,ID:GroupId}" --profile=sts_cli --region {{account_region}}'
+      register: sg_consult_id
+
+#    - debug:
+#        var: sg_consult
+
+    - name: convert sg_consult_id to json 
+      set_fact: 
+        sg_consult_id: '{{sg_consult_id.stdout|from_json}}'
+
+    - debug:
+        var: sg_consult_id
+
+    - name: set sg_id when not defined
+      set_fact:
+        sg_id: '{{sg_consult_id[0].ID}}'
+
+  when: sg_id is not defined
+
+- name: get sg_name when not defined
+  block:
+    - name: get sg_name when not defined
+      shell: '/usr/local/bin/aws ec2 describe-security-groups  --group-ids {{sg_id}} --profile=sts_cli --region {{account_region}}'
+      register: sg_consult_name
+
+    - debug:
+        var: sg_consult_name
+
+    - name: converto sg_consult_name to json
+      set_fact: 
+        sg_consult_name: '{{sg_consult_name.stdout|from_json}}'
+
+    - debug:
+        var: sg_consult_name
+
+    - name: set sg_name when not defined
+      set_fact:
+        sg_name: '{{sg_consult_name.SecurityGroups[0].GroupName}}'
+
+  when: sg_name is not defined
+
+
+- name: list rules
+  include_tasks: ec2_security_group_list_rules.yml
+
+  #- name: describe security {{sg_id}}  from {{account}} account
+  #  shell: '/usr/local/bin/aws ec2 describe-security-groups --group-ids {{sg_id}} --profile=sts_cli'
+  #  #  shell: '/usr/local/bin/aws ec2 describe-security-groups --group-ids {{sg_id}} --query "SecurityGroups[0].IpPermissionsEgress[*].{protoclo:IpProtocol,source:IpRanges}"   --profile=sts_cli'
+  #  register: sg_describe
+  #
+  #- name: out1 
+  #  debug:
+  #    var: sg_describe
+  #
+
+  #- set_fact:
+  #    sg_Egress: '{{sg_describe.stdout|from_json}}'
+
+- debug:
+    msg:
+      - "########################## SG DETAILS #########################"
+      - "##                                                           ##"
+      - "##   sg_id   | {{sg_id}}"
+      - "##   sg_name | {{sg_name}}"
+      - "##                                                           ##"
+      - "###############################################################"
+      - "########################Rules Not Found########################"
+      - "###############################################################"
+
+  when: rules_list.SecurityGroupRules == []        
+
+
+- debug:
+    msg:
+      - "######################### SG DETAILS ##########################"
+      - "##                                                           ##"
+      - "##   sg_id   | {{sg_id}}"
+      - "##   sg_name | {{sg_name}}"
+      - "##                                                           ##"
+      - "###############################################################"
+      - "######################## rules_list ###########################"
+      - "###############################################################"
+      - "##                                                           ##"
+      - "## {{rules_list.SecurityGroupRules|replace('{','###')}}"
+      - "##                                                           ##"
+      - "###############################################################"
+
+  when: rules_list.SecurityGroupRules != []        
+
+
+    ###SDG###    

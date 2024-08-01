@@ -1,0 +1,38 @@
+---
+- name: Incluir Assume-Role
+  include_tasks: sts_connection.yml
+
+- name: clean rdslist
+  set_fact: 
+    rdslist: !!null 
+
+
+- name: Get info of all existing DB clusters
+  amazon.aws.rds_cluster_info:
+    aws_access_key: "{{ assumed_role_ak }}"
+    aws_secret_key: "{{ assumed_role_sk }}"
+    security_token: "{{ assumed_role_token }}"
+    validate_certs: no
+  register: result_cluster_info
+
+
+- debug:
+    var: result_cluster_info
+
+
+#- name: set eksList to json'
+#  set_fact:
+#    ekslist: '{{result_cluster_info.stdout|from_json}}'
+
+- debug:
+    var: result_cluster_info.clusters.database_name
+
+- name: describe cluster
+  include_tasks: eks_list_describe.yml
+  with_items:
+    - '{{ekslist.clusters}}'
+  loop_control:
+    loop_var: eks_name
+  when: ekslist.clusters != []
+
+### SDG ###

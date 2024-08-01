@@ -1,0 +1,18 @@
+- name: create key pair using key_material obtained using 'file' lookup plugin
+  amazon.aws.ec2_key:          
+    aws_access_key: "{{ assumed_role_ak }}"
+    aws_secret_key: "{{ assumed_role_sk }}"
+    security_token: "{{ assumed_role_token }}"
+    region: '{{account_region}}'
+    validate_certs: no
+
+    state: present
+    name: sre-suport
+    key_material: "{{ lookup('file', 'files/sre_rsa.pub') }}"
+  register: key_created
+
+- debug:
+    var: key_created  
+
+
+###SSDG###

@@ -1,0 +1,16 @@
+---
+aws s3api get-bucket-logging --bucket testeraissa
+aws s3api get-bucket-encryption --bucket testeraissa
+
+- name: describe {{s3_name}} account {{account}}
+  shell: /usr/local/bin/aws macie2 describe-buckets --criteria '{"bucketName":{"prefix":"testeraissa"}}' --profile=sts_cli
+  #  shell: /usr/local/bin/aws macie2 describe-buckets  --profile=sts_cli
+  #  shell: /usr/local/bin/aws macie2 describe-buckets --criteria '{"bucketName":{"prefix":"{{s3_name}}"}}'
+  register: s3_describe
+
+- name: debug s3_describe variable
+  debug:
+    var: s3_describe
+
+
+### SDG ###    

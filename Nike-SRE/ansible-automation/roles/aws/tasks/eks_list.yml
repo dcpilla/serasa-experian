@@ -1,0 +1,31 @@
+---
+- name: clean ekslist
+  set_fact: 
+    ekslist: !!null 
+
+- name: list eks by aws cli
+  shell: '/usr/local/bin/aws --profile sts_cli eks list-clusters --region {{account_region}}' 
+  register: ekslist
+
+- name: set eksList to json
+  set_fact:
+    ekslist: '{{ekslist.stdout|from_json}}'
+
+- debug:
+    var: ekslist.clusters
+
+- name: describe cluster
+  block:
+    - name: clear list eksfields_list
+      set_fact:
+        eksfields_list: []
+    
+    - include_tasks: eks_list_describe.yml
+      with_items:
+        - '{{ekslist.clusters}}'
+      loop_control:
+        loop_var: eks_name
+
+  when: ekslist.clusters != []
+
+### SDG ###

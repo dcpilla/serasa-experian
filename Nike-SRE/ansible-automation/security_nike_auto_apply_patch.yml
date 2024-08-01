@@ -1,0 +1,84 @@
+---
+#- hosts: all
+- hosts: localhost
+  #- hosts: spobrnikeworker
+ gather_facts: no
+ tasks:
+#    - name: get server_list when environ is reports-dev.... current environ was {{environ}}
+#      shell: cat /etc/ansible/hosts | grep '/repo_kp/reports/dev/'| awk {'print $1'}
+#      register: server_list
+#      when: environ == 'reports-dev'
+
+#    - debug:
+#        var: server_list
+
+    - name: create dynamic inventory
+      add_host: 
+        name: '{{item}}'
+        group: dynamic_hosts
+      with_items:
+#       - '{{server_list.stdout_lines}}'
+        - 10.99.249.33 
+        - 10.99.249.26 
+        - 10.99.249.80 
+        - 10.99.249.84 
+        - 10.99.249.93 
+        - 10.99.249.62 
+        - 10.99.249.48 
+        - 10.99.249.219
+        - 10.99.249.159
+      when: environ == 'reports-dev'
+
+    - name: set fact to send email started patching for the '{{ambiente}}' group
+      set_fact:
+        email_title: "started<br/>
+                      Automatic patch<br/>
+                      {{environ}}"
+        body: "<br>Process Name: Automatic patch for the  {{environ}} group<br/>
+               <br>{{server_list.stdout_lines}}<br/>"
+
+    - name: send email started patch '{{environ}}' group
+      #      delegate_to: "{{workerexec}}"
+      ignore_errors: yes
+      mail:
+        host: '{{mail_host}}'
+        port: '{{mail_port}}'
+        from: '{{mail_from}}'
+        #        to: '{{suport_email}}'
+        to: 'alessandro.bahia@br.experian.com'
+#        cc: occ@br.experian.com
+        subject: 'Linux Management: Automatic patch for the {{environ}} group'
+        subtype: html
+        body: "{{ lookup('template', 'html_template_mail') }}"
+
+- hosts: dynamic_hosts
+  tasks:
+    - name:
+      include_role:
+        name: patch
+        tasks_from: apply.yml
+  become: yes
+
+#- hosts: localhost
+##- hosts: spobrnikeworker
+#  tasks:
+#    - name: set fact to send email finished patch from the '{{environ}}' group
+#      set_fact:
+#        email_title: "Finished<br/>
+#                      Automatic patch<br/>
+#                      {{environ}}"
+#        body: "<br>Process Name: Finished patch for the  {{environ}} group<br/>"
+
+#    - name: send email Finished patch '{{environ}}' group
+#      #      delegate_to: "{{workerexec}}"
+#      ignore_errors: yes
+#      mail:
+#        host: '{{mail_host}}'
+#        port: '{{mail_port}}'
+#        from: '{{mail_from}}'
+#        #        to: '{{suport_email}}'
+#        to: 'alessandro.bahia@br.experian.com'        
+##        cc: occ@br.experian.com
+#        subject: 'Linux Management: Automatic patch for the {{environ}} group'
+#        subtype: html
+#        body: "{{ lookup('template', 'html_template_mail') }}"

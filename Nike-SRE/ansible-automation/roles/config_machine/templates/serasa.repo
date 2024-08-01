@@ -1,0 +1,45 @@
+[Serasa_Experian_MANDATORY_COLLECTION_GENERIC_RHEL_Generic_RHEL_Servers_RPMs_x86_64]
+metadata_expire = 1
+#enabled_metadata = 1
+#slclientcert = /etc/pki/entitlement/4778125098962613567.pem
+baseurl = http://spobrsatellite1.br.experian.local/pulp/repos/Serasa_Experian/PRODUCAO/CV_RHEL7/custom/MANDATORY_COLLECTION_GENERIC_RHEL/Generic_RHEL_Servers_RPMs_x86_64
+sslverify = 0
+name = Generic RHEL Servers RPMs x86_64
+enabled = 1
+gpgcheck = 0
+
+[Serasa_Experian_MANDATORY_COLLECTION_RH7_Zabbix_RHEL_7_Server_RPMs_x86_64]
+metadata_expire = 1
+#nabled_metadata = 1
+#slclientcert = /etc/pki/entitlement/1223504748337706263.pem
+baseurl = http://spobrsatellite1.br.experian.local/pulp/repos/Serasa_Experian/Library/custom/MANDATORY_COLLECTION_RH7/Zabbix_RHEL_7_Server_RPMs_x86_64/
+sslverify = 0
+name = Zabbix RHEL 7 Server RPMs x86_64
+#sslclientkey = /etc/pki/entitlement/1223504748337706263-key.pem
+enabled = 1
+#sslcacert = /etc/rhsm/ca/katello-server-ca.pem
+gpgcheck = 0
+
+[Serasa_Experian_MANDATORY_COLLECTION_RH7_Security_Agents_RH7]
+metadata_expire = 1
+#enabled_metadata = 1
+#sslclientcert = /etc/pki/entitlement/1223504748337706263.pem
+baseurl = http://spobrsatellite1.br.experian.local/pulp/repos/Serasa_Experian/PRODUCAO/CV_RHEL7/custom/MANDATORY_COLLECTION_RH7/Security_Agents_RH7
+sslverify = 0
+name = Security Agents RH7
+#sslclientkey = /etc/pki/entitlement/1223504748337706263-key.pem
+enabled = 1
+#sslcacert = /etc/rhsm/ca/katello-server-ca.pem
+gpgcheck = 0
+
+[Serasa_Experian_AmazonLinux_MongoDB_4_2]
+metadata_expire = 1
+#enabled_metadata = 1
+#sslclientcert = /etc/pki/entitlement/1223504748337706263.pem
+baseurl = http://spobrsatellite1.br.experian.local/pulp/repos/Serasa_Experian/Library/custom/AmazonLinux/MongoDB_4_2/
+sslverify = 0
+name = Security Agents RH7
+#sslclientkey = /etc/pki/entitlement/1223504748337706263-key.pem
+enabled = 1
+#sslcacert = /etc/rhsm/ca/katello-server-ca.pem
+gpgcheck = 0

@@ -1,0 +1,45 @@
+---
+- name: Get servers IPs
+  include_role:
+    name: servicenow
+    tasks_from: get_server_ip.yml
+
+- name: Removal block
+  block:
+    - name: Get NetWork {{network}}
+      uri:
+        url: https://{{server_api}}ipv4address?ip_address={{ip}}
+        validate_certs: False
+        method: GET
+        user: usr_ansible
+        password: '{{usr_ansible_pass}}'
+        status_code: 201
+        #        body_format: json
+        headers:
+          content-type: application/json
+          accept: application/json
+      ignore_errors: yes
+      register: result_ips
+    
+    - debug:
+        msg: '{{result_ips.json.0._ref}}'
+    
+    - name: load register variable
+      set_fact:
+        reg: "{{result_ips.json.0._ref}}"
+    
+    - name: reclaim register {{reg}}
+      uri:
+        url: https://{{server_api}}{{reg}}
+        validate_certs: False
+        method: DELETE
+        user: usr_ansible
+        password: '{{usr_ansible_pass}}'
+        status_code: 201
+        #        body_format: json
+        headers:
+          content-type: application/json
+          accept: application/json 
+      ignore_errors: yes
+      register: result_reclaim
+  when: ip != "" and ip.startswith('10.53.129') or ip.startswith('10.53.130') or ip.startswith('10.53.131') or ip.startswith('10.53.132') or ip.startswith('10.53.133') or ip.startswith('10.53.134') or ip.startswith('10.53.135') or ip.startswith('10.53.137') or ip.startswith('10.53.138') or ip.startswith('10.53.139') or ip.startswith('10.53.140') or ip.startswith('10.53.144') or ip.startswith('10.53.146') or ip.startswith('10.53.148') or ip.startswith('10.53.150') or ip.startswith('10.53.152') or ip.startswith('10.53.154')

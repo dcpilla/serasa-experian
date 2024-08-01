@@ -1,0 +1,76 @@
+---
+- name: set file check emr uptime
+  set_fact:
+    emr_uptime_file: /home/Check/Inv/emr_uptime.txt
+
+
+- name: remove existent {{emr_uptime_file}} file
+  become: yes
+  file:
+    state: absent    
+    path: '{{emr_uptime_file}}'
+
+- name: get dates to compare in {{inventory_emr_path}} file
+  become: yes
+  shell: "cat {{inventory_emr_path}} | cut -d '|' -f6 | cut -d '.' -f1"
+#  shell: "cat {{inventory_emr_path}} |grep -v prod | cut -d '|' -f6 | cut -d 'T' -f1"
+  register: date_to_compare
+
+
+- name: list date_to_compare.stdout_lines
+  debug:
+    var: date_to_compare
+
+- name: clean dictonary date_diff_list
+  set_fact:
+    date_diff_list : []
+    uptime_emr_list: []
+
+- name: compar block when  date_to_compare.stout exist values
+  block:
+
+    - name: call playbook to compare 2 dates to create uptime_emr_list variable
+      include_tasks: compare_2_dates.yml
+      with_items: 
+        - '{{date_to_compare.stdout_lines}}'
+      loop_control:
+        loop_var: date_compare
+
+
+    - name: show uptime_emr_list from compare_2_dates.yml
+      debug:
+        var: uptime_emr_list
+
+    - name: block when have cluter more a day
+      block:
+        - name: save return from compare_2_dates.yml  uptime_emr_list variable in {{emr_uptime_file}}
+          become: yes
+          lineinfile:
+            path: '{{emr_uptime_file}}'
+            line: '{{item}}'  
+            state: present
+            create: true
+          with_items:
+            - '{{uptime_emr_list}}'
+        
+        - name: get cluster more {{emr_terminate_hours}} Hours
+          shell: "for V in `cat {{emr_uptime_file}}`; do cat {{inventory_emr_path}} | grep $V | cut -d '|' -f2,3,4,6; done"
+          register: emr_running_more_hours_define
+        
+        - name: debug cluster no prod more {{emr_terminate_hours}} Hours to terminate from account {{account_name}}
+          debug:
+            var: emr_running_more_hours_define
+         
+        - name: get cluster ID more {{emr_terminate_hours}}  Hours to terminate from account {{account_name}}
+          shell: "for V in `cat {{emr_uptime_file}}`; do cat {{inventory_emr_path}} | grep $V | cut -d '|' -f3; done"
+          register: emr_id_to_terminate
+
+        - name: debug cluster id ti terminate
+          debug:
+            var: emr_id_to_terminate
+  
+      when: uptime_emr_list is defined and uptime_emr_list != []
+
+  when: date_to_compare.stdout_lines != []
+
+### SDG ###

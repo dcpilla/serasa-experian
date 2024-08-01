@@ -1,0 +1,7 @@
+---
+
+  - name: Restart Tanium
+    service:
+      name: taniumclient
+      state: restarted
+      enabled: yes

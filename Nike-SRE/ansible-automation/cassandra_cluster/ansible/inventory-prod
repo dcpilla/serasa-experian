@@ -1,0 +1,27 @@
+[all:vars]
+cassandra_jvm_xms="4G"
+cassandra_jvm_xmx="4G"
+rapid7_args="ScoreCI, Brazil SP, AWS 688321605224, prod"
+
+[cassandra_seeds]
+# Zone A
+10.99.216.153
+
+# Zone B
+10.99.216.221
+
+# Zona C
+10.99.188.152
+
+[cassandra_nodes]
+# Zone A
+10.99.216.136
+10.99.216.161
+
+# Zone B
+10.99.216.247
+10.99.216.222
+
+# Zone C
+10.99.188.161
+10.99.188.179

@@ -1,0 +1,37 @@
+---
+- name: Wait for node to join cluster
+  wait_for:
+    search_regex: "No gossip backlog; proceeding"
+    path: /var/log/cassandra/cassandra.log
+  tags:
+    - nodetools
+    - repair
+
+- name: CQLSH commands
+  shell: cqlsh "{{ansible_default_ipv4.address}}" -u "{{nodetools_user}}" -p "{{nodetools_passwd}}" -e "{{ item }}"
+  loop: "{{nodetools_cmds}}" 
+  tags:
+    - nodetools
+    - repair
+      # notify:
+      #    - Restart cassandra
+      #
+      #- name: Wait for node to join cluster
+      #  wait_for:
+      #    search_regex: "No gossip backlog; proceeding"
+      #    path: /var/log/cassandra/cassandra.log
+      #  tags:
+      #    - nodetools
+      #    - repair
+
+- name: Nodetools Repair 
+  shell: nodetool -u "{{nodetools_user}}" -pw "{{nodetools_passwd}}" repair --full
+  tags:
+    - nodetools
+    - repair
+
+- name: Nodetools CleanUp 
+  shell: nodetool -u "{{nodetools_user}}" -pw "{{nodetools_passwd}}" cleanup
+  tags:
+    - nodetools
+    - repair

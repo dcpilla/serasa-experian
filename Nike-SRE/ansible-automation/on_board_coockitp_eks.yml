@@ -1,0 +1,22 @@
+---
+- name: auth
+  import_role:
+    name: aws
+    tasks_from: sts_connection
+
+- name: criar policy 
+  import_role:
+    name: aws
+    tasks_from: iam_policy_on_board.yml
+
+- name: Executar Cloudformation
+  import_role:
+    name: aws
+    tasks_from: cloudformation_cockpit.yml
+    
+    # when: policy_created.filed is false
+
+- name: Create KMS
+  import_role:
+    name: aws
+    tasks_from: kms_create.yml

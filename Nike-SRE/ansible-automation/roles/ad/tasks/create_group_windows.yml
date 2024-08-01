@@ -1,0 +1,154 @@
+---
+- name: AD groups creation
+  block:
+    - set_fact:
+        type_group: '{{item}}'
+
+    - name: Set Experianbr Domain Variables current domain is {{domain}}
+      set_fact:
+        dcserver: '{{dcserver_experianbr}}'
+        domainname: '{{domains.experianbr}}'
+        dcuser: '{{dcuser_experianbr}}'
+        dcuser_pwd: '{{dcuser_pwd_experianbr}}'
+        fqdn: '{{hostname}}.br.experian.local'
+        dc: spobrexpdc01
+        ou: DC=br,DC=experian,DC=local
+      when: domain == "experianbr"
+
+    - name: Set Serasacliente Domain Variables current domain is {{domain}}
+      set_fact:
+        dcserver: '{{dcserver_serasacliente}}'
+        domainname: '{{domains.serasacliente}}'
+        dcuser: '{{dcuser_serasacliente}}'
+        dcuser_pwd: '{{dcuser_pwd_serasacliente}}'
+        fqdn: '{{hostname}}.serasacliente.com.br'
+        dc: '{{dcserver_serasacliente}}'
+        ou: DC=serasacliente,DC=com,DC=br
+      when: domain == "serasacliente"
+
+    - name: Block to use only a variable
+      delegate_to: '{{dcserver}}'
+      vars:
+         ansible_connection: winrm
+         ansible_port: 5986
+         ansible_winrm_server_cert_validation: ignore
+         ansible_winrm_transport: certificate
+         ansible_winrm_cert_pem: '{{winrm_cert_pem}}'
+         ansible_winrm_cert_key_pem: '{{winrm_server_key}}'
+         ansible_become: yes
+         ansible_become_method: runas
+         ansible_become_user: dcuser
+         ansible_become_pass: dcuser_pwd
+         ansible_become_flags: logon_type=new_credentials logon_flags=netcredentials_only
+      block:
+        - name: Block when type_group WS-STD
+          block:
+            - name: BR Experian - Saving Add group by {{dcserver}}...type_group {{type_group}}...hostname {{hostname}}...domain {{domain}} when type_group WS-STD
+              win_domain_group:
+                domain_username: "{{dcuser}}"
+                domain_password: "{{dcuser_pwd}}"
+                name: "{{type_group}}_{{hostname}}"
+                description: 'Standard RDP Windows Server Access for "{{hostname}}" [ {{type_group}}_{{hostname}} ]'
+                display_name: "{{type_group}}_{{hostname}}"
+                #    domain_server: '{{dc}}'
+                attributes:
+                  info: 'This group is designed to grant standard remote access to {{hostname}}'
+                  #extensionAttribute2: 'ADMIN'
+                  extensionAttribute4: '2#LM#{{user_login}}'
+                  extensionAttribute5: 'Requestable:Yes#Certifiable:Yes#Privileged:Yes#ProvideBulkPII:No#ViewPIIData:No#dataOwnerCert:Yes'
+                  extensionAttribute6: 'owner:{{user_login}}#logiplexAppName:Windows Server RDP Access#app_Id:{{geear_app_id}}'
+                scope: universal #domainlocal #domainlocal global universal
+                organizational_unit: 'OU=Remote Access Servers,OU=Groups,{{ou}}'
+                state: present
+              register: reg_unx
+              ignore_errors: yes
+              when: domain == "experianbr"
+
+            - name: Serasa Cliente - Saving Add group by {{dcserver}}...type_group {{type_group}}...hostname {{hostname}}...domain {{domain}} when type_group WS-STD 
+              win_domain_group:
+                domain_username: "{{dcuser}}"
+                domain_password: "{{dcuser_pwd}}"
+                name: "{{type_group}}_{{hostname}}"
+                description: 'Standard RDP Windows Server Access for "{{hostname}}" [ {{type_group}}_{{hostname}} ]'
+                display_name: "{{type_group}}_{{hostname}}"
+                attributes:
+                  info: 'This group is designed to grant standard remote access to {{hostname}}'
+                  extensionAttribute2: 'ADMIN'
+                  extensionAttribute4: '2#LM#{{user_login}}'
+                  extensionAttribute5: 'Requestable:Yes#Certifiable:Yes#Privileged:Yes#ProvideBulkPII:No#ViewPIIData:No#dataOwnerCert:Yes'
+                  extensionAttribute6: 'owner:{{user_login}}#logiplexAppName:Windows Server RDP Access#app_Id:{{geear_app_id}}'
+                scope: universal #domainlocal #domainlocal global universal
+                organizational_unit: 'OU=Remote Access Servers,OU=Groups,{{ou}}'
+                state: present
+              register: reg_unx
+              ignore_errors: yes
+              when: domain == "serasacliente"
+
+            - name: Wait AD group creation
+              win_wait_for:
+                delay: 15
+                timeout: 30
+
+            - debug:
+                var: reg_unx
+          when: type_group == 'WS-STD'
+
+        - name: Block when type_group WS-ADM
+          block:
+            - name: Saving Add group by {{dcserver}}...type_group {{type_group}}...hostname {{hostname}}...domain {{domain}} when type_group WS-ADM
+              win_domain_group:
+                domain_username: "{{dcuser}}"
+                domain_password: "{{dcuser_pwd}}"
+                name: "{{type_group}}_{{hostname}}"
+                description: 'Administrator of server "{{hostname}}" [ {{type_group}}_{{hostname}} ]'
+                display_name: "{{type_group}}_{{hostname}}"
+                #    domain_server: '{{dc}}'
+                attributes:
+                  info: 'This group is designed to grant administrative access via Manageby tab on computer object with Dynamic Restricted Groups tool.'
+                  extensionAttribute2: 'ADMIN'
+                  extensionAttribute4: '2#LM#{{user_login}}'
+                  extensionAttribute5: 'Requestable:No#Certifiable:Yes#Privileged:Yes#ProvideBulkPII:No#ViewPIIData:No#dataOwnerCert:Yes'
+                  extensionAttribute6: 'owner:{{user_login}}#logiplexAppName:Windows Server Admin Access#app_Id:{{geear_app_id}}'
+                scope: universal #domainlocal #domainlocal global universal
+                organizational_unit: 'OU=Admin Servers,OU=Groups,{{ou}}'
+                state: present
+              register: reg_unx_adm
+              ignore_errors: yes
+       
+            - debug:
+                var: reg_unx_adm
+
+            - name: Wait AD group creation
+              win_wait_for:
+                delay: 15
+                timeout: 30
+
+            - name: Set Manageby on AD Computer object
+              community.windows.win_domain_computer:
+                domain_username: "{{dcuser}}"
+                domain_password: "{{dcuser_pwd}}"
+                dns_hostname: "{{fqdn}}"
+                name: "{{hostname}}"
+                ou: 'OU=SrvDefault,OU=WinServer2019,OU=Servers,{{ou}}'
+                managed_by: 'WS-ADM_{{hostname}}'
+              register: managed
+
+            - debug:
+                var: fqdn    
+
+          when: type_group == 'WS-ADM'
+
+      when: type_group is defined
+
+- name: Set Group under Remote Desktop Users
+  ignore_errors: yes
+  delegate_to: "{{lab_ip}}"
+  vars:
+    ansible_connection: winrm
+    ansible_port: 5985
+    ansible_winrm_server_cert_validation: ignore
+    ansible_winrm_transport: basic
+    ansible_user: "{{win_bootstrap_user}}"
+    ansible_ssh_pass: "{{win_bootstrap_pass}}"
+  win_shell: Add-LocalGroupMember -Group "Remote Desktop Users" -Member 'WS-STD_{{ hostname }}'
+  when: type_group == 'WS-STD'    

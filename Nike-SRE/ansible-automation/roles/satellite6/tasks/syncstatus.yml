@@ -1,0 +1,24 @@
+---
+- set_fact:
+    id: "{{item}}"
+
+- name: Get status from repo {{id}}
+  shell: "hammer repository info --id={{id}} | grep Status | awk {'print $2'}"
+  register: status
+
+- name: Get name from repo {{id}}
+  shell: "hammer repository info --id={{id}} --fields 'Name'"
+  register: name
+
+- set_fact:
+    new_id: "{{id|replace(' ','')}}"
+    new_name: "{{name.stdout|replace('Name: ','')}}"
+    new_status: "{{status.stdout}}"
+
+- name: Create list sync incomplete
+  delegate_to: "{{workerexec}}"
+  lineinfile:
+    dest: /tmp/repos.csv
+    line: "{{new_id}}|{{new_name}}|{{new_status}}"
+    state: present
+  when: status.stdout is defined and status.stdout == "Warning"

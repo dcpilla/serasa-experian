@@ -1,0 +1,49 @@
+---
+- hosts: localhost
+  gather_facts: false
+  connection: local
+  tasks:
+    - debug:
+        var: hosts_list
+
+    - name: Set host to run standalone
+      add_host:
+        name: '{{ item }}'
+        group: hosts_invent
+      with_items: '{{ hosts_list }}'
+
+- hosts: hosts_invent 
+  gather_facts: false
+  tasks:
+#    - name: get packege name
+#      shell: rpm -qa | grep -i '{{package_name}}'
+#      register: pack_name
+#      become: yes
+    
+    - name: get installation date
+      shell: rpm -qa --last | grep -i '{{package_name}}' | awk {'print $1,$2,$3,$4,$5,$6,$7,$8'}
+      register: inst_date
+    
+    - name: get release
+      shell: cat /etc/os-release  | grep '^NAME='
+      register: os_name
+
+    - name: get release
+      shell: cat /etc/os-release  | grep 'VERSION_ID='
+      register: os_version
+
+    - debug:
+        var: os_name
+
+    - debug:
+        msg:
+          - '#######################################'
+          - '##              Results              ##'
+          - '#######################################'
+          - "## OS: {{os_name.stdout.split('=')[1]}} "
+          - "## Version: {{os_version.stdout.split('=')[1]}}"
+          - '#######################################'
+          - '##                                   '
+          - "## {{inst_date.stdout_lines}}"
+          - '##                                   '            
+          - '#######################################'

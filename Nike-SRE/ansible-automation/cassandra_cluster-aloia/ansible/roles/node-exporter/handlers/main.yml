@@ -1,0 +1,11 @@
+---
+- name: Reenable node exporter service
+  systemd:
+    daemon_reload: yes
+    enabled: yes
+    name: node_exporter
+
+- name: Restart node exporter
+  service:
+    name: node_exporter
+    state: restarted

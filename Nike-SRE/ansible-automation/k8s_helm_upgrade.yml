@@ -1,0 +1,66 @@
+---
+- include_role:
+    name: aws
+    tasks_from: sts_connection
+
+- name: clean helmupgrate_erros
+  set_fact:
+    helmupgrate_erros: []  
+
+
+- name: include role with task kubectl_config_cluster.yml
+  include_role:
+    name: k8s
+    tasks_from: kubectl_config_cluster.yml
+
+
+- name: get trivy before upgrade eks {{cluster_name}} from account {{account}}
+  ignore_errors: yes
+  shell: 'trivy k8s {{cluster_name}}  --scanners vuln --report summary'
+  register: before_trivy
+
+- debug:
+    var: before_trivy.stdout_lines
+
+- include_tasks: roles/k8s/tasks/helm_upgrade.yml
+  with_items:
+    # helm_name_release|helm_chart_name|helm_repo_name|helm_repo_url|namespace
+    - external-dns|external-dns|external-dns|https://kubernetes-sigs.github.io/external-dns|kube-system
+    - aws-efs-csi-driver|aws-efs-csi-driver|aws-efs|https://kubernetes-sigs.github.io/aws-efs-csi-driver/|kube-system
+    - istiod|istiod|istio|https://istio-release.storage.googleapis.com/charts|istio-system
+    - istio-ingress|gateway|istio|https://istio-release.storage.googleapis.com/charts|istio-system
+  loop_control:
+    loop_var: helm_item
+
+
+- name: get trivy after upgrade eks {{cluster_name}} from account {{account}}
+  ignore_errors: yes
+  shell: 'trivy k8s {{cluster_name}}  --scanners vuln --report summary'
+  register: after_trivy
+
+- debug:
+    var: after_trivy.stdout_lines
+
+
+- name: set fact to notify
+  set_fact:
+    notify_type: mail
+    title: "EKS HELM UPGRADE {{cluster_name}} from account {{account}}"
+    descr: "HELM UPGRADE Details <br/>Cluster EKS: {{cluster_name}}  <br/> Account: {{account}}"
+    msg: "Trivy before upgrade: <br/> {{before_trivy.stdout_lines}}"
+
+    #    msg: "Trivy before upgrade: 
+    #                <br/> {{before_trivy.stdout_lines|replace(',','<br/>')}} 
+    #         <br/> Trivy after upgrad: <br/>  {{after_trivy.stdout_lines|replace(',','<br/>')}}
+    #         <br/> Errors: <br/> {{helmupgrate_erros}} "
+    msg_to:
+      - "{{suport_email}}"
+      - alessandro.bahia@experian.com
+
+- name: notify started
+  import_role:
+    name: notify
+
+
+
+### SDG ###

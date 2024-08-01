@@ -1,0 +1,68 @@
+---
+- import_role:
+    name: disk
+    tasks_from: clean.yml
+
+- name: get McAfeeTP-10.7
+  shell: 'rpm -qa | grep -i  McAfeeTP-10.7.0-351.x86_64'
+  register: McAfeeTP
+  args:
+    warn: false
+  ignore_errors: yes
+
+- name: get LV /opt/McAfee
+  shell: lvs | grep opt_McAfee  | awk {'print $1'}
+  register: LVoptMcAfee
+
+- debug:
+    var: '{{item}}'
+  with_items:
+    - LVoptMcAfee.stdout
+    - McAfeeTP
+    - ansible_distribution_version
+
+- name: Reinstall Mcafee
+  block:
+
+    - import_role:
+        name: mcafee
+        tasks_from: uninstall_mcafee
+
+    - debug:
+        var: LVoptMcAfee
+
+    - import_role:
+        name: mcafee
+        tasks_from: reconfigura_disk
+      when:  LVoptMcAfee.stdout   == ''
+
+    - import_role:
+        name: mcafee
+        tasks_from: check_if_installed.yml
+
+    - import_role:
+        name: mcafee
+        tasks_from: check_disk_space.yml
+
+    - block:
+        - import_role:
+            name: mcafee
+            tasks_from: install_agent.yml
+
+        - import_role:
+            name: mcafee
+            tasks_from: install_antivirus.yml
+      rescue:
+          - import_role:
+              name: mcafee
+              tasks_from: cleanup.yml
+          - set_fact:
+                has_cleaned_up: True
+
+    - import_role:
+        name: mcafee
+        tasks_from: cleanup.yml
+      when: has_cleaned_up is not defined
+
+#  when: ansible_distribution_version|int <= 6 
+#  when: (McAfeeTP.stdout == '' or LVoptMcAfee.stdout   == '') and ansible_distribution_major_version|int < 5

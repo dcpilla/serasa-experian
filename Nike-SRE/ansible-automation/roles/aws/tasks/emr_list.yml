@@ -1,0 +1,48 @@
+---
+- name: Include Assume-Role account {{account}}
+  include_tasks: sts_connection.yml
+
+- name: clean emr_list_id
+  set_fact:
+    emr_list_id: !!null
+
+- name: list emr by aws cli
+  shell: /usr/local/bin/aws --profile sts_cli emr list-clusters --active --query Clusters[].Id
+  register: emr_list_id
+
+- name: convert emr_List_id to json
+  set_fact:
+    emr_list_id: '{{emr_list_id.stdout|from_json}}'
+
+#- name: show variable emr_list_id
+#  debug:
+#    var: emr_list_id
+
+- name: describe emr 
+  block:
+    - name:  include task emr_list_describe.yml in emr_List_id variable
+      include_tasks: emr_list_describe.yml
+      with_items: '{{emr_list_id}}'  
+      loop_control:
+        loop_var: emr_id
+
+  when: emr_list_id != []
+
+- name: Print MSG EMR ACCOUNT DONT HAVE EMR CLUSTER
+  debug:
+    msg: 
+      - '#####################################'
+      - '#####################################'
+      - '          {{account_name}}'
+      - '#####################################'
+      - '##  ACCOUNT DONT HAVE EMR CLUSTER  ##'
+      - '#####################################'
+      - '#####################################'
+  when:  emr_list_id == []
+
+
+
+### destruit session
+
+
+###SDG### 

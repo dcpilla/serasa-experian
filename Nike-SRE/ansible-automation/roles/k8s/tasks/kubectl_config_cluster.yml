@@ -1,0 +1,57 @@
+---
+- name: config kubectl {{cluster_name}} in account {{account}}
+  shell: '/usr/local/bin/aws eks --region {{account_region}} update-kubeconfig --name {{cluster_name}} --alias {{cluster_name}} --profile=sts_cli'
+  register: kubeconfig
+
+- name: print kubeconfig variable
+  debug:
+    var: kubeconfig
+
+- set_fact:
+    command: /usr/local/bin/kubectl get vs  -A | grep eeca | awk {'print $4'} |cut -d '.' -f2-5 |cut -d'"' -f1 | head -1
+
+- name: get cluster domain {{command}}
+  shell: '{{command}}'
+  register: cluster_domain
+
+- name: get only cluster_domain.stdout
+  set_fact:
+    cluster_domain: '{{cluster_domain.stdout}}'
+
+
+- name: get cluster_fs_id to aws-efs
+  shell: "/usr/local/bin/helm get values aws-efs-csi-driver -n kube-system| grep fileSystemId | cut -d ':' -f2| sed '0,/[[:blank:]]/s/[[:blank:]]//'"
+  register: cluster_fs_id
+
+- name: get only cluster_fs_id.stdout
+  set_fact:
+    cluster_fs_id: '{{cluster_fs_id.stdout}}'
+
+- name: get cluster version
+  shell: /usr/local/bin/aws eks describe-cluster --name {{cluster_name}} --profile sts_cli --region {{account_region}} --query "cluster.[version]" --output text
+  register: cluster_version
+
+
+- name: get only cluster_version.stdout
+  set_fact:
+    cluster_version: '{{cluster_version.stdout}}'
+
+- name: print values to upgrade helms of {{cluster_name}}
+  debug:
+    msg:
+      - "#############################################################"
+      - "#        CLUSTER-EKS RETURNS BY KUBECTL IN  ANSIBLE         #"
+      - "#############################################################"
+      - "#  Return Variables  |               Values                 #"
+      - "#############################################################"
+      - "#############################################################"
+      - "##                                                         ##"
+      - "## cluster_name......: {{cluster_name}}"
+      - "## cluster_domain....: {{cluster_domain}}"
+      - "## cluster_fs_id.....: {{cluster_fs_id}}"
+      - "## cluster_version...: {{cluster_version}}"
+      - "##                                                         ##"
+      - "#############################################################"
+      - "#############################################################"
+
+###SDG###

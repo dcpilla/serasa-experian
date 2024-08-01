@@ -1,0 +1,65 @@
+---
+- name: list kms and define enable and disable list
+  include_role:
+    name: aws
+    tasks_from: kms_list.yml
+
+- name: clean errors to enable rotation
+  set_fact:
+     enable_rotatios_errors: []
+     enabled_rotatios: []
+
+- name: enable key rotation of kms_customer_enable_list variable list from {{account}} account  
+  with_items: '{{kms_rotation_disabled_list}}'
+  include_tasks: roles/aws/tasks/kms_enable_key_rotation.yml
+  loop_control:
+    loop_var: km_key_id    
+  when: kms_customer_enable_list != []
+
+- name: block when contain errors in enable kms
+  block:
+    - name: show enable_rotatios_errors
+      debug:
+        var: enable_rotatios_errors
+
+    - name: set fact to notification
+      set_fact:
+        notify_type: mail
+        title: 'Errors when Enabled KMS Rotation form account {{account}}'
+#        sub_title: 'Erros when Enabled KMS Rotation'
+        descr: 'This job Enable kms rotation from nike aws accounts'
+        msg: '{{enable_rotatios_errors}}'
+        msg_to:
+          - '{{suport_email}}'
+          - 'alessandro.bahia@br.experian.com'            
+
+    - include_role:
+        name: notify
+
+  when: enable_rotatios_errors != []
+
+- name: block when enebled kms
+  block:
+    - name: show enable_rotatios
+      debug:
+        var: enabled_rotatios
+
+    - name: set fact to notification
+      set_fact:
+        notify_type: mail
+        title: 'Enabled KMS Rotation from account {{account}}'
+#        sub_title: 'Erros when Enabled KMS Rotation'
+        descr: 'This job Enable kms rotation from Nike Project <br/>account: {{account}}'
+        msg: 'kms-ids: <br/>{{enabled_rotatios}}'
+        msg_to:
+          - '{{suport_email}}'
+          - 'alessandro.bahia@br.experian.com'            
+
+    - include_role:
+        name: notify
+
+
+  when: enabled_rotatios != []
+  
+
+ ### SDG ###

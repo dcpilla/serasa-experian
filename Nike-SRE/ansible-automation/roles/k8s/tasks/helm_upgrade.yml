@@ -1,0 +1,60 @@
+- name: segregate current helm facts {{helm_item}}
+  set_fact:
+    current_helm_release: "{{helm_item.split('|')[0]}}"
+    current_chart_name: "{{helm_item.split('|')[1]}}"
+    current_repo_name: "{{helm_item.split('|')[2]}}"
+    current_repo_url:  "{{helm_item.split('|')[3]}}"
+    current_namespace: "{{helm_item.split('|')[4]}}"
+
+- name: write /tmp/helms-values/{{cluster_name}}-{{current_helm_release}}-values.yaml
+  ansible.builtin.template:
+     src: 'roles/k8s/templates/{{current_helm_release}}-values.yaml'
+     dest: '/tmp/helms-values/{{cluster_name}}-{{current_helm_release}}-values.yaml'
+     force: yes
+
+- name: add current repo  {{current_repo_name}}  
+  ignore_errors: yes
+  shell: '{{item}}'
+  with_items: 
+    - "/usr/local/bin/helm repo add {{current_repo_name}} {{current_repo_url}} --force-update "
+  register: repoadd
+
+- debug:
+    var: repoadd
+
+- name: upgrade current helm {{current_helm_release}} in {{cluster_name}} namespace {{current_namespace}} from account {{account}}
+  ignore_errors: yes 
+  shell: '/usr/local/bin/helm upgrade --install {{current_helm_release}} --namespace {{current_namespace}} --values /tmp/helms-values/{{cluster_name}}-{{current_helm_release}}-values.yaml  {{current_repo_name}}/{{current_chart_name}} --force'
+  register: helm_upgrade
+
+- name: set fact when helmupgrate is error
+  set_fact: 
+    helmupgrate_erros: "{{helmupgrate_erros|default([]) + [ helm_upgrade.stderr ] }}"
+  when: helm_upgrade.stderr != ''  
+
+
+#- debug:
+#    var: helm_upgrade
+
+#  with_items:
+#    - '/usr/local/bin/kubectx'
+#          #    - '/usr/local/bin/helm --repo https://kubernetes-sigs.github.io/aws-efs-csi-driver/ upgrade --install aws-efs-csi-driver --namespace kube-system --values templates/efs-csi-driver-values.yaml  aws-efs-csi-driver/aws-efs-csi-driver --force'
+#          #    - '/usr/local/bin/helm --repo https://kubernetes-sigs.github.io/external-dns/ upgrade --install external-dns --namespace kube-system --values templates/external-dns-values.yaml  external-dns/external-dns  --force'
+#    - '/usr/local/bin/helm --repo https://istio-release.storage.googleapis.com/charts upgrade --install  istiod --namespace istio-system  --values /tmp/helms-values/isntiod-values.yaml  istio/istiod --force'
+  register: update_test
+
+
+- debug: 
+    var: update_test  
+
+
+#- name: remove /tmp/helms-values/{{cluster_name}}-{{current_helm_release}}-values.yaml
+#  file:
+#    path: '/tmp/helms-values/{{cluster_name}}-{{current_helm_release}}-values.yaml'
+#    state: absent
+
+  # kubectl  get events -n kube-system  --sort-by='.metadata.creationTimestamp' -w
+  
+  
+
+###SDG###

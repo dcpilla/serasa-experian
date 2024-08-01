@@ -1,0 +1,29 @@
+---
+- import_role:
+    name: aws
+    tasks_from: sts_connection
+
+- name: clean eksfields_list dictonary
+  set_fact:
+    eksfields_list: []
+
+- name: debug var eksfields_list 
+  debug:
+    var: eksfields_list
+
+
+- import_role:
+    name: aws
+    tasks_from: eks_list
+
+- name: ADD eks invetory in {{inventory_eks_path}} 
+  become: yes
+  lineinfile:
+    path: '{{inventory_eks_path}}'
+    line: "{{account_id}}|{{account_name}}|{{item.eks_name}}|{{item.eks_arn}}|{{item.eks_version}}|{{item.eks_image}}|{{item.eks_tags}}"
+    state: present
+    create: true
+  with_items: '{{eksfields_list}}'
+  when:  eksfields_list != []
+
+### SDG ###  

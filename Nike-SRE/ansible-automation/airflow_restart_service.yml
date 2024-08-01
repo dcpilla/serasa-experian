@@ -1,0 +1,14 @@
+---
+- hosts: localhost
+  tasks:
+    - name: create dynamic inventory
+      add_host:
+        name: '{{host_ip}}'
+        group: dynamic_ip
+
+- hosts: dynamic_ip
+  tasks:
+    - import_role:
+        name: airflow
+        tasks_from: restart_service.yml
+  become: yes

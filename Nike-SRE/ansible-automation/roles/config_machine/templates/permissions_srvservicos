@@ -1,0 +1,2 @@
+# srvservicos group
+%srvservicos ALL=NOPASSWD: /bin/su -

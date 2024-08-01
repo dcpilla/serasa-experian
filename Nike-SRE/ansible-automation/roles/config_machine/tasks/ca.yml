@@ -1,0 +1,18 @@
+---
+- name: Import CA Serasa and WebProxy
+  copy:
+    src: files/{{ item }}
+    dest: /etc/pki/ca-trust/source/anchors/
+  with_items:
+    - Serasa_Corporate_Issuing_CA_01.cer
+    - Serasa_Corporate_Issuing_CA_02.cer
+    - Serasa_Corporate_Issuing_CA_03.cer
+    - Serasa_Corporate_Root_CA.cer
+    - ExperianProxyCert2020.crt
+
+- name: Extract and add the Intermediate CA
+  shell: update-ca-trust extract
+  args:
+    executable: /bin/bash
+
+

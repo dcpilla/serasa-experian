@@ -1,0 +1,32 @@
+---
+## taks nao atem assumed role pois precisa ser executa de outra task que ja tem essa função
+
+- name: terminate emr id {{emr_job_id}} in account {{account_name}}
+  shell: "/usr/local/bin/aws emr terminate-clusters --cluster-ids {{emr_job_id}} --profile sts_cli"
+  register: emrterminated
+  ignore_errors: yes
+
+- debug:
+    var: emrterminated
+
+- name: register action of terminate cluster with emr_running_more_than_a_day variable from task check_emr_no_prod_uptime.yml  account {{account_name}}
+  block:
+    - name: get cluster name from emr job id {{emr_job_id}}
+      shell: "grep {{emr_job_id}} {{inventory_emr_path}}"
+      register: cluster_name
+
+    - name: register terminetade cluster in /home/Check/Inv/emr_terminated.txt
+      become: yes
+      lineinfile:
+        path: /home/Check/Inv/emr_terminated.txt
+        line: "{{ansible_date_time.date}}-{{ansible_date_time.time}}|{{account_name}}|{{emr_job_id}}|{{cluster_name.stdout}}"
+        state: present
+        create: true
+
+  when: emrterminated is defined and emrterminated.stderr_lines == []
+
+#  with_items:
+#    - '{{emr_running_more_than_a_day.stdout_lines}}'
+    
+
+###SDG### 

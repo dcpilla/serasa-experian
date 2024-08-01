@@ -1,0 +1,19 @@
+---
+- name: create {{key_name}} key pair using key_material obtained using 'file' lookup plugin account {{account}}
+  ec2_key:
+    aws_access_key: "{{ assumed_role_ak }}"
+    aws_secret_key: "{{ assumed_role_sk }}"
+    security_token: "{{ assumed_role_token }}"
+    validate_certs: no
+    region: '{{account_region}}'
+  
+    name: sre-suport
+    key_material: "{{ lookup('file', 'sre-suport.pub') }}"
+    state: present
+  ignore_errors: yes
+  register: key_created
+
+
+- debug:
+    var: key_created  
+

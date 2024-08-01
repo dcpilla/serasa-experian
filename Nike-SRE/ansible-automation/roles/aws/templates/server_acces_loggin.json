@@ -1,0 +1,6 @@
+{
+      "LoggingEnabled": {
+          "TargetBucket": "aws-logs-{{account_id}}-{{account_region}}",
+          "TargetPrefix": "{{s3name}}/"
+       }
+} 

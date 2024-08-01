@@ -1,0 +1,152 @@
+---
+- name: set values to weekly schedule
+  block:
+    #melhor essa forma de condicional ta muito lixo
+    - set_fact:
+        RRULE: FREQ=WEEKLY;BYDAY=MO;INTERVAL=1
+      when: weekly_day == 'Segunda'
+    - set_fact:
+        RRULE: FREQ=WEEKLY;BYDAY=TU;INTERVAL=1
+      when: weekly_day == 'Terca'
+    - set_fact:
+        RRULE: FREQ=WEEKLY;BYDAY=WE;INTERVAL=1
+      when: weekly_day == 'Quarta'
+    - set_fact:
+        RRULE: FREQ=WEEKLY;BYDAY=TH;INTERVAL=1
+      when: weekly_day == 'Quinta'
+    - set_fact:
+        RRULE: FREQ=WEEKLY;BYDAY=FR;INTERVAL=1
+      when: weekly_day == 'Sexta'
+    - set_fact:
+        RRULE: FREQ=WEEKLY;BYDAY=SA;INTERVAL=1
+      when: weekly_day == 'Sabado'
+    - set_fact:
+        RRULE: FREQ=WEEKLY;BYDAY=SU;INTERVAL=1
+      when: weekly_day == 'Domingo'
+
+  when: schedule_type == 'Semanal'
+
+- name: set values to monthly schedule
+  set_fact:
+    RRULE: FREQ=MONTHLY;BYMONTHDAY={{monthly_day}};INTERVAL=1
+  when: schedule_type  == 'Mensal-Dia'
+
+- name: set values to monthly schedule
+  block:
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=1;BYDAY=SU;INTERVAL=1
+      when: monthly_weekly_day == 'PRIMEIRO-DOMINGO'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=1;BYDAY=MO;INTERVAL=1
+      when: monthly_weekly_day == 'PRIMEIRA-SEGUNDA-FEIRA'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=1;BYDAY=TU;INTERVAL=1
+      when: monthly_weekly_day == 'PRIMEIRA-TERCA-FEIRA'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=1;BYDAY=WE;INTERVAL=1
+      when: monthly_weekly_day == 'PRIMEIRA-QUARTA-FEIRA'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=1;BYDAY=TH;INTERVAL=1
+      when: monthly_weekly_day == 'PRIMEIRA-QUINTA-FEIRA'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=1;BYDAY=FR;INTERVAL=1
+      when: monthly_weekly_day == 'PRIMEIRA-SEXTA-FEIRA'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=1;BYDAY=SA;INTERVAL=1
+      when: monthly_weekly_day == 'PRIMEIRO-SABADO'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=2;BYDAY=SU;INTERVAL=1
+      when: monthly_weekly_day == 'SEGUNDO-DOMINGO'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=2;BYDAY=MO;INTERVAL=1
+      when: monthly_weekly_day == 'SEGUNDA-SEGUNDA-FEIRA'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=2;BYDAY=TU;INTERVAL=1
+      when: monthly_weekly_day == 'SEGUNDA-TERCA-FEIRA'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=2;BYDAY=WE;INTERVAL=1
+      when: monthly_weekly_day == 'SEGUNDA-QUARTA-FEIRA'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=2;BYDAY=TH;INTERVAL=1
+      when: monthly_weekly_day == 'SEGUNDA-QUINTA-FEIRA'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=2;BYDAY=FR;INTERVAL=1
+      when: monthly_weekly_day == 'SEGUNDA-SEXTA-FEIRA'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=2;BYDAY=SA;INTERVAL=1
+      when: monthly_weekly_day == 'SEGUNDO-SABADO'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=3;BYDAY=SU;INTERVAL=1
+      when: monthly_weekly_day == 'TERCEIRO-DOMINGO'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=3;BYDAY=MO;INTERVAL=1
+      when: monthly_weekly_day == 'TERCEIRA-SEGUNDA-FEIRA'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=3;BYDAY=TU;INTERVAL=1
+      when: monthly_weekly_day == 'TERCEIRA-TERCA-FEIRA'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=3;BYDAY=WE;INTERVAL=1
+      when: monthly_weekly_day == 'TERCEIRA-QUARTA-FEIRA'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=3;BYDAY=TH;INTERVAL=1
+      when: monthly_weekly_day == 'TERCEIRA-QUINTA-FEIRA'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=3;BYDAY=FR;INTERVAL=1
+      when: monthly_weekly_day == 'TERCEIRA-SEXTA-FEIRA'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=3;BYDAY=SA;INTERVAL=1
+      when: monthly_weekly_day == 'TERCEIRO-SABADO'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=4;BYDAY=SU;INTERVAL=1
+      when: monthly_weekly_day == 'QUARTO-DOMINGO'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=4;BYDAY=MO;INTERVAL=1
+      when: monthly_weekly_day == 'QUARTA-SEGUNDA-FEIRA'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=4;BYDAY=TU;INTERVAL=1
+      when: monthly_weekly_day == 'QUARTA-TERCA-FEIRA'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=4;BYDAY=WE;INTERVAL=1
+      when: monthly_weekly_day == 'QUARTA-QUARTA-FEIRA'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=4;BYDAY=TH;INTERVAL=1
+      when: monthly_weekly_day == 'QUARTA-QUINTA-FEIRA'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=4;BYDAY=FR;INTERVAL=1
+      when: monthly_weekly_day == 'QUARTA-SEXTA-FEIRA'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=4;BYDAY=SA;INTERVAL=1
+      when: monthly_weekly_day == 'QUARTO-SABADO'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=-1;BYDAY=SU;INTERVAL=1
+      when: monthly_weekly_day == 'ULTIMO-DOMINGO'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=-1;BYDAY=MO;INTERVAL=1
+      when: monthly_weekly_day == 'ULTIMA-SEGUNDA-FEIRA'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=-1;BYDAY=TU;INTERVAL=1
+      when: monthly_weekly_day == 'ULTIMA-TERCA-FEIRA'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=-1;BYDAY=WE;INTERVAL=1
+      when: monthly_weekly_day == 'ULTIMA-QUARTA-FEIRA'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=-1;BYDAY=TH;INTERVAL=1
+      when: monthly_weekly_day == 'ULTIMA-QUINTA-FEIRA'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=-1;BYDAY=FR;INTERVAL=1
+      when: monthly_weekly_day == 'ULTIMA-SEXTA-FEIRA'
+    - set_fact:
+        RRULE: FREQ=MONTHLY;BYSETPOS=-1;BYDAY=SA;INTERVAL=1
+      when: monthly_weekly_day == 'ULTIMO-SABADO'
+
+  when: schedule_type == 'Mensal-Dia-Semana'
+
+- debug:
+    msg:
+      - '################################'           
+      - '#        RRULE Defined         #'          
+      - '################################'           
+      - '{{RRULE}}' 
+      - '################################'            
+
+### SDG ###        

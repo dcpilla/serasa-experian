@@ -1,0 +1,65 @@
+---
+- name: Set sudoers
+  block:
+    - name: Remove match_group_by_gid in sudoers
+      lineinfile:
+        path: /etc/sudoers
+        state: absent
+        line: match_group_by_gid
+
+    - name: Add configs syslog in sudoers
+      lineinfile:
+        path: /etc/sudoers
+        state: present
+        line: 'Defaults  syslog=authpriv,syslog_goodpri=info,syslog_badpri=info' 
+
+    - name: Alias NETWORKING sudoers
+      replace:
+        path: /etc/sudoers
+        regexp: '^# (Cmnd_Alias NETWORKING.*)$'
+        replace: '\1'
+
+    - name: Alias SOFTWARE sudoers
+      replace:
+        path: /etc/sudoers
+        regexp: '^# (Cmnd_Alias SOFTWARE.*)$'
+        replace: '\1'
+  
+    - name: Alias SERVICES sudoers
+      replace:
+        path: /etc/sudoers
+        regexp: '^# (Cmnd_Alias SERVICES.*)$'
+        replace: '\1'
+
+    - name: Alias LOCATE sudoers
+      replace:
+        path: /etc/sudoers
+        regexp: '^# (Cmnd_Alias LOCATE.*)$'
+        replace: '\1'
+
+    - name: Alias STORAGE sudoers
+      replace:
+        path: /etc/sudoers
+        regexp: '^# (Cmnd_Alias STORAGE.*)$'
+        replace: '\1'
+
+    - name: Alias DELEGATING sudoers
+      replace:
+        path: /etc/sudoers
+        regexp: '^# (Cmnd_Alias DELEGATING.*)$'
+        replace: '\1'
+
+    - name: Alias PROCESSES sudoers
+      replace:
+        path: /etc/sudoers
+        regexp: '^# (Cmnd_Alias PROCESSES.*)$'
+        replace: '\1'
+
+    - name: Alias DRIVERS sudoers
+      replace:
+        path: /etc/sudoers
+        regexp: '^# (Cmnd_Alias DRIVERS.*)$'
+        replace: '\1'
+
+  tags:
+    - setsudoers

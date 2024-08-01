@@ -1,0 +1,204 @@
+---
+# ref https://www.techbeatly.com/dynamic-scheduler-in-ansible-automation-platform/
+
+- name: call task check pre-req
+  include_tasks: schedule_create_pre_check.yml
+
+- name: set datetoday
+  shell: 'date "+%Y%m%d"'
+  register: datetoday
+  become: false
+
+- set_fact:
+    app_ip: '{{tower_server}}'
+    #user_id: 3 nikeworker
+    #user_id: 347 towervelho
+    user_id: 374
+    #job_template_id: 10 nikeworker
+    #job_template_id: 635 old tower
+    job_template_id: 667
+    sched_hour:  "{{datetoday.stdout}}T{{execution_hour|replace(':','')}}00"    
+    #formato que deve ser a lista de ips server_list: ['10.99.249.33','10.99.249.33s']
+    py_file: /tmp/pyreplace.py
+    server_list_file: /tmp/servers-list.txt
+
+
+- name: create python replace in {{py_file}}
+  become: false
+  template:
+    src: roles/tower/templates/pyreplace.py
+    dest: '{{py_file}}'
+
+- name: Output the server list in {{server_list_file}} file
+  become: false
+  lineinfile:
+    dest: '{{server_list_file}}'
+    state: present
+    insertafter: EOF
+    line: "{{instancias_ip}}"
+    create: yes
+
+- name: execute python file {{py_file}}
+  shell: python3 '{{py_file}}'
+  become: false
+
+- name: get server-list   
+  shell: cat "{{server_list_file}}"
+  register: server_list_get
+  become: false
+
+- set_fact:
+    lista_ips: '{{server_list_get.stdout}}'
+
+- name: Remove files
+  become: false
+  #  become: yes
+  ansible.builtin.file:
+    path: '{{item}}'
+    state: absent  
+  with_items:
+    - '{{py_file}}'
+    - '{{server_list_file}}'
+
+
+- debug:
+    msg:     
+      - "############# INTERNAL  VARIABLES #############"
+      - "# datetoday:....... {{datetoday.stdout}}"
+      - "# sched_hour:...... {{sched_hour}} "
+      - "# user_id:......... {{user_id}}"  
+      - "# job_template_id:. {{job_template_id}}"
+      - "# app_ip:.......... {{app_ip}}"
+      - "# lista_ips:....... {{lista_ips}}"
+      - "                                               "
+      - "# ############# EXTERNAL VARIABLES #############"
+      - "# aws_account_id:........ {{aws_account_id}}"
+      - "# solicitante:........... {{solicitante}}"
+      - "# schedule_name:......... {{schedule_name}}"
+      - "# squad_env:............. {{squad_env}}"        
+      - "# schedule_type:......... {{schedule_type}}"
+      - "# weekly_day:............ {{weekly_day}}"
+      - "# monthly_day:........... {{monthly_day}}"
+      - "# monthly_weekly_day:.... {{monthly_weekly_day}}"
+      - "# execution_hour:........ {{execution_hour}}"
+      - "# mail_copy:............. {{mail_copy}}"
+      - "# instancias_ip:......... {{instancias_ip}}"
+      - "# chg_assignment_group:.. {{chg_assignment_group}}"
+      - "# chg_assigned_to:....... {{chg_assigned_to}}"
+      - "# chg_environment:....... {{chg_environment}}"        
+      - "                                               "
+      - "###############################################"
+
+
+
+- name: call task create define RRULE
+  include_tasks: schedule_create_define_RRULE.yml
+
+- name: retrieve the Ansible Tower Token
+  uri:
+    url: https://{{ app_ip }}/api/v2/users/{{ user_id }}/personal_tokens/
+    user: '{{loginapi}}'
+    password: '{{pwdapi}}'
+    method: POST
+    force_basic_auth: yes
+    headers:
+      Content-Type: application/json
+    return_content: yes
+    validate_certs: no
+    status_code: [200, 201]
+    body_format: json
+    body:
+      extra_vars:
+        description: "Tower CLI"
+        application: null
+        scope: write
+  register: result
+    #
+    ## the schedule name has to be unique
+- name: Create unique schedule name
+  set_fact:
+    token: "{{ result['json']['token'] }}"
+
+# the schdule can have it's own extra_data pasing the extr varaibles' value
+# to the job tempalte patch
+# The REST API needs boht SGT and UTC times :-)
+- name: Add the {{schedule_name}} schedule to template from squad {{squad_env}}
+  uri:
+    url: https://{{ app_ip }}/api/v2/job_templates/{{ job_template_id }}/schedules/
+    method: POST
+    headers:
+      Authorization: "Bearer {{ token }}" 
+    return_content: yes
+    validate_certs: no
+    status_code: [200, 201]
+    body_format: json
+    body:
+        # RRULE Generator
+        # https://freetools.textmagic.com/rrule-generator#:~:text=A%20recurrence%20rule%2C%20commonly%20referred,instances%20in%20a%20calendar%20component). 
+        #rrule: "DTSTART;TZID=America/Sao_Paulo:'{{sched_hour}}' RRULE:{{RRULE}}"
+        rrule: "DTSTART;TZID=America/Sao_Paulo:{{sched_hour}} RRULE:{{RRULE}}"
+                                                                
+        name: "{{ schedule_name }}"
+        description: ""
+        extra_data: 
+          ambiente: '{{squad_env}}'
+          server_list: "['{{lista_ips}}']"
+          mail_copy: '{{mail_copy}}'
+          aws_account: '{{aws_account_id}}'
+          chg_assignment_group: '{{chg_assignment_group}}'
+          chg_assigned_to: '{{chg_assigned_to}}'
+          chg_environment: '{{chg_environment}}'        #UAT Dev Production          
+          solicitante: '{{solicitante}}'
+        inventory: null
+        scm_branch: ""
+        job_type: null
+        job_tags: ""
+        skip_tags: ""
+        limit: ""
+        diff_mode: null
+        verbosity: null
+        enabled: true
+        unified_job_template: '{{job_template_id}}'
+        #        dtstart: "20230418"
+        dtstart: "{{datetoday.stdout}}"
+#        dtend: "{{ utc_date }}"
+        dtend: 'Never'
+        next_run: null
+        timezone: "America/Sao_Paulo"
+        until: ""
+  register: result
+  when: precheck == true  
+
+- name: set fact to send email 
+  set_fact:
+    email_title: "Auto apply patch {{schedule_name}} schedule created<br/>"
+    sub_title: 'This is an automatic process from Nike Program'
+    description: 'Created schedule to auto apply patch'
+    report_date: "{{ lookup('pipe', 'date -d \"3 hour ago\" +\"%Y-%m-%d %H:%M:%S\"') }}"
+    body: "<br>Process Name: Auto apply patch schedule creation <br/>
+           ambiente: {{squad_env}} <br/>
+           mail squad: {{mail_copy}} <br/>
+           aws account: {{aws_account_id}} <br/>
+           snow assignment group: {{chg_assignment_group}} <br/>
+           snow assigned to: {{chg_assigned_to}} <br/>
+           snow environment: {{chg_environment}} <br/>
+           requester: {{solicitante}} <br/>
+           Server List: {{instancias_ip}} <br/>"
+
+- name: send email with {{schedule_name}} schedule inform
+  become: false
+  delegate_to: "{{workerexec}}"
+  ignore_errors: yes
+  mail:
+    host: '{{mail_host}}'
+    port: '{{mail_port}}'
+    from: '{{mail_from}}'
+    to:
+      - '{{suport_email}}'
+      - '{{mail_copy}}'
+#      - 'alessandro.bahia@br.experian.com'
+    subject: '{{schedule_name}} schedule created'
+    subtype: html
+    body: "{{ lookup('template', '{{mail_template}}') }}"
+
+### SDG ###

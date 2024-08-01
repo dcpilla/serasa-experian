@@ -1,0 +1,16 @@
+---
+- hosts: localhost
+  gather_facts: no
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    AWS_REGION: sa-east-1
+  tasks:
+    - import_role:
+        name: aws
+        tasks_from: sts_connection
+
+    - import_role:
+        name: aws
+        tasks_from: bucket_list.yml
+#  become: yes

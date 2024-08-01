@@ -1,0 +1,25 @@
+---
+- name: Create a {{rds_name}} DB instance using the default AWS KMS encryption key
+  amazon.aws.rds_instance:
+    aws_access_key: "{{ assumed_role_ak }}"
+    aws_secret_key: "{{ assumed_role_sk }}"
+    security_token: "{{ assumed_role_token }}"
+    region: '{{account_region}}'
+    validate_certs: no
+
+    id: '{{rds_name}}'
+    state: present
+    engine: '{{engine}}' #mariadb
+    storage_encrypted: True
+    db_instance_class: '{{db_instance_class}}' #db.t2.medium
+    username: "{{ username }}"
+    password: "{{ password }}"
+    allocated_storage: "{{ gb_storage_db }}"
+    purge_tags: false
+    tags:
+      "{{tag}}" 
+  register: rds
+
+- name:
+  debug:
+    var: rds

@@ -1,0 +1,25 @@
+---
+- name: get packege name
+  shell: rpm -qa | grep -i '{{package_name}}'
+  register: pack_name
+  become: yes
+
+- name: get installation date
+  shell: rpm -qa --last | grep -i '{{package_name}}' | awk {'print $1,$2,$3,$4,$5,$6,$7,$8'}
+  register: inst_date
+  become: yes
+
+- name: get release
+  shell: cat /etc/os-release  | egrep '^NAME=|VERSION_ID'
+  register: release
+  become: yes
+
+- name: append output on file
+  delegate_to: localhost
+  delegate_facts: true
+  lineinfile:
+    dest: '{{ Path_arquivo_gerado }}'
+    state: present
+    insertafter: EOF
+    line: "{{inventory_hostname}}|{{release.stdout}}|{{pack_name.stdout_lines}}|{{inst_date.stdout_lines}}"
+  become: yes

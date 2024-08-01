@@ -1,0 +1,23 @@
+---
+- name: Rebuid rpmdb
+  shell: '{{item}}'
+  with_items:
+    - 'rm -rf /var/lib/rpm/__db.*'
+    - 'rpmdb --rebuilddb'
+    
+- name: Install yum utils (RHEL > 5)
+  yum:
+    name: yum-utils
+    state: present
+  ignore_errors: yes
+  when: ansible_distribution_major_version|int > 5
+    
+- name: Cleanup old kernels
+  shell: package-cleanup --oldkernels --count=1 -y
+  ignore_errors: yes
+  when: ansible_distribution_major_version|int <= 7
+    
+- name: Cleanup old kernels RHEL 8
+  shell: dnf remove -y  --oldinstallonly --setopt installonly_limit=1 kernel 
+  ignore_errors: yes
+  when: ansible_distribution_major_version|int == 8

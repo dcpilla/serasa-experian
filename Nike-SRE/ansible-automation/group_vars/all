@@ -1,0 +1,198 @@
+---
+inventory_our_instance_path_linux: /home/Check/Inv/ec2-invetory_our_linux_instaces.txt
+inventory_our_instance_path_windows: /home/Check/Inv/ec2-invetory_our_windows_instaces.txt
+inventory_all_instances_path: /home/Check/Inv/ec2-invetory_all_instances.txt
+inventory_emr_path: /home/Check/Inv/emr_invetory.txt
+inventory_emr_path_no_prod: /home/Check/Inv/emr_no_prod_invetory.txt
+inventory_s3_path: /home/Check/Inv/s3_invetory.txt
+inventory_eks_path: /home/Check/Inv/eks_invetory.txt
+container_vulnerability_search: /home/Check/container_vulnerability_search.txt
+voume_available_path: /home/Check/Inv/voume_available.txt
+
+accounts:
+  - 'arcsandbox'
+  - 'dsdev'
+  - 'corporatedev'
+  - 'corporateprod'
+  - 'dsprod'
+  - 'dsstage'
+  - 'sredev'
+  - 'ssrmdev'
+  - 'ssrmprod'
+  - 'ssrmsandbox'
+  - 'datahubdev'
+  - 'datahubprod'
+
+accounts_prod:
+  - 'corporateprod'
+  - 'dsprod'
+  - 'ssrmprod'
+  - 'datahubprod'
+
+accounts_no_prod:
+  - 'arcsandbox'
+  - 'dsdev'
+  - 'corporatedev'
+  - 'dsstage'
+  - 'sredev'
+  - 'ssrmdev'
+  - 'ssrmsandbox'
+  - 'datahubdev'
+
+
+team: SRE NIKE
+suport_email: nikesre@br.experian.com
+########### mail #####
+#mail_host: correiosmtp
+mail_host: relaysmtp.serasa.intranet
+mail_port: 25
+mail_template: html_nike_template_mail
+mail_from: 'nikesre@br.experian.com'
+mail_operation: 'egoc-br@br.experian.com'
+
+
+major: '{{ ansible_distribution_major_version }}'
+satellite_6_rhel_8_enable_repos:
+    - 'rhel-{{ major }}-for-x86_64-appstream-rpms'
+    - 'rhel-{{ major }}-for-x86_64-baseos-rpms'
+    - 'rhel-{{ major }}-for-x86_64-supplementary-rpms'
+    - 'rhel-{{ major }}-server-satellite-tools-6.7-for-rhel-8-x86_64-rpms'
+
+satellite_6_rhel_7_enable_repos:
+    - 'rhel-{{ major }}-server-rpms'
+#    - 'rhel-{{ major }}-server-satellite-tools-6.6-rpms'
+    - 'rhel-{{ major }}-server-extras-rpms'
+    - 'rhel-{{ major }}-server-optional-rpms'
+    - 'rhel-{{ major }}-server-supplementary-rpms'
+    - 'rhel-{{ major }}-server-satellite-tools-6.7-for-rhel-7-x86_64-rpms'
+                 
+satellite_6_rhel_6_enable_repos:
+    - 'rhel-{{ major }}-server-rpms'
+#    - 'rhel-{{ major }}-server-satellite-tools-6.6-rpms'
+    - 'rhel-{{ major }}-server-supplementary-rpms'
+    - 'rhel-6-server-els-rpms' 
+    - 'rhel-6-server-els-optional-rpms'
+    - 'rhel-{{ major }}-satellite-tools-6.7-for-rhel-6-x86_64-rpms'
+
+satellite_6_rhel_5_enable_repos: 
+    - 'rhel-{{ major }}-server-rpms'
+    - 'rhel-{{ major }}-server-els-satellite-tools-6.6-rpms'
+    - 'rhel-5-server-els-rpms'
+
+ami_aws_rhel_7_enable_repos:
+    - 'rhui-REGION-client-config-server-7'
+    - 'rhui-REGION-rhel-server-releases'
+    - 'rhui-REGION-rhel-server-rh-common'
+
+ami_aws_rhel_6_enable_repos:
+    - 'rhui-REGION-client-config-server-6'
+    - 'rhui-REGION-rhel-server-releases'
+    - 'rhui-REGION-rhel-server-rh-common'
+
+satellite_5_enable_repos:
+    - 'rhel-x86_64-server-{{ major }}'
+    - 'rhn-tools-rhel-x86_64-server-{{ major }}'
+
+sqlserver: spobrsqlprd14,1433
+
+sqluser: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          66613936316233376136356563356235336565373262356236623934646234363361363264343437
+          3232393638383562613763393561663036373436373163340a363064393737343632326235343363
+          34356135323833613631306538313732653530366365306561323838363434363465633462663935
+          6336626236393465380a643935353738393262663764383831313061353539663430343136646563
+          6636
+
+sqlpasswd: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          65653937623838376261396233316661323539656238316136643738643361633138643862616336
+          3537346630393935616362333030386466633732666630350a306539336535656536383365396231
+          63313939626639376566303736376565373337373630653464333336353334386232663863313639
+          3938656236633530640a303439343061373539643038363734323236386539306639393833316438
+          6663
+
+user_ansible: usr_ansible@serasa.intranet
+
+usr_ansible_pass: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          34303862633765653535633031653531343231656638376165346661643664633631343138396462
+          3930303962356239633362643463616131633132656165660a356232333266623966323666313963
+          35373235666466363139343766396336666462663230633331386239616631343731353937613961
+          3838373534626162380a323064366163343230643762316164313430333361343132333163666631
+          6536
+
+#########workers
+workerexec: spobrnikeworker
+workersql: spobrbastion
+workermail: spobrbastion
+workerfile: spobrbastion
+workerhammer: spobrsatellite1
+########### mail #####
+########### chang assing
+linux_assigned_to: 'C85698A'
+win_assigned_to: 'C86257A'
+
+
+winrm_cert_pem: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          64356563333932636662653930633934373630353334373063666230636637653136346165396634
+          6139343566646531616636333736383361656530636633300a653866386461643963336132386536
+          35643935623636653562393130333065396435623866313165343162616234383032613763383265
+          6533353630396333630a303836393333386337353139316138303932613535613039353565333138
+          32313662346237383832653237613163386163393035393232353063386565396166
+
+winrm_server_key: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          66616233393231653039316263343263626161636464333232346666616431396664636433376563
+          6131643064366262646638643331343434623732643964310a323734336563316163616664366264
+          33636538336530393664363062333364326633346263366366623039333066313031353433303661
+          3130313431303864650a393535323035383765643564393266343362343164643161353835333332
+          37653566333637343463323362316130653039356134613136663662303962623731
+
+win_bootstrap_pass: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          30386365643464373664323938353131323161363362353563383530323263653761396265356530
+          3961623633613861656133366134396636343231323632320a386662653863363535336266663139
+          66666331396338306137346135393039356638656539653236373633616539346162393837323461
+          3633386262376565310a303430333435303464653332646362643063383964633134663366333633
+          3062
+
+win_bootstrap_user: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          38363136376465623933376164383065313365653132353235646537656366323238366561633863
+          3661373562393062663865663438366535626238313336630a626537383533663061356365613831
+          34643865303566633163336237313263353066663463383635343766333766363531623335366266
+          3862396334663039310a653131373763313739643161613430363565656438666166383936383039
+          6562
+
+#environment_aws:
+#  ssrm-dev:
+#    AWS_ACCESS_KEY_ID:  '{{ssrm_dev_AK}}'
+#    AWS_SECRET_ACCESS_KEY:  '{{ssrm_dev_SK}}'
+#    AWS_REGION: sa-east-1
+#    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+#    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+#  
+#  ssrm-prod:
+#    AWS_ACCESS_KEY_ID:  '{{ssrm_prod_AK}}'
+#    AWS_SECRET_ACCESS_KEY:  '{{ssrm_prod_SK}}'
+#    AWS_REGION: sa-east-1
+#    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+#    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+#  
+#  reports-dev:
+#    AWS_ACCESS_KEY_ID:  '{{reports_dev_AK}}'
+#    AWS_SECRET_ACCESS_KEY:  '{{reports_dev_SK}}'
+#    AWS_REGION: sa-east-1
+#    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+#    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+#  
+#  
+#  reports-prod:
+#    AWS_ACCESS_KEY_ID:  '{{reports_prod_AK}}'
+#    AWS_SECRET_ACCESS_KEY:  '{{reports_prod_SK}}'
+#    AWS_REGION: sa-east-1
+#    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+#    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+
+### SDG ###

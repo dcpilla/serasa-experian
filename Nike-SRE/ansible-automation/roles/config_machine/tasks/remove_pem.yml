@@ -1,0 +1,30 @@
+---
+- name: get keys in authorized_keys
+  shell: grep -v 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCN1VeRQkn9tDVILVRB2EjKwp8w3lSdefeppGX2r' /home/ec2-user/.ssh/authorized_keys
+  ignore_errors: yes
+  register: localkeys
+
+- debug:
+    var: localkeys.stdout_lines
+
+- name: remove local_keys
+  lineinfile:
+    path: /home/ec2-user/.ssh/authorized_keys
+    line: '{{item}}'
+    state: absent  
+  with_items: '{{localkeys.stdout_lines}}'    
+
+- name: reset keys of patch
+  shell: curl http://spobrsatellite.br.experian.local/pub/Nike/instances_apply_patch >> /home/ec2-user/.ssh/authorized_keys
+
+
+  ###SDG###
+
+
+#tem que deixar
+#
+#        suporte-sre
+                #ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCN1VeRQkn9tDVILVRB2EjKwp8w3lSdefeppGX2r6oRr93cpRoi9dMyFGjRi1Y5FkcAPG8Dswki+AUu3b5VNCdhozOJBSahwx+rmRHnmxdwSQppWaYTkKEBPRtW0jbe2AokTeeBdUa1LTgm4H8VJUFTqTY6Wx1cISLiCrxdU1LetBpDy9XwCpXhUvFi/doblLMOcg4Oucf3cKFGEVgvoBkeBJ/FZadWx463G3g7RrekvWBRtkPhXqlqxN4KkT2oPRXr9N0oai4u8MbJIz6DV9d8zw4+T48oKwRlxKVlbBD1dlCvqHe5ngE/c+teN9G7eOznoMtdlyYmaxeq99+8TP6P sre-suport
+
+#        patch update
+                #ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC+oz3C7Sy2tSr7VMh/fP2u1smzeR/ScW82lGO1KCSN5ko2z88gtfNJ+maH5soaDMuzzqkzgBku+xWtqrrxYAqqP0DUjriCDZiDmsD72Kvm4G73iMN7J4llstxQSYNr5evvmWQKW+mrde9r8XpkvwCAU6CMDFK9U4wH1G4zkgEnd6JF7fmRzU4P1LheDMRd54adhm1aC+URqFcp4GHfalMpmmsp56EgWYqv94j/Az3RSkKvyr/4izK9MFGcUxCKWJVcLgzgh7ol2IEph6SMpWBtnGB8L+pfeuWsX7I7cZD/Djl0fHKGDLfQg8pxxi7dnHbUU2Bp8kGVq13fB5bzKIh5

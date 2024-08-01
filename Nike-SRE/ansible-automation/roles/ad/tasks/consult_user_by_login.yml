@@ -1,0 +1,130 @@
+---
+- name: Delegate to {{ workerexec }}
+  delegate_to: '{{ workerexec }}'
+  block:
+    - name: Set Experianbr Domain Variables 
+      set_fact:
+        domainname: '{{domains.experianbr}}'
+        dc: spobrexpdc01
+        ou: OU=UnixComputerRoles,OU=UnixGroups,OU=Groups,DC=br,DC=experian,DC=local
+    
+    
+    - name: get facts about user "{{solicitante}}"
+#      delegate_to: '{{dcserver_experianbr}}'
+      ignore_errors: yes
+      block:
+              
+        - name: Consult user by login "{{solicitante}}"
+#          win_command: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -Command "get-aduser -Filter {samAccountName -eq '{{solicitante}}'} -Properties *"
+          command: "ldapsearch -x -H 'ldap://ldapexp.br.experian.local:3268' -D 'CN=usr_ansible,OU=Usuarios,OU=Servidores Linux,OU=Servers,DC=br,DC=experian,DC=local' -b ' '  '(&(objectclass=user)(samaccountname={{solicitante}}))' -l max -w '{{usr_ansible_pass}}'"
+          register: user_out_login
+
+        - debug:
+            var: user_out_login
+
+        - name: set returns when find by login
+          set_fact:
+            user_login: "{{ solicitante }}"
+            user_firstname: "{{ user_out_login.stdout | regex_search('.*GivenName.*', ignorecase=True)|regex_search(':.*', ignorecase=True)| replace(': ','')| regex_replace('(\\r)','') }}"
+            user_surname: "{{ user_out_login.stdout | regex_search('.*sn.*', ignorecase=True)|regex_search(':.*', ignorecase=True)| replace(': ','')| regex_replace('(\\r)','') }}"
+            user_cr: "{{ user_out_login.stdout | regex_search('.*extensionAttribute2.*', ignorecase=True)|regex_search(':.*', ignorecase=True)| replace(': ','')| regex_replace('(\\r)','') }}"
+            user_email: "{{ user_out_login.stdout | regex_search('mail:.*', ignorecase=True)|regex_search(':.*', ignorecase=True) | replace(': ','') | regex_replace('(\\r)','')}}"
+            user_title: "{{ user_out_login.stdout | regex_search('.*Title.*', ignorecase=True)|regex_search(':.*', ignorecase=True) | replace(': ','') | regex_replace('(\\r)','')}}"
+            user_departament: "{{ user_out_login.stdout | regex_search('.*Department.*', ignorecase=True)|regex_search(':.*', ignorecase=True) | replace(': ','') | regex_replace('(\\r)','')}}"
+            user_manager_email: "{{ user_out_login.stdout | regex_search('.*extensionAttribute14.*', ignorecase=True)|regex_search(':.*', ignorecase=True) | replace(': ','') | regex_replace('(\\r)','')}}"
+            user_manager: "{{ user_out_login.stdout | regex_search('.*Manager.*', ignorecase=True)|regex_search(':.*', ignorecase=True) | replace(': ','') | regex_replace('(\\r)','') | regex_replace('CN=','')|regex_replace(',OU=.*','') | regex_replace('\\\\','') }}"
+          when: user_out_login.stdout_lines|length > 0
+
+#        - block:
+#            - name: Consult user by email 
+#              win_command: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -Command "get-aduser -Filter {EmailAddress -eq '{{solicitante}}@br.experian.com'} -Properties *"          
+#              register: user_out_mail
+#
+#            - name: set returns when find by email
+#              set_fact:
+#                user_login: "{{ user_out_mail.stdout | regex_search('.*SamAccountName.*', ignorecase=True)|regex_search(':.*', ignorecase=True) | replace(': ','')| regex_replace('(\\r)','')}}"
+#                user_firstname: "{{ user_out_mail.stdout | regex_search('.*GivenName.*', ignorecase=True)|regex_search(':.*', ignorecase=True)| replace(': ','')| regex_replace('(\\r)','') }}"
+#                user_surname: "{{ user_out_mail.stdout | regex_search('.*Surname.*', ignorecase=True)|regex_search(':.*', ignorecase=True)| replace(': ','')| regex_replace('(\\r)','') }}"
+#                user_cr: "{{ user_out_mail.stdout | regex_search('.*extensionAttribute2.*', ignorecase=True)|regex_search(':.*', ignorecase=True)| replace(': ','')| regex_replace('(\\r)','') }}"
+#                user_email: "{{ user_out_mail.stdout | regex_search('.*EmailAddress.*', ignorecase=True)|regex_search(':.*', ignorecase=True) | replace(': ','') | regex_replace('(\\r)','')}}"
+#                user_title: "{{ user_out_mail.stdout | regex_search('.*Title.*', ignorecase=True)|regex_search(':.*', ignorecase=True) | replace(': ','') | regex_replace('(\\r)','')}}"
+#                user_departament: "{{ user_out_mail.stdout | regex_search('.*Department.*', ignorecase=True)|regex_search(':.*', ignorecase=True) | replace(': ','') | regex_replace('(\\r)','')}}"
+#                user_manager_email: "{{ user_out_mail.stdout | regex_search('.*extensionAttribute14.*', ignorecase=True)|regex_search(':.*', ignorecase=True) | replace(': ','') | regex_replace('(\\r)','')}}"
+#                user_manager: "{{ user_out_mail.stdout | regex_search('.*Manager.*', ignorecase=True)|regex_search(':.*', ignorecase=True) | replace(': ','') | regex_replace('(\\r)','') | regex_replace('CN=','')|regex_replace(',OU=Serasa','') }}"
+#              when: user_out_mail.stdout_lines|length > 0
+#
+#          when: user_out_login.stdout_lines|length == 0 
+
+#        - block:
+#            - set_fact:
+#                first_name: "{{ solicitante | regex_search('(.\\w*)', '\\1', ignorecase=True)}}"
+#
+#            - set_fact:
+#                last_name: "{{ solicitante | regex_search('([^\\.]\\w*$)', '\\1', ignorecase=True)}}"
+#
+#            - name: Consult user from Global
+#              win_shell: "Get-ADUser -LDAPFilter '(&(Name=*{{first_name[0]}}*)(Name=*{{last_name[0]}}*))' -Properties * -ResultSetSize 1"
+#              register: user_out_global
+#
+#            - name: set returns when find ldap - global
+#              set_fact:
+#                user_login: "{{ user_out_global.stdout | regex_search('.*SamAccountName.*', ignorecase=True)|regex_search(':.*', ignorecase=True) | replace(': ','')| regex_replace('(\\r)','')}}"
+#                user_firstname: "{{ user_out_global.stdout | regex_search('.*GivenName.*', ignorecase=True)|regex_search(':.*', ignorecase=True)| regex_search('[^(-A)]\\w*',ignorecase=True) | replace(': ','')| regex_replace('(\\r)','') | replace (' ','')}}"
+#                user_surname: "{{ user_out_global.stdout | regex_search('.*Surname.*', ignorecase=True)|regex_search(':.*', ignorecase=True)| replace(': ','')| regex_replace('(\\r)','') }}"
+#                user_cr: "Global"
+#                #email pode vir em branco - avaliar possivel impacto nas automações
+#                user_email: "{{solicitante}}@br.experian.com"
+#                #title pode vir em branco - avaliar possivel impacto nas automações
+#                user_title: "{{ user_out_global.stdout | regex_search('.*Title.*', ignorecase=True)|regex_search(':.*', ignorecase=True) | replace(': ','') | regex_replace('(\\r)','')}}"
+#                user_departament: "{{ user_out_global.stdout | regex_search('.*Department.*', ignorecase=True)|regex_search(':.*', ignorecase=True) | replace(': ','') | regex_replace('(\\r)','')}}"
+#                #definido email do Carlos, pois vem em branco
+#                user_manager_email: "Carlos.Junior@br.experian.com"
+#                #manager pode vir em branco - avaliar possivel impacto nas automações
+#                user_manager: "{{ user_out_global.stdout | regex_search('.*Manager.*', ignorecase=True)|regex_search(':.*', ignorecase=True) | replace(': ','') | regex_replace('(\\r)','') | regex_replace('CN=','')|regex_replace(',OU=Serasa','') }}"
+#
+#          when: user_out_login.stdout_lines|length == 0 and
+#                user_out_mail.stdout_lines|length == 0
+
+
+      when: solicitante is defined
+#      vars:
+#         ansible_connection: winrm
+#         ansible_port: 5986
+#         ansible_winrm_server_cert_validation: ignore
+#         ansible_winrm_transport: certificate
+#         ansible_winrm_cert_pem: '{{winrm_cert_pem}}'
+#         ansible_winrm_cert_key_pem: '{{winrm_server_key}}'
+#         ansible_become: yes
+#         ansible_become_method: runas
+#         ansible_become_user: '{{dcuser_experianbr}}'
+#         ansible_become_pass: '{{dcuser_pwd_experianbr}}'
+#         ansible_become_flags: logon_type=new_credentials logon_flags=netcredentials_only
+
+
+    - name: set user_name
+      ignore_errors: yes
+      set_fact:
+        user_name: '{{user_firstname}} {{user_surname}}'
+        
+    - name: debug
+      ignore_errors: yes
+      debug:
+        msg:
+          - "################################################################"
+          - "#################### Values loaded of user  ####################"
+          - "                         Login {{solicitante}}                  "
+          - "################################################################"
+          - "_________________________________________________________________"
+          - "#---- Variables Name -----+-------- Values of Variables -------#"
+          - "# user_login:.............| {{user_login}}"
+          - "# user_firstname:.........| {{user_firstname}}"
+          - "# user_surname:...........| {{user_surname}}"
+          - "# user_name:..............| {{user_name}}"
+          - "# user_cr:................| {{user_cr}}"
+          - "# user_email:.............| {{user_email}}"
+          - "# user_title:.............| {{user_title}}"
+          - "# user_departament:.......| {{user_departament}}"
+          - "# user_manager:...........| {{user_manager}}"
+          - "# user_manager_email:.....| {{user_manager_email}}"
+          - "################################################################"
+  when: solicitante is defined

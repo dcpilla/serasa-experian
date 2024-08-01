@@ -1,0 +1,42 @@
+---
+- include_tasks: aws_create_inventory_emr.yml
+
+- name: block when emrfields_list is defined variable from aws_create_inventory_emr.yml task
+  block:
+    - include_tasks: check_emr_no_prod_uptime.yml 
+
+#    - debug:
+#        var: emr_running_more_than_a_day 
+#
+#    - debug:
+#        var: emr_id_to_terminate
+
+    - name: block to terminate emr cluster when emr_id_to_terminate is defined from check_emr_no_prod_uptime.yml task
+      block:
+        - name: Terminete emr cluster with  emr_id_to_terminate variable from task check_emr_no_prod_uptime.yml  account {{account_name}}
+          include_tasks: roles/aws/tasks/emr_terminate.yml
+          with_items:
+            - '{{emr_id_to_terminate.stdout_lines}}'
+          loop_control:
+            loop_var: emr_job_id
+
+#          loop:
+#            - '{{emr_id_to_terminate.stdout_lines}}'
+#          loop_control: 
+#            loop_var: id_emr
+        
+#        - name: register action of terminate cluster with emr_running_more_than_a_day variable from task check_emr_no_prod_uptime.yml  account {{account_name}}
+#          become: yes
+#          lineinfile:
+#            path: /home/Check/Inv/emr_terminated.txt
+#            line: '{{ansible_date_time.date}}-{{ansible_date_time.time}}|{{item}}'
+#            state: present
+#            create: true
+#          with_items:
+#            - '{{emr_running_more_than_a_day.stdout_lines}}'
+          
+      when: emr_id_to_terminate is defined and emr_id_to_terminate.skipped is not defined
+
+  when:  emrfields_list != []
+
+### SDG ###  

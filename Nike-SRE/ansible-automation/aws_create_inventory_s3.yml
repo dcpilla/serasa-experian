@@ -1,0 +1,24 @@
+---
+- name: clean s3_fields dictonary
+  set_fact:
+    s3_fields: []
+
+- name: debug var s3_fields
+  debug:
+    var: s3_fields
+
+- import_role:
+    name: aws
+    tasks_from: s3_list 
+
+- name: ADD s3 invetory in {{inventory_s3_path}} from group when s3_fields not is []
+  become: yes
+  lineinfile:
+    path: '{{inventory_s3_path}}'
+    line: "{{prof_account.id}}|{{account_name}}|{{item.names}}"
+    state: present
+    create: true
+  with_items: '{{s3_fields}}'
+  when:  s3_fields != []
+
+### SDG ###  

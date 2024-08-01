@@ -1,0 +1,140 @@
+---
+- set_fact:
+#   role_to_assume: BURoleForSRE
+   role_to_assume: BURoleForSREAutomation
+
+- name: load profile from account {{account}}
+  set_fact:
+    prof_account: "{{ profile[ account ]}}"
+
+#- name: destroi  session
+#  shell: "unset AWS_ACCESS_KEY_ID; unset AWS_SECRET_ACCESS_KEY; unset AWS_SESSION_TOKEN"
+
+- name: configure account 
+  shell: '{{item}}'
+  with_items:
+    - '/usr/local/bin/aws configure set aws_access_key_id {{AUTOMATION_AK}} --profile cli'
+    - '/usr/local/bin/aws configure set aws_secret_access_key {{AUTOMATION_SK}} --profile cli'
+    - '/usr/local/bin/aws configure set default.region sa-east-1 --profile cli'
+#    - 'aws configure set default.ca_bundle /path/to/ca-bundle.pem'
+#    - 'aws configure set region us-west-1 --profile testing'
+#    - 'aws configure set profile.testing2.region eu-west-1'
+#    - 'aws configure set preview.cloudsearch true'
+
+
+  
+- name:  assume role in {{account}} arn:aws:iam::{{prof_account.id}}:role/{{role_to_assume}} by aws cli
+  shell: /usr/local/bin/aws --profile cli sts assume-role --role-arn "arn:aws:iam::{{prof_account.id}}:role/{{role_to_assume}}" --role-session-name assumed-role
+  register: cli_assumed_role
+
+#- name: debug cli_assumed_role.stdout_lines
+#  debug:
+#    var: cli_assumed_role.stdout
+
+- name: set cli_assumed_role to json
+  set_fact:
+    sts_cli_json: '{{cli_assumed_role.stdout|from_json}}'
+ 
+
+- name: seta returs of assumed role
+  set_fact:
+    assumed_role_ak: "{{sts_cli_json.Credentials.AccessKeyId}}"
+    assumed_role_sk: "{{sts_cli_json.Credentials.SecretAccessKey}}"
+    assumed_role_token: "{{sts_cli_json.Credentials.SessionToken}}"
+    assumed_role_time: "{{sts_cli_json.Credentials.Expiration}}"
+
+- name: configure account 
+  shell: '{{item}}'
+  with_items:
+    - '/usr/local/bin/aws configure set aws_access_key_id {{assumed_role_ak}} --profile sts_cli'
+    - '/usr/local/bin/aws configure set aws_secret_access_key {{assumed_role_sk}} --profile sts_cli'
+    - '/usr/local/bin/aws configure set aws_session_token {{assumed_role_token}} --profile sts_cli'
+    - '/usr/local/bin/aws configure set default.region sa-east-1 --profile sts_cl'
+#    - 'export AWS_DEFAULT_PROFILE=sts_cli'
+- debug:
+    msg: 
+      - "######################################################################"
+      - "#                         Details Assumed Role                       #"
+      - "######################################################################"
+      - "#    Return  Variables    |                 Values                   #"
+      - "######################################################################"
+      - "# assumed_role_ak         | {{assumed_role_ak}}                     #"
+      - "# assumed_role_sk         | {{assumed_role_sk}} #"
+      - "# assumed_role_token      | {{assumed_role_token}}"
+      - "#                                                                    #"        
+      - "# assumed_role_time       | {{assumed_role_time}}                #"
+      - "#                                                                    #"        
+        #      - "# assumed_role_user_arn   | {{assumed_role_user_arn}}                #"
+        #      - "# assumed_role_id         | {{assumed_role_id}}                      #"
+      - "######################################################################"
+
+
+- name: get account information from cli module
+  shell: /usr/local/bin/aws sts get-caller-identity --profile=sts_cli
+  register: account_info
+
+- name: get account name
+  shell: /usr/local/bin/aws iam list-account-aliases --profile=sts_cli
+  register: account_alias
+
+#- debug:
+#    var: account_alias
+
+- name: convert returns account to json format
+  set_fact:
+    caller_info: '{{account_info.stdout|from_json}}'
+    alias_info: '{{account_alias.stdout|from_json}}'
+  
+#- debug:
+#    var: caller_info
+
+- name: set_returns
+  set_fact:
+    account_id: "{{caller_info|json_query('Account')}}"
+    account_user: "{{caller_info|json_query('Arn')}}"
+    account_name: "{{alias_info|json_query('AccountAliases')|replace('[','')|replace(']','')}}"
+    account_apid: "{{prof_account.appid}}"
+    account_environment: "{{prof_account.enviroment}}"
+    account_ccosting:  "{{prof_account.ccosting}}"
+    account_email_team: "{{prof_account.email_team}}"
+    account_sm_team: "{{prof_account.sm_team}}"
+    account_tl_team: "{{prof_account.tl_team}}"
+    account_manager: "{{prof_account.manager}}"
+    
+
+- name: account details
+  debug:
+    msg:
+      - "################################################################################################"
+      - "#                            ACCOUNT-ID RETURNS BY STS CLI MODULE                              #"
+      - "################################################################################################"
+      - "#  Return Variables  |                            Values                                       #"
+      - "################################################################################################"
+      - "# account_id         | {{account_id}}                                                            #"
+      - "# account_user       | {{account_user}}#"
+      - "# account_name       | {{account_name}}                                          "
+      - "# account_apid       | {{account_apid}}     #"
+      - "# account_environment| {{account_environment}} #"
+      - "# account_ccosting   | {{account_ccosting}}#"
+      - "# account_email_team | {{account_email_team}} #"
+      - "# account_sm_team    | {{account_sm_team}} #"
+      - "# account_tl_team    | {{account_tl_team}} #"        
+      - "# account_manager    | {{account_manager}} #"        
+      - "################################################################################################"
+
+
+
+#ok: [localhost] => {
+#    "msg": [
+#        "################################################################################################",
+#        "#                         ACCOUNT-ID RETURNS BY STS ANSIBLE MODULE                             #",
+#        "################################################################################################",
+#        "#  Return Variables  |                            Values                                       #",
+#        "################################################################################################",
+#        "# account_id         | 530914589075                                                            #",
+#        "# account_user       | arn:aws:sts::530914589075:assumed-role/BURoleForSREAutomation/BURoleForSREAutomation_session#",
+#        "# account_name       | eec-aws-br-ds-dataservices-dev                                               ",
+#        "################################################################################################"
+#
+
+#### SDG ###

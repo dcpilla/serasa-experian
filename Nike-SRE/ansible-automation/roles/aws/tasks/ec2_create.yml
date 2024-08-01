@@ -1,0 +1,219 @@
+---
+#aws ec2 --region sa-east0 --profile=ssrmprod run-instances --image-id ami-0d92757c552e3243d --instance-type t3.micro --key-name raissakey --subnet-id subnet-079ba479f7d948039  --iam-instance-profile Name=eec-aws-amifactory-sc-iam-ec2role
+
+- name: when linux
+  block: 
+    - name: set ami name
+      set_fact:
+        ami_name: eec_aws_amzn-lnx*
+        name_sg: ssh-onpremise
+        sg_port: 22
+        instance_size: t3.micro
+  when: so == 'linux'
+
+- name: when windows
+  block: 
+    - name: set ami name
+      set_fact:
+        ami_name: eec_aws_windows_2022
+        name_sg: rdp-onpremise
+        sg_port: 3389
+        instance_size: t3.medium
+
+  when: so == 'windows'
+
+- name: create sre-suport keypar 
+  include_tasks: ec2_keys_par_create.yml
+
+
+- name: gather information about eec_aws_amzn-lnx_2
+  include_tasks: ec2_ami_get_last_id.yml
+
+  #- name: chek if exist security group security_group 
+  #
+
+  #- name: create instance in comand line
+  #  shell: "/usr/local/bin/aws ec2 run-instances --image-id {{last_image_ID}} --instance-type t3.micro --key-name sre-suport --subnet-id {{subnet_id}} --security-group-ids {{sg_id}} --tag-specifications 'ResourceType=instance,Tags=[{Key=CostString,Value={{account_ccosting}}},{Key=AppID,Value={{account_apid}}},{Key=Environment,Value={{account_environment}}},{Key=Name,Value={{instance_name}}}]' --profile=sts_cli"
+  #         
+         
+- name: set variable to create SG ssh-onpremise
+  set_fact:
+    sg_name: '{{name_sg}}'
+    descr: 'acesso {{sg_port}} from onpremise'
+    #vpc_id: '{{vpcid}}'
+    protcolo: TCP
+    port: '{{sg_port}}'
+    source_cidr: 10.0.0.0/8
+
+
+- name: create security_group
+  include_tasks: ec2_security_group_create.yml
+
+- name: create {{name}} instance
+  amazon.aws.ec2_instance:
+    aws_access_key: "{{ assumed_role_ak }}"
+    aws_secret_key: "{{ assumed_role_sk }}"
+    security_token: "{{ assumed_role_token }}"
+    region: '{{account_region}}'
+    validate_certs: no
+
+    name: "{{name}}"
+    image_id: '{{last_image_ID}}'
+    vpc_subnet_id: '{{subnetid}}'
+    instance_type: '{{instance_size}}'
+    key_name: "sre-suport"
+    security_group: '{{name_sg}}'
+    tags:
+      "{{tag}}"
+      
+    wait: yes
+#    volumes:
+#      - device_name: /dev/sda1
+#        ebs:
+#          volume_size: 16
+#          delete_on_termination: true
+  
+  register: instance
+
+
+- debug: 
+    var: instance
+
+- name: set variables instance_vpcid instance_id instance_ip
+  set_fact:
+    instance_vpcid: '{{instance.instances[0].vpc_id}}'
+    instance_id: '{{instance.instances[0].instance_id}}'
+    instance_ip: '{{instance.instances[0].private_ip_address}}'
+
+- debug:
+    msg:
+      - "###########################################" 
+      - "##        Instance Created               ##"
+      - "###########################################" 
+      - "##  variables    |     Values            ##"
+      - "##_______________|______________________ ##"
+      - "## so                      | {{so}} "
+      - "## last_image_ID           | {{last_image_ID}}"
+      - "## last_image_CreationDate | {{last_image_CreationDate}}"
+      - "## last_image_name         | {{last_image_name}}"
+      - "## instance_ip             | {{instance_ip}}       ##"
+      - "## instance_id             | {{instance_id}}   ##"
+      - "###########################################" 
+      - "###########################################"
+
+- name: "waiting for the port tcp/{{sg_port}} to be open in instance_ip Host"
+  ansible.builtin.wait_for:
+    host: '{{instance_ip}}'
+    port: '{{sg_port}}'
+    state: "started"
+    timeout: 900
+
+
+- name: enable resource-name-dns-a-record
+  shell: /usr/local/bin/aws ec2 modify-private-dns-name-options --instance-id {{instance_id}} --enable-resource-name-dns-a-record --profile=sts_cli
+
+
+- name: block config  when so == 'linux'
+  block:
+    - name: import config machine basic
+      delegate_to: '{{instance_ip}}'
+      become: yes
+      import_role:
+        name: config_machine
+        tasks_from: config_basic.yml
+    
+    
+    - name: block docker
+      block:
+        - name: set fact to alocate volume
+          set_fact:
+            size: 13
+            volume_name: 'DOCKER-VOLUME-{{name}}' 
+    
+        - include_tasks: ec2_volume_create_and_attach.yml #returns volume_id and volume_device
+    
+        - name: set fact to create VG and mount point
+          set_fact:
+            vg_name: VgDocker
+            lv_name: LvDocker
+            mount_point: /var/lib/docker
+    
+        - name: create new VG LV and mount point
+          become: yes
+          delegate_to: '{{instance_ip}}'
+          import_role:
+            name: config_machine
+            tasks_from: mount_point.yml
+    
+        - name: install docker
+          delegate_to: '{{instance_ip}}'
+          become: yes
+          shell: '{{item}}'
+          with_items:
+            - "curl -SL https://github.com/docker/compose/releases/download/v2.23.3/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose"
+            - "ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose"
+            - "yum install docker -y"
+    #      yum: 
+    #        name: docker.x86_64
+    #        state: present 
+    #      with_items:
+    #        - docker-ce-rootless-extras
+    #        - docker-ce
+    #        - docker-buildx-plugin
+    #        - docker-scan-plugin
+    #        - docker-compose-plugin
+    #        - docker-ce-cli
+    
+        - name: set fact to create sg docker-ports-{{name}}
+          set_fact:
+            protcolo: TCP
+            port: 80
+            source_cidr: 10.0.0.0/8
+            sg_name: 'docker-ports-{{name}}'
+            descr: 'acesso docker-ports-{{name}} {{docker_ports}} from onpremise'
+    
+    
+    
+        - name: create security_group
+          include_tasks: ec2_security_group_create.yml
+    
+    
+        - name: insert ports docker in {{sg_out.group_id}}
+          shell: "/usr/local/bin/aws ec2 authorize-security-group-ingress --group-id '{{sg_out.group_id}}' --protocol tcp --port '{{port_docker}}' --cidr {{source_cidr}}  --profile=sts_cli"
+          with_items:
+            - '{{docker_ports}}'
+          loop_control:
+            loop_var: port_docker
+    
+    
+      when: docker is defined and docker == 'yes'
+    
+    - name: Update all in instance {{instance_ip}}
+      delegate_to: '{{instance_ip}}'
+      yum:
+        name: '*'
+        state: latest
+        skip_broken: yes
+        # when: ansible_distribution != "RedHat"
+    #  when: ansible_python_version != '3.6.12'
+
+  when: so == 'linux'
+
+- debug:
+    msg:
+      - "###########################################" 
+      - "##        Instance Created               ##"
+      - "###########################################" 
+      - "##  variables    |     Values            ##"
+      - "##_______________|______________________ ##"
+      - "## so                      | {{so}} "
+      - "## last_image_ID           | {{last_image_ID}}"
+      - "## last_image_CreationDate | {{last_image_CreationDate}}"
+      - "## last_image_name         | {{last_image_name}}"
+      - "## instance_ip             | {{instance_ip}}       ##"
+      - "## instance_id             | {{instance_id}}   ##"
+      - "###########################################" 
+      - "###########################################"
+
+
+### SDG ###

@@ -1,0 +1,7 @@
+---
+- name: Check if rapid is running
+  service:
+    name: ir_agent
+    state: started
+  register: rapid_status
+  ignore_errors: yes

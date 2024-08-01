@@ -1,0 +1,23 @@
+---
+- hosts: spobrnikeworker
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: include task to call config_machine_config_basic.yml
+      shell: '/usr/bin/ansible-playbook -e host=all -i {{inventory_our_instance_path_linux}} /home/svi4808-a/automation/config_machine_basic.yml  -b'
+      ignore_errors: yes
+      register: config_basic
+
+
+    - debug:
+        var: config_basic
+
+    - name: include task to call config_machine_remove_pem.yml
+      shell: "/usr/bin/ansible-playbook -e host='*-prod' -i {{inventory_our_instance_path_linux}} /home/svi4808-a/automation/config_machine_remove_pem.yml  -b"
+      ignore_errors: yes
+      register: config_remove_key
+
+    - debug:
+        var: config_remove_key
+
+###SDG###

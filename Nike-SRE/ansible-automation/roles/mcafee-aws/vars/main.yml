@@ -1,0 +1,7 @@
+---
+agent_version: '5.6.5'
+antivirus_version: '10.7.0'
+#agent_installer_url: http://spobrsatellite.br.experian.local/pub/program/mcafee/McAfee_Agent_for_Linux/last_version_rpms_MFE
+agent_installer_url: http://spobrsatellite.br.experian.local/pub/program/mcafee/McAfee_Agent_for_Linux/agent_last_version
+antivirus_installer_url: http://spobrsatellite.br.experian.local/pub/program/mcafee/McAfee_Endpoint_Security/last_version_rpm_mcafee
+antivirus_installer_url_rhel5: http://spobrsatellite.br.experian.local/pub/program/mcafee/McAfee_Endpoint_Security/mes10.5.zip

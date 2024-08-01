@@ -1,0 +1,18 @@
+---
+- name: list ECR
+  shell: '/usr/local/bin/aws --profile=sts_cli ecr describe-repositories  --query "repositories[].repositoryName"'
+  register: ecr_list
+
+
+- debug: 
+    msg:
+      - "##########################################"
+      - "#               ECR RETURNS              #"
+      - "##########################################"
+      - "###### accounte:  {{account}} #######"
+      - "##########################################"
+
+- debug:
+    var: ecr_list.stdout_lines
+
+

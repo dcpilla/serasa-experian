@@ -1,0 +1,52 @@
+---
+- name: remove the previous installation 
+  yum:
+    name: BESAgent
+    state: absent
+  ignore_errors: yes
+
+
+- name: Grant IBM BESAgent ILMT is installed on RH >=6
+  yum:
+    name: http://spobrbastion/pub/repos/rhel/generic/x86_64/BESAgent-9.5.18.74-rhe6.x86_64.rpm
+    state: present
+    #   enablerepo: Serasa_Experian_Third_party_Third_Party_for_RHEL_7_Server_RPMs_x86_64
+    disable_gpg_check: yes
+  when: ansible_distribution_major_version|int >= 6
+
+  #- name: Grant IBM BESAgent ILMT is installed on RH >=6
+  #  yum:
+  #    name: BESAgent
+  #    state: present
+  #    enablerepo: Serasa_Experian_Third_party_Third_Party_for_RHEL_6_Server_RPMs_x86_64
+  #    disable_gpg_check: yes
+  #  when: ansible_distribution_major_version|int == 6
+
+- name: Grant IBM BESAgent ILMT is installed on RH 5
+  shell: yum install -y BESAgent
+  when: ansible_distribution_major_version|int == 5
+
+- name: Copy actionsite.afxm
+  copy:
+    src: files/actionsite.afxm
+    dest: /etc/opt/BESClient/
+
+- name: Enable service and grant it is started
+  service:
+    name: besclient
+    state: started
+    enabled: yes
+
+- name: Get installed BESAgent
+  shell: rpm -qa | grep -i besagent
+  ignore_errors: yes
+  register: besagent
+
+#- name: Generate report from servers
+#  delegate_to: "{{workerexec}}"
+#  lineinfile:
+#    state: present
+#    create: yes
+#    insertafter: EOF
+#    path: /inventario/Output/Linux/InventarioLinuxILMT.csv
+#    line: "{{ ansible_nodename }};{{ besagent.stdout }}"

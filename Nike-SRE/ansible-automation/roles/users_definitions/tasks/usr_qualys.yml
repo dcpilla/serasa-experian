@@ -1,0 +1,9 @@
+---
+- name: Ensure '#includedir /etc/sudoers.d' is present in the /etc/sudoers
+  lineinfile:
+      path: /etc/sudoers
+      state: present
+      line: '#includedir /etc/sudoers.d'
+
+- name: Ensure /etc/sudoers.d/usr_qualys exists
+  copy: src=files/usr_qualys dest=/etc/sudoers.d/usr_qualys owner=root mode=0600

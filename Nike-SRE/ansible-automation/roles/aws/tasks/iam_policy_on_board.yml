@@ -1,0 +1,19 @@
+---
+- name: set json template of policy
+  template:
+    src: BUPolicyForDevSecOpsPiaaS.json
+    dest: "/tmp/BUPolicyForDevSecOpsPiaaS.json"
+    owner: root
+    group: root
+    mode: 0644
+
+
+- name: create policy {{policy_name}}
+  shell: "/usr/local/bin/aws --profile=sts_cli iam create-policy --policy-name BUPolicyForDevSecOpsPiaaS --policy-document file:///tmp/BUPolicyForDevSecOpsPiaaS.json "
+  ignore_errors: yes
+  register: policy_created
+
+- debug:
+    var: policy_created
+
+                             

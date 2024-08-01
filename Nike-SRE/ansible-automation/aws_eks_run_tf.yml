@@ -1,0 +1,86 @@
+---
+- hosts: localhost
+  gather_facts: no
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    AWS_REGION: sa-east-1  
+  tasks:
+    - name: call connection
+      include_role:
+        name: aws
+        tasks_from: sts_connection
+
+    - name: set default variables
+      set_fact:
+        account_bu: EITS
+        efs_enabled: true
+        addomain: br.experian.local
+        eks_ami_id: latest
+        kubeconfig_enabled: true
+        resource_owner: nikesre@br.experian.com
+        resource_anme: '{{eks_name}}'
+
+    - name: set variable repo_files
+      set_fact:
+        repo_files: '/home/Check/aws-eks-serasa/'
+        #                     /home/Check/aws-eks-serasa/repo-sre-amazon-eks/   
+    - name: Copy templates to {{repo_files}}
+      become: yes
+      template:
+        src: 'roles/aws/templates/{{item}}'
+        dest: '{{repo_files}}'
+        owner: root
+        group: root
+        mode: 0655
+      with_items:
+        - everything.sh
+          #       - kubeconfig.sh
+        - pre-flight.py
+        - eksctl-install.sh
+
+    - name: Copy tempalte variables_catalog.tfvars  to {{repo_files}}repo-sre-amazon-eks/variables/catalog.tfvars
+      become: yes
+      template:
+        src: roles/aws/templates/variables_catalog.tfvars
+        dest: '{{repo_files}}repo-sre-amazon-eks/variables/catalog.tfvars'
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Copy tempalte variables.tf  to {{repo_files}}/repo-sre-amazon-eks/catalog.tfvars
+      become: yes
+      template:
+        src: roles/aws/templates/variables.tf
+        dest: '{{repo_files}}/repo-sre-amazon-eks/variables.tf'
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Copy tempalte backend-config_catalog.tfvars  to {{repo_files}}/repo-sre-amazon-eks/backend-config/catalog.tfvars
+      become: yes
+      template:
+        src: roles/aws/templates/backend-config_catalog.tfvars
+        dest: '{{repo_files}}/repo-sre-amazon-eks/backend-config/catalog.tfvars'
+        owner: root
+        group: root
+        mode: 0644
+
+
+    - name: Execute comands
+      ignore_errors: yes
+      shell: '{{item}}'
+      register: executed
+      with_items:
+        - '{{repo_files}}everything.sh'
+          #        - 'python3 {{repo_files}}pre-flight.py'
+          #        - '{{repo_files}}kubeconfig.sh'
+          #        - 'export AWS_PROFILE={{account}};export AWS_REGION={{account_region}};export AWS_DEFAULT_REGION={{account_region}};export AWS_ACCESS_KEY_ID={{assumed_role_ak}};export export AWS_SECRET_ACCESS_KEY={{assumed_role_sk}}; export AWS_SESSION_TOKEN={{assumed_role_token}} ; echo $AWS_PROFILE; echo $AWS_REGION; /usr/local/bin/terraform -chdir={{repo_files}}repo-sre-amazon-eks init -backend-config=backend-config/catalog.tfvars -reconfigure'
+          #        - 'export AWS_PROFILE={{account}};export AWS_REGION={{account_region}};export AWS_DEFAULT_REGION={{account_region}};export AWS_ACCESS_KEY_ID={{assumed_role_ak}};export export AWS_SECRET_ACCESS_KEY={{assumed_role_sk}}; export AWS_SESSION_TOKEN={{assumed_role_token}} ;echo $AWS_PROFILE; echo $AWS_REGION; /usr/local/bin/terraform -chdir={{repo_files}}repo-sre-amazon-eks plan --var-file=variables/catalog.tfvars -out step2.plan'
+          #          #        - 'export AWS_PROFILE={{account}};export AWS_REGION={{account_region}};export AWS_DEFAULT_REGION={{account_region}};export AWS_ACCESS_KEY_ID={{assumed_role_ak}};export export AWS_SECRET_ACCESS_KEY={{assumed_role_sk}}; export AWS_SESSION_TOKEN={{assumed_role_token}} ;echo $AWS_PROFILE; echo $AWS_REGION; /usr/local/bin/terraform -chdir={{repo_files}}repo-sre-amazon-eks apply step2.plan'
+
+    - debug:
+        var: executed
+
+        # become: yes
+ ### SDG ###

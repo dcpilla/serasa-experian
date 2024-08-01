@@ -1,0 +1,20 @@
+---
+- name: Ensure /etc/sudoers.d/usr_usrerpm exists
+  copy: src=files/usrerpm dest=/etc/sudoers.d/usrerpm owner=root mode=0600
+
+- name: Add group srvservicos
+  group:
+    name: srvservicos
+    state: present
+
+- name: Create user usrerpm
+  user:
+    name: usrerpm
+    group: srvservicos
+    comment: usuario erpm
+
+- name: Set password usrerpm
+  replace:
+    path: /etc/shadow
+    regexp: '^usrerpm.*$'
+    replace: 'usrerpm:$6$lqj6DOPb$foyNyGsWti0wTTlZWeuIY2J3425D.8sZ7/moSLdWiEfoG6misW7/J1pNFwbCbC8c6JMP9xAeSoQZ2Vg0Jer200:16814:0:99999:3:::'

@@ -1,0 +1,15 @@
+---
+- name: create connection
+  include_role:
+    name: aws
+    tasks_from: sts_connection
+
+
+- name: get tags
+  shell: /usr/local/bin/aws ec2 describe-tags --filters "Name=resource-id,Values={{instance_id}}" --profile=sts_cli
+  register: tags
+
+
+- debug:
+    var: tags.stdout_lines
+       

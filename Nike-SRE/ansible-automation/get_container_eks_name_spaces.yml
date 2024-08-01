@@ -1,0 +1,41 @@
+---
+- name: block when found == false
+  block:
+    - debug:
+        msg:
+          - "#############################################"
+          - "##                {{account}}              ##"
+          - "#############################################"
+          - "##                                         ##"
+          - "##   Found                | {{found}}         ##"
+          - "##   Start search cluster | {{cluster_name}}  ##"
+          - "##                                         ##"
+          - "#############################################"
+          - "#############################################"
+
+
+
+    - name: include role with task kubectl_config_cluster.yml
+      include_role:
+        name: k8s
+        tasks_from: kubectl_config_cluster.yml
+
+    - name: get namespaces
+      become: false
+      shell: "/usr/local/bin/kubectl get namespace | awk {'print $1'}| grep -v NAME "
+      register: namespaces
+    
+    - name: print variable namespaces.stdout_lines namespaces of eks cluster {{cluster_name}} 
+      debug:
+        var: namespaces.stdout_lines
+    
+    - name: gate pods of ns 
+      include_tasks: get_container_eks_pods.yml
+      #  when: not (found.changed|d(false))
+      with_items:
+        - '{{namespaces.stdout_lines}}'
+      loop_control:
+        loop_var: ns
+      when: found == false and namespaces.stdout_lines != []
+
+  when: found == false

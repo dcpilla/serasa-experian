@@ -1,0 +1,24 @@
+---
+- name: Add line allow key on zabbix conf
+  lineinfile:
+    path: /etc/zabbix/zabbix_agent2.conf
+    insertbefore: '### Option: DenyKey'
+    line: "{{ item }}"
+    state: present
+  with_items:
+    - "AllowKey=system.run[*]"
+    - "\n"
+
+- name: Add line deny key
+  lineinfile:
+    path: /etc/zabbix/zabbix_agent2.conf
+    regexp: '# DenyKey=system.run(.*)$'
+    line: 'DenyKey=system.run[sudo]'
+
+- name: Restart zabbix agent
+  service:
+    name: zabbix-agent2
+    state: '{{ item }}'
+  with_items:
+    - stopped
+    - started

@@ -1,0 +1,77 @@
+---
+- hosts: localhost
+  gather_facts: false
+  connection: local
+  tasks:
+    - debug:
+        var: hosts_list
+
+    - name: Set host to run standalone
+      add_host:
+        name: '{{ item }}'
+        group: hosts_invent
+      with_items: '{{ hosts_list }}'
+
+
+    - set_fact:
+        Path_arquivo_gerado: /tmp/check_package.csv
+
+    - name: Erase output file when TCP
+      file:
+        path: '{{ Path_arquivo_gerado }}'
+        state: absent
+      become: yes
+
+    - name: Create output file when TCP
+      file:
+        path: '{{ Path_arquivo_gerado }}'
+        state: touch
+        owner: root
+        group: root
+        mode: 775
+      become: yes
+
+    - name: append output on file
+      delegate_facts: true
+      lineinfile:
+        dest: '{{ Path_arquivo_gerado }}'
+        state: present
+        insertafter: BOF
+        line: "hostname|Release|Package name|Package Date"
+      become: yes
+
+- hosts: hosts_invent 
+  become: yes
+  become_user: root
+  gather_facts: false
+  tasks:
+    - set_fact:
+        Path_arquivo_gerado: /tmp/check_package.csv
+
+    - import_role:
+        name: checks
+        tasks_from: check_package.yml
+
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - set_fact:
+        email_title: 'Check Package Report'
+        body: '<br>Ansible-report<br/>
+               <br>check package {{package_name}}<br/>
+               <br>Attached csv file sparated by | '
+
+    - name: send email to '{{email}}'
+      delegate_to: "{{workerexec}}"
+      mail:
+        host: '{{mail_host}}'
+        port: '{{mail_port}}'
+        from: '{{mail_from}}'
+        to: '{{suport_email}}'
+        subject: 'Linux Management: check package {{package_name}}'
+        subtype: html
+        body: "{{ lookup('template','roles/check_tasks/templates/mail') }}"
+        attach:
+          - '{{Path_arquivo_gerado}}'
+      when: email is defined
+

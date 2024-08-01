@@ -1,0 +1,15 @@
+---
+- name: call sts_connection
+  include_role:
+    name: aws
+    tasks_from: sts_connection
+
+- name: call configservice_list_discovered_resources.yml
+  include_role:
+    name: aws
+    tasks_from: configservice_list_discovered_resources.yml
+
+- name: call aws_eks_tlmp.yml
+  include_tasks: aws_eks_tlmp.yml    
+
+ ### SDG ###

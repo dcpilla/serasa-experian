@@ -1,0 +1,23 @@
+---
+- name: get instance
+  include_tasks: ec2_describe.yml
+
+- name: stop instance
+  shell: "/usr/local/bin/aws ec2 terminate-instances --instance-ids={{instance_id}} --profile=sts_cli"
+  register: instance_status
+
+
+
+#- name: Terminate instances that were previously launched
+#  ec2:
+#    aws_access_key: "{{ assumed_role_ak }}"
+#    aws_secret_key: "{{ assumed_role_sk }}"
+#    security_token: "{{ assumed_role_token }}"
+#    validate_certs: no
+#          
+#    state: 'absent'
+#    instance_ids: '{{instance_id }}'    
+#  register: instance_status
+
+- debug:
+    var: instance_status

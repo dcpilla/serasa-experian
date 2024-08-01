@@ -1,0 +1,5 @@
+---
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - include_tasks:  check_emr_no_prod_uptime.yml

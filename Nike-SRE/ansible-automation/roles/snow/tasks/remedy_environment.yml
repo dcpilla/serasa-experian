@@ -1,0 +1,34 @@
+---
+- name: change chg_environment when is sbx current {{chg_environment}}
+  set_fact:
+    chg_environment: Dev
+    ambiente: Dev
+  when: chg_environment == 'sbx'
+
+- name: change chg_environment when is tst current {{chg_environment}}
+  set_fact:
+    chg_environment: Dev
+    ambiente: Dev
+  when: chg_environment == 'tst'
+
+
+- name: change chg_environment when is dev current {{chg_environment}}
+  set_fact:
+    chg_environment: Dev
+    ambiente: Dev
+  when: chg_environment == 'dev'
+
+- name: change chg_environment when is prd current {{chg_environment}}
+  set_fact:
+    chg_environment: Production
+    ambiente: Production
+  when: chg_environment == 'prd'
+
+- name: change chg_environment when is stg current {{chg_environment}}
+  set_fact:
+    chg_environment: UAT
+    ambiente: UAT
+  when: chg_environment == 'stg'
+
+
+  ###SDG###

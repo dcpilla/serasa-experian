@@ -1,0 +1,88 @@
+---
+- hosts: localhost
+  gather_facts: no
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+  become: yes
+  tasks:
+    - block:
+        - name: call task request_create_certificate_digital.yml when req_type == certificate
+          import_role:
+            name: snow
+            tasks_from: request_create_digital_certificate
+          when: req_type == 'certificate'
+    
+        - name: call task request_create_certificate_digital.yml when req_type == global-firewall
+          import_role:
+            name: snow
+            tasks_from: request_create_firewall_acesses_global
+          when: req_type == 'global-firewall'
+    
+        - name: call task request_create_certificate_digital.yml when req_type == brazil-firewall
+          import_role:
+            name: snow
+            tasks_from: request_create_firewall_acesses_brazil
+          when: req_type == 'brazil-firewall'
+    
+        - name: call task request_create_certificate_digital.yml when req_type == cloud-account 
+          import_role:
+            name: snow
+            tasks_from: request_create_cloud_account.yml
+          when: req_type == 'cloud-account'
+    
+        - name: call task request_create_certificate_digital.yml when req_type == resource-deploy
+          import_role:
+            name: snow
+            tasks_from: request_create_resource_deploy_authorization.yml
+          when: req_type == 'resource-deploy'
+    
+        - name: call task request_create_certificate_digital.yml when req_type == proxy
+          import_role:
+            name: snow
+            tasks_from: request_create_proxy.yml
+          when: req_type == 'proxy'
+
+
+#        - debug:
+#            msg: 
+#              - "{{req.json| regex_search('REQ[0-9]{7}') }}"
+#              - "{{req.json| regex_search('RITM[0-9]{7}') }}"
+#                #              - "{{req.json| regex_search('[0-9]{7}') }}"
+
+      when: req_type is defined
+
+    - name: show variable requested
+      debug:
+        msg:
+          - '#########################################'
+          - '#########################################'
+          - '##                                     ##'
+          - '## Please Define the req_type variable ##'
+          - '## values:                             ##'
+          - '##   - certificate                     ##'
+          - '##   - global-firewall                 ##'
+          - '##   - brazil-firewall                 ##'
+          - '##   - cloud-account                   ##'
+          - '##   - resource-deploy                 ##'
+          - '##   - proxy                           ##'
+          - '##                                     ##'
+          - '#########################################'
+          - '#########################################'
+
+      when: req_type is not defined
+
+    - name: show erros in the process
+      debug:
+        msg:
+          - '#########################################'
+          - '#########################################'
+          - '##                                     ##'
+          - '##  {{error_processes}}'
+          - '##                                     ##'
+          - '#########################################'
+          - '#########################################'
+
+      when: req_type is defined and error_processes is defined
+
+      ###SDG###      

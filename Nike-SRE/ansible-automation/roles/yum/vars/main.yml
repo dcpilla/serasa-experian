@@ -1,0 +1,12 @@
+packages:
+  - bind-utils
+  - lsof
+  - psmisc
+  - rsync
+  - sg3_utils
+  - tcpdump
+  - telnet
+  - vim
+  - wget
+  - yum-utils
+  - unzip

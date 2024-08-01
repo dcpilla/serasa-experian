@@ -1,0 +1,51 @@
+---
+- name: Bootstrap Amazon 
+  block:
+    # Set basic configs
+    - include_role:
+        name: config_machine 
+
+    # Set basic configurations from AMIs 
+    - include_role:
+        name: config_machine 
+        tasks_from: config_amazon
+  
+    # Set definitions on sudoers
+    - include_role:
+        name: sudoers  
+
+    # Set basics packages
+    - include_role:
+        name: yum 
+
+    # Install and configure DNS
+    - include_role:
+        name: dns_config
+      vars:
+        region: amazon 
+    
+    # Install NTP and configure
+    - include_role:
+        name: ntp 
+
+    # Install centrify, register in AD ad update hostname in DNS
+    - include_role:
+        name: centrify 
+      vars:
+        region: amazon 
+    
+    # Set definitions of users 
+    - include_role:
+        name: users_definitions 
+
+    # Set Mandatory Agents
+    - include_tasks: mandatory_agents.yml
+
+    # OOM Exception List
+    - include_role:
+        name: oom_killer_exception
+
+    # Set sshd configs
+    - include_role:
+        name: config_machine
+        tasks_from: config_sshd

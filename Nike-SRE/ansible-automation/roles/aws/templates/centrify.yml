@@ -1,0 +1,67 @@
+---
+- name: wrapper playbook for configuring agents
+  hosts: localhost
+  become: true
+
+  tasks:
+    - name: validate which cloud_platform is currently setup
+      shell: cat /etc/eec-hardened-instance
+      register: cloud_platform_out
+
+  roles:
+    - role: gather_instance_metadata
+      tags: gather_instance_metadata
+
+    - role: smt
+      tags: smt
+      when: ansible_facts['os_family'] == 'Suse' and cloud_platform_out.stdout.find("AWS") != -1
+
+    - role: proxy
+      tags: proxy
+      when: cloud_platform_region.find("southafrica") == -1
+
+    - role: partitions
+      tags: partitions
+      when:
+        - cloud_platform_out.stdout.find("Azure") != -1
+        - ansible_facts['os_family'] == 'Suse'
+
+    - role: ssm
+      tags: ssm
+      when: cloud_platform_out.stdout.find("AWS") != -1
+
+    - role: splunkforwarder
+      tags: splunkforwarder
+
+    - role: guardium
+      tags: guardium
+
+    - role: dynatrace
+      tags: dynatrace
+
+    - role: tanium
+      tags: tanium
+
+    - role: mcafee
+      tags: mcafee
+
+    - role: dns
+      tags: dns
+
+    - role: centrify
+      tags: centrify
+
+    - role: cyberark_onboarding
+      tags: cyberark
+      when: cloud_platform_out.stdout.find("AWS") != -1
+
+
+    - role: clean_files
+      tags: clean_files
+
+
+
+
+
+
+

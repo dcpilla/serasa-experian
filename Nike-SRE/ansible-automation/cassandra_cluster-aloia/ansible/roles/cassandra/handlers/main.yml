@@ -1,0 +1,21 @@
+---
+- name: Reenable cassandra service
+  systemd:
+    daemon_reload: yes
+    enabled: yes
+    name: cassandra.service
+  tags:
+    - cassandra 
+    - configuration
+
+# handlers file for cassandra
+
+- name: Restart cassandra
+  service:
+    name: cassandra.service
+    state: restarted
+    enabled: true
+    daemon_reload: true
+  tags:
+    - cassandra 
+    - configuration

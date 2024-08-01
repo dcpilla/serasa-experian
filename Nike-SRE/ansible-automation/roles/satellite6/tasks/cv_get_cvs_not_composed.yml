@@ -1,0 +1,4 @@
+- name: Gete CVS when is not composite
+  delegate_to: spobrsatellite1
+  shell: hammer content-view list --organization-id 1 --noncomposite true | egrep -v "CONTENT|Default|----" | awk {'print $1"-"$3'}
+  register: cv_id_name

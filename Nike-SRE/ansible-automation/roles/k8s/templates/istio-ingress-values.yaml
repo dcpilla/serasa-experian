@@ -1,0 +1,55 @@
+#autoscaling:
+#  minReplicas: 2
+#  targetCPUUtilizationPercentage: 100
+image: {{account_id}}.dkr.ecr.sa-east-1.amazonaws.com/chainguard/istio-proxy
+tag: v1.22.3-r0
+nodeSelector:
+  Worker: infra
+resources:
+  limits:
+    cpu: 1000m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+#podAnnotations:
+#  sidecar.istio.io/inject: "false"
+#service:
+#  annotations:
+#    service.beta.kubernetes.io/aws-load-balancer-access-log-enabled: "true"
+#    service.beta.kubernetes.io/aws-load-balancer-access-log-s3-bucket-name: se-a1a4d7d5eb8a7e66-nike-tech-dev-access-logs
+#    service.beta.kubernetes.io/aws-load-balancer-access-log-s3-bucket-prefix: logs-istio-nlb
+#    service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: map-migrated=d-server-01riktnbfe0092
+#    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
+#    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+#    service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+#    service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: '*'
+#    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: arn:aws:acm:sa-east-1:187739130313:certificate/402260e9-d8c9-4723-a166-279bf799689e
+#    service.beta.kubernetes.io/aws-load-balancer-ssl-negotiation-policy: ELBSecurityPolicy-TLS13-1-2-2021-06
+#    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
+#    service.beta.kubernetes.io/aws-load-balancer-subnets: subnet-07084e6a5888f00da,subnet-0846a1bf36cf95824,subnet-08e859bd244ee79d8
+#    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+#  loadBalancerSourceRanges:
+#  - 10.0.0.0/8
+#  ports:
+#  - name: status-port
+#    port: 15021
+#    protocol: TCP
+#    targetPort: 15021
+#  - name: http2
+#    port: 80
+#    protocol: TCP
+#    targetPort: 80
+#  - name: https
+#    port: 443
+#    protocol: TCP
+#    targetPort: 8080
+tolerations:
+- effect: NoSchedule
+  key: dedicated
+  operator: Equal
+  value: infra
+- effect: NoSchedule
+  key: Disabled
+  operator: Equal
+  value: ForKarpenter

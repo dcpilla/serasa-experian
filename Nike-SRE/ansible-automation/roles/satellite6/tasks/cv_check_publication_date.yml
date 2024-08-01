@@ -1,0 +1,19 @@
+---
+- set_fact:
+    date_pub: "{{item.split('|')[1]}}"
+    cv_name: "{{item.split('|')[0]}}"
+
+- name: get difference date
+  shell: echo $((($(date +%s)-$(date +%s --date "{{date_pub}}"))/(3600*24))) 
+  register: diff_days
+
+
+- name: append output when  check if public date is bigger 31 days
+  become: yes
+  delegate_facts: true
+  lineinfile:
+    dest: '{{Path_arquivo_gerado}}'
+    state: present
+    insertafter: EOF
+    line: "<br>{{cv_name}}|{{date_pub}}|{{diff_days.stdout}}<br/>"
+  when: diff_days.stdout|int > 31

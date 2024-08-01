@@ -1,0 +1,8 @@
+---
+- name:
+  include_tasks: cv_get_cvs_not_composed.yml
+
+- name: call remove old cv version
+  include_tasks: cv_remove_old_version.yml
+  with_items:
+    - '{{cv_id_name.stdout_lines}}'

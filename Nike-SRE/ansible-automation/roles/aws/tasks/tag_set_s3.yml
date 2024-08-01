@@ -1,0 +1,81 @@
+---
+  #create a bucket, add a policy from a file, enable requester pays, enable versioning and tag
+- name: set tag in s3 {{s3name}} from account {{account}}
+  s3_bucket:   # https://docs.ansible.com/ansible/2.9/modules/s3_bucket_module.html#s3-bucket-module
+    aws_access_key: "{{ assumed_role_ak }}"
+    aws_secret_key: "{{ assumed_role_sk }}"
+    security_token: "{{ assumed_role_token }}"
+    region: "{{account_region}}"
+    validate_certs: no
+
+    state: present
+#    bucket_key_enabled : true
+    public_access:
+      block_public_acls: yes
+      ignore_public_acls: true    
+
+    name: '{{s3name}}'
+#   policy: "{{ lookup('file','policy.json') }}"
+#   requester_pays: yes
+#   versioning: yes
+    purge_tags: no
+    tags:
+      "{{tag}}"
+  ignore_errors: yes
+  register: set_s3_tag
+
+- name: block
+  block:
+
+    - debug:
+        var: set_s3_tag
+
+
+    - name: set fact to notify
+      set_fact:
+        notify_type: mail
+        title: "Set Default tags in s3 {{s3name}} <br/> account {{account}}"
+        descr: "Set Default tags <br/> s3: {{s3name}} <br/> account: {{account}}"
+        msg: "Defined Tags: <br/> {{set_s3_tag.tags|replace(',','<br/>')}}"
+        msg_to:
+          - "{{suport_email}}"
+#          - alessandro.bahia@br.experian.com
+
+    - include_role:
+        name: notify
+
+  when: set_s3_tag.changed
+
+- name: blcok when set_s3_tag is true
+  block:
+          #        - name: debug set_s3_tag
+          #          debug:
+          #            var: set_s3_tag
+
+    - name: debug set_s3_tag
+      debug:
+        var: set_s3_tag.msg
+
+    - name: set fact to notify
+      set_fact:
+        notify_type: mail
+        title: 'Error to set tag in  {{s3name}} S3 from {{account}} account'
+        descr: "Error to set tag in  {{s3name}} S3 from {{account}} account"
+        msg: '{{set_s3_tag.msg}}'
+        msg_to:
+          - "{{suport_email}}"
+#          - alessandro.bahia@br.experian.com
+
+    - include_role:
+        name: notify
+
+  when: set_s3_tag.failed
+
+
+- name: default config enable Server access logging properties and set Target bucket
+  include_tasks: s3_server_acces_loggin_enable.yml  
+
+- name: call to Default Config Enable encryption
+  include_tasks: s3_encription_enable.yml
+
+### SDG ###  

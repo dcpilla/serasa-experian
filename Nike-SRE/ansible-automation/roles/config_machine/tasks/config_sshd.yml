@@ -1,0 +1,35 @@
+#Match Host spobrsatellite*
+#    PermitRootLogin without-password
+#Match Host spbrhdpcorp01*
+#    PermitRootLogin without-password
+#Match Host awsbrtower*
+#    PermitRootLogin without-password
+#PermitRootLogin yes
+#    PermitRootLogin without-password
+# Match Address 10.96.170.146
+#  PermitRootLogin without-password
+# # BEGIN ANSIBLE MANAGED BLOCK
+# Match Host spobrsatellite
+#     PermitRootLogin without-password
+# # END ANSIBLE MANAGED BLOCK
+
+- name: /etc/centrifydc/ssh/sshd_config
+  stat:
+    path: /etc/centrifydc/ssh/sshd_config
+  register: centrify_sshd_config
+  check_mode: no
+
+- name: remove items on /etc/centrifydc/ssh/sshd_config
+  lineinfile:
+    path: /etc/centrifydc/ssh/sshd_config
+    state: absent
+    regexp: '{{item}}'
+  with_items:
+#    - '^%wheel' 
+    - 'Match Address 10.96.170.146'
+    - 'PermitRootLogin without-password'
+    - 'BEGIN ANSIBLE MANAGED BLOCK'
+    - 'Match Host spobrsatellite*'
+    - 'END ANSIBLE MANAGED BLOCK'
+  notify: restart ssh service
+  when: centrify_sshd_config.stat.exists == True

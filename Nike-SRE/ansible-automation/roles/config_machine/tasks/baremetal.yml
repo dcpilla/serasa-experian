@@ -1,0 +1,7 @@
+---
+- name: Disable FirewallD
+  service:
+    name: firewalld
+    state: stopped
+    enabled: False
+  ignore_errors: yes

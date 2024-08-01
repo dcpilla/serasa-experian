@@ -1,0 +1,40 @@
+- hosts: localhost
+  gather_facts: no
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    AWS_REGION: sa-east-1
+  become: yes
+  tasks:
+    - name: set facts to create BURoleForEmrEc2Nike with Policies
+      set_fact:
+        name_role: BURoleForEmrEc2Nike
+#        name_policy: BUPolicyForEmrEc2Nike
+
+    - name: call connection
+      import_role:
+        name: aws
+        tasks_from: sts_connection
+
+    - name: call create role
+      import_role:
+        name: aws
+        tasks_from: iam_role_create.yml
+
+    - name: call attach policies
+      include_tasks: roles/aws/tasks/iam_role_attach_policie.yml
+      with_items:
+        - BUPolicyForEmrEc2Nike
+        - BUPolicyForAwsBaselineEmrEc2RolePolicyNike
+        - BUPolicyForAwsBaselineEmrEncryptionPolicyNike
+        - BUPolicyForAwsBaselineEmrRolePolicyNike
+      loop_control:
+        loop_var: name_policy
+
+    - name: attach aws policies
+      shell: "/usr/local/bin/aws --profile=sts_cli iam attach-role-policy --policy-arn {{item}} --role-name BURoleForEmrEc2Nike"
+      with_items:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM'
+        - 'arn:aws:iam::aws:policy/service-role/AmazonElasticMapReduceforEC2Role'
+        - 'arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore'
+        - 'arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy'

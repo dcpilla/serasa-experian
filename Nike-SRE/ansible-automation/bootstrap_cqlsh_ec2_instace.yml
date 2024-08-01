@@ -1,0 +1,13 @@
+---
+- hosts: localhost
+  tasks: 
+    - name: install and config cqlsh
+      delegate_to: '{{host}}'
+      #      environment:
+      #        https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+      #        http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+      #        user: ec2-user
+      #        key_file: 
+      import_role:
+        name: bootstrap
+        tasks_from: cqlsh_ec2_instace.yml

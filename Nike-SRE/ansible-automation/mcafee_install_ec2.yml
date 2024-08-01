@@ -1,0 +1,31 @@
+---
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: create dynamic inventory
+      add_host:
+        name: '{{item}}'
+        group: server_hosts
+      with_items:
+        - '{{server_list}}'
+
+- hosts: server_hosts
+  gather_facts: yes
+  tasks:
+    - meta: end_play
+      when: ansible_architecture != "x86_64"
+
+    - import_role:
+        name: preconf
+        tasks_from: create.yml
+
+    - debug:
+        var: ansible_distribution_major_version
+
+    - import_role:
+        name: mcafee
+
+    - import_role:
+        name: preconf
+        tasks_from: destroy.yml
+  become: yes

@@ -1,0 +1,37 @@
+---
+- name: get_access_key of user {{user_name}} from {{account}}
+  shell: '/usr/local/bin/aws --profile=sts_cli iam list-access-keys --user-name {{user_name}}'  
+  register: list_access_keys
+  
+- name: convert list_access_keys to json 
+  set_fact: 
+   list_access_keys: '{{list_access_keys.stdout|from_json}}'
+
+- name: print list_access_keys
+  debug: 
+    var: list_access_keys 
+ 
+- name: print list_access_keys
+  debug: 
+    var: list_access_keys.AccessKeyMetadata[0].CreateDate
+
+- name: set variable Created Date
+  set_fact: 
+    key_date: '{{list_access_keys.AccessKeyMetadata[0].CreateDate}}'
+    date_compare: '{{list_access_keys.AccessKeyMetadata[0].CreateDate}}'
+    key_active: '{{list_access_keys.AccessKeyMetadata[0].Status}}'
+
+- debug: 
+    msg: 
+      - '######################'
+      - 'key_date: {{key_date}}' 
+      - 'key_active: {{key_active}}'
+      - '######################'
+
+- name: compare date
+  include_tasks: compare_2_dates.yml
+
+- name: create dictonary to notify rotate
+  set_fact: 
+    key_user_90: "{{key_user_90|default([]) + [{'user': user_name, 'time_key': diff_dates_keys_user.stdout  }]}}"    
+  when: diff_dates_keys_user.stdout|int > 90 

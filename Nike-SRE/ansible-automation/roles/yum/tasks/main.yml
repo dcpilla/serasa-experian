@@ -1,0 +1,17 @@
+---
+# name: Enable Generic Third Party Repository
+# rhsm_repository:
+#   name: Serasa_Experian_Third_party_Third_Party_for_RHEL_Generic_Server_RPMs_x86_64
+#   state: enabled
+# when: not inventory_hostname.startswith('awsbr')
+
+- name: Install necessary packages
+  block:
+    - name: Install necessary packages
+      yum:
+        name: "{{ packages }}"
+        state: present
+        disable_gpg_check: yes
+      ignore_errors: yes 
+  tags:
+    - setpackages

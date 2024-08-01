@@ -1,0 +1,14 @@
+---
+- name: get route53 list-hosted-zones
+  shell: '/usr/local/bin/aws route53 list-hosted-zones --query "HostedZones[].Name" --profile sts_cli --region {{account_region}}'
+  register: host_zones
+
+- debug:
+    msg:
+      - "##########################################"
+      - "#           HostedZones List             #"
+      - "#           {{account}}             #"
+      - "##########################################"
+- debug:
+    var: host_zones.stdout_lines
+

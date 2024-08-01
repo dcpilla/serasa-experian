@@ -1,0 +1,16 @@
+---
+- name: Enable and start cassandra
+  systemd:
+    name: cassandra.service
+    state: started
+    enabled: true
+    daemon_reload: true
+  tags:
+    - cassandra
+
+- name: Wait for node to join cluster
+  wait_for:
+    search_regex: "No gossip backlog; proceeding"
+    path: /var/log/cassandra/cassandra.log
+  tags:
+    - cassandra

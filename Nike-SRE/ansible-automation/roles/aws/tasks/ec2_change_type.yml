@@ -1,0 +1,10 @@
+---
+- name: stop instance
+  include_tasks: ec2_stop.yml
+
+- name: change instance {{instance_id}} from {{account}}
+  shell: "/usr/local/bin/aws ec2 modify-instance-attribute --instance-id {{instance_id}} --instance-type '{\'Value\': \'{{type}}\'}' --profile=stc_cli"
+  register: intance_changed
+
+- debug:
+    var: intance_changed

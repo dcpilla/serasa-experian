@@ -1,0 +1,53 @@
+---
+- set_fact:
+    old: "{{old_domain | lower}}"
+  when: old_domain is defined
+
+- set_fact:
+    new: "{{new_domain | lower}}"
+  when: new_domain is defined
+
+- block:
+    - name: View json file
+      shell: "cat /usr/lib/zabbix/externalscripts/whois/dominios.json"
+      register: result
+
+    - set_fact:
+        jsondata: "{{result.stdout | from_json}}"
+
+    - set_fact:
+        domain: "{{ jsondata | json_query(jmesquery) }}"
+      vars:
+        jmesquery: 'domains'
+    
+    - debug:
+        msg: 
+          - "Domínios existentes no arquivo"
+          - "{{domain}}"
+  when: action == "Consultar"
+
+- block:
+   - name: Validate existence from {{old}}
+     shell: "grep -i '{{old}}' /usr/lib/zabbix/externalscripts/whois/dominios.json"
+     ignore_errors: yes
+     register: old_d
+
+   - name: Search and change {{old}} on {{host}} to {{new}}
+     replace:
+        path: /usr/lib/zabbix/externalscripts/whois/dominios.json
+        regexp: "{{old}}"
+        replace: "{{new}}"
+     when: '"{{old}}" in old_d.stdout'
+
+   - debug:
+       msg: "O domínio {{old}} não existe no arquivo. Por favor, validar os domínios atuais."
+     when: old_d.stdout | length == 0
+  when: action == "Alterar"
+
+- block:
+    - name: Remove domain from file
+      lineinfile:
+        path: /usr/lib/zabbix/externalscripts/whois/dominios.json 
+        regexp: "{{old}}"
+        state: absent
+      when: action == "Apagar"

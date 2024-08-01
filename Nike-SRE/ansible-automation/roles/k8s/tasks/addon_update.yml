@@ -1,0 +1,5 @@
+aws eks update-addon --cluster-name `kubectx` --addon-name coredns --profile dsstage  --addon-version v1.11.1-eksbuild.9
+aws eks update-addon --cluster-name `kubectx` --addon-name aws-ebs-csi-driver --profile dsstage  --addon-version v1.31.0-eksbuild.1
+aws eks update-addon --cluster-name `kubectx` --addon-name vpc-cni --profile dsstage  --addon-version v1.18.2-eksbuild.1
+aws eks update-addon --cluster-name `kubectx` --addon-name kube-proxy --profile dsstage  --addon-version v1.29.3-eksbuild.5
+

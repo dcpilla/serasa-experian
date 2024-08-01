@@ -1,0 +1,52 @@
+---
+#- name: set vmname {{item}}
+#  set_fact:
+#    vm_name: '{{item}}'
+
+#- name: check if server {{item}} is on
+#  include_role:
+#    name: vsphere
+#    tasks_from: get_facts_vmware.yml
+#  register: server_on
+
+- name: check if server {{item}} is on
+  shell: ping -c 1 {{item}} | awk 'NR==2 {print $5}'| sed 's/(//;s/)://'
+  register: server_on
+
+
+- debug:
+    var: server_on.stdout
+
+- name: 
+  set_fact:
+    server_name: '{{item}}'
+
+- name: create windows when {{item}} server state power-off
+  block:
+    - name: set create action
+      set_fact:
+        action: 'create'
+        window_group: 'Owner'
+        maintenance_type: 'Identify'
+
+    - name: include task manage_maintenance_windows.yml from zabbix role
+      include_role:
+        name: zabbix
+        tasks_from: manage_maintenance_windows.yml
+
+  when: server_on.stdout == 'Destination'
+
+- name: remove windows when {{item}} server state power-on
+  block:
+    - name: set create action to remove windows {{item}}
+      set_fact:
+        action: 'remove'
+        window_group: 'Owner'
+        maintenance_type: 'Identify'
+        time_minutes: 3030300
+
+    - name: include task manage_maintenance_windows.yml from zabbix role
+      include_role:
+        name: zabbix
+        tasks_from: manage_maintenance_windows.yml
+  when: server_on.stdout != 'Destination'

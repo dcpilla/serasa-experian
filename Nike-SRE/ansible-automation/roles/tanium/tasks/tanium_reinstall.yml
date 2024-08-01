@@ -1,0 +1,35 @@
+---
+- name: Cleaning proxy
+  shell: '{{item}}'
+  with_items:
+    - 'export https_proxy='
+    - 'export http_proxy='
+
+- name: get lv opt/Tanium
+  shell: lvs | grep opt_Tanium | awk {'print $1'}
+  register: LVOptTanium
+
+- name: gat Tanium Pack
+  shell: rpm -qa | grep -i Tanium
+  register: TaniumPack
+  args:
+    warn: false
+  ignore_errors: yes
+
+- name: reinstal or install
+  block:
+    - import_role:
+        name: tanium
+        tasks_from: tanium_uninstall
+      when: TaniumPack.stdout != ''
+   
+#    - import_role:
+#        name: tanium
+#        tasks_from: tanium_reconfig_disk
+#      when: LVOptTanium is defined and LVOptTanium.stdout == ''
+
+    - import_role:
+        name: tanium
+        tasks_from: tanium_install
+
+#  when: LVOptTanium.stdout == '' or  TaniumPack.stdout != ''

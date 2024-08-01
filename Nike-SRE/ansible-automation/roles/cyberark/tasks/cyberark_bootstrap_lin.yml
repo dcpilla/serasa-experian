@@ -1,0 +1,144 @@
+---
+- name: BLOCK - Set Variables
+  delegate_to: "{{ workerexec }}"
+  block:
+
+    - name: Set Serasa Intranet Domain Variables
+      set_fact:
+        domain_machine: 'serasa.intranet'
+        machine_fqdn: '{{ hostname }}.serasa.intranet'
+        type_account: 'linux'
+      when: domain == "serasa"
+
+    - name: Set Experianbr Domain Variables
+      set_fact:
+        domain_machine: 'br.experian.local'
+        machine_fqdn: '{{ hostname }}.br.experian.local'
+        type_account: 'linux'
+      when: domain == "brexperian"
+
+    - name: Set Serasa Cliente Domain Variables
+      set_fact:
+        domain_machine: 'serasacliente.com.br'
+        machine_fqdn: '{{ hostname }}.serasacliente.com.br'
+        type_account: 'linux'   
+      when: domain == "serasacliente"
+
+    - name: Get date to notes on new builtin account
+      shell: date +%F
+      register: date_time
+
+    - name: Get CyberArk credentials for "{{ username }}"
+      uri:
+        url: "{{ CCP_URL }}/AIMWebService/api/Accounts?AppID={{ app_id }}&Object={{ cyberark_ObjectName }}"
+        method: GET
+        validate_certs: no
+      register: cyberark_password
+    
+    - name: "Get API Token"
+      uri:
+        url: "{{ PVWA_URL }}/PasswordVault/API/Auth/CyberArk/Logon"
+        method: POST
+        body_format: json
+        body: {"Username": "{{ username }}", "Password": "{{ cyberark_password.json.Content }}" }
+        return_content: no
+        validate_certs: no
+      register: api_token_output
+      run_once: true
+    
+    - name: "get token fact"
+      set_fact:
+        api_token: "{{ api_token_output.json  }}"
+      run_once: true
+    
+    - name: Set {{ account_type[os_name] }} object name to create cyberark account
+      set_fact:
+        object_name_onboard_user: "{{ account_type[os_name] }}@{{ machine_address }}"
+    
+    - name: Set object name to search if {{ account_type[os_name] }} account exists before creating it
+      set_fact:
+        search_name_onboard_user: "{{ account_type[os_name] }}%20{{ machine_address }}"
+    
+    - name: "Validate if {{ account_type[os_name] }} object already exists"
+      uri:
+        url: "{{ PVWA_URL }}/PasswordVault/WebServices/PIMServices.svc/Accounts?safe={{ safe_name[os_name] }}&Keywords={{ search_name_onboard_user }}"
+        method: GET
+        validate_certs: no
+        headers:
+          Authorization: "{{ api_token }}"
+      register: accounts_onboard_user
+        
+    - name: "Create {{ account_type[os_name] }} from account id: {{ account_id }} in CyberArk"
+      uri:
+        url: "{{ PVWA_URL }}/PasswordVault/api/Accounts"
+        status_code: 201
+        method: POST
+        body_format: json
+        body: {"name": "{{ object_name_onboard_user }}", "address": "{{ machine_address }}", "userName": "{{ account_type[os_name] }}", "platformId": "{{ platform_name[os_name] }}", "safeName": "{{ safe_name[os_name] }}", "secretType":"password" ,"secret": "dsadasda=toreconciledsad", "platformAccountProperties":{ "Domain" : "{{ machine_domain }}", "ApplicationId" : "{{  machine_name }} {{ account_id }} BrazilBUILD-{{ date_time.stdout_lines }}" } }
+        validate_certs: no
+        headers:
+          Authorization: "{{ api_token }}"
+      ignore_errors: yes
+      register: saida
+      when:
+        - accounts_onboard_user.json.Count == 0
+        - "'linux' in os_name"
+    #- debug:
+    #    msg: "Onboarding has been done successfully"
+    #  when: "'201' in saida.msg"
+    
+    - name: "Create {{ account_type[os_name] }} from account id: {{ account_id }} in CyberArk"
+      uri:
+        url: "{{ PVWA_URL }}/PasswordVault/api/Accounts"
+        method: POST
+        body_format: json
+        body: {"name": "{{ object_name_onboard_user }}", "address": "{{ machine_address }}", "userName": "{{ account_type[os_name] }}", "platformId": "{{ platform_name[os_name] }}", "safeName": "{{ safe_name[os_name] }}", "secretType":"password" ,"secret": "toreconcilepdas12", "platformAccountProperties":{ "Domain" : "{{ machine_domain }}", "LogonDomain": "{{  machine_name }}", "ApplicationId" : "{{  machine_name }} {{ account_id }} BrazilBUILD-{{ ansible_date_time.date }}" } }
+        validate_certs: no
+        headers:
+          Authorization: "{{ api_token }}"
+      ignore_errors: yes
+      register: saida
+      when:
+        - accounts_onboard_user.json.Count == 0
+        - "'windows' in os_name"
+    #- debug:
+    #    msg: "Onboarding has been done successfully"
+    #  when: "'201' in saida.msg"
+    
+    - name: Get {{ account_type[os_name] }} cyberark account once created
+      uri:
+        url: "{{ PVWA_URL }}/PasswordVault/WebServices/PIMServices.svc/Accounts?safe={{ safe_name[os_name] }}&Keywords={{ search_name_onboard_user }}"
+        method: GET
+        validate_certs: no
+        headers:
+          Authorization: "{{ api_token }}"
+      register: account_created_onboard_user
+    
+    - name: Reconcile {{ account_type[os_name] }} account in CyberArk
+      uri:
+        url: "{{ PVWA_URL  }}/PasswordVault/API/Accounts/{{ account_created_onboard_user.json.accounts[0].AccountID }}/Reconcile"
+        method: POST
+        body_format: json
+        validate_certs: no
+        headers:
+          Authorization: "{{ api_token }}"
+      when: account_created_onboard_user.json.Count > 0
+    
+    - name: Reconcile {{ account_type[os_name] }} account in CyberArk
+      uri:
+        url: "{{ PVWA_URL  }}/PasswordVault/API/Accounts/{{ account_created_onboard_user.json.accounts[0].AccountID }}/Change"
+        method: POST
+        body_format: json
+        validate_certs: no
+        headers:
+          Authorization: "{{ api_token }}"
+      when: account_created_onboard_user.json.Count > 0
+    
+    - name: logoff from cyberark
+      uri:
+        url: "{{ PVWA_URL }}/PasswordVault/API/Auth/Logoff"
+        method: POST
+        body_format: json
+        validate_certs: no
+        headers:
+          Authorization: "{{ api_token }}"

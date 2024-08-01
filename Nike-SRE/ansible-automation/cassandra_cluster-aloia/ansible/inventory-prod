@@ -1,0 +1,30 @@
+[all:vars]
+cassandra_jvm_xms="4G"
+cassandra_jvm_xmx="4G"
+#env="dev"
+#
+##somente em prod
+#endpoint_snitch="GossipingPropertyFileSnitch"
+#cassandra_cluster_name="cassandra-reports-dev"
+#cassandra_allocate_tokens_for_local_replication_factor="2"
+#cassandra_topology=["10.99.249.14"=datacenter1:rack1",""]
+
+rapid7_args="ScoreCI, Brazil SP, AWS 688321605224, prod"
+
+[cassandra_seeds]
+# Zone A
+10.99.249.14
+
+# Zone B
+10.99.249.177
+
+# Zona C
+
+[cassandra_nodes]
+# Zone A
+10.99.249.19
+
+# Zone B
+10.99.249.173
+
+# Zone C

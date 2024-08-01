@@ -1,0 +1,50 @@
+---
+- name: Get the current caller identity information {{account}}
+  become: yes
+  aws_caller_info:
+    aws_access_key: "{{ assumed_role_ak }}"
+    aws_secret_key: "{{ assumed_role_sk }}"
+    security_token: "{{ assumed_role_token }}"
+    validate_certs: no
+  register: caller_info
+
+#- debug:
+#    var: caller_info  
+
+- name: set_returns
+  set_fact:
+    account_id: "{{caller_info|json_query('account')}}"
+    account_user: "{{caller_info|json_query('arn')}}"
+    account_name: "{{caller_info|json_query('account_alias')}}"
+    account_apid: "{{prof_account.appid}}"
+    account_environment: "{{prof_account.enviroment}}"
+    account_ccosting:  "{{prof_account.ccosting}}"
+    account_email_team: "{{prof_account.email_team}}"
+    account_sm_team: "{{prof_account.sm_team}}"
+    account_tl_team: "{{prof_account.tl_team}}"
+    account_manager: "{{prof_account.manager}}"
+    account_region: '{{prof_account.region}}'
+    #   account_domain: '{{prof_account.domain}}'
+
+- name: account details {{account}}
+  debug:
+    msg: 
+      - "################################################################################################"
+      - "#                         ACCOUNT-ID RETURNS BY STS ANSIBLE MODULE                             #"
+      - "################################################################################################"
+      - "#  Return Variables  |                            Values                                       #"
+      - "################################################################################################"
+      - "# account_id         | {{account_id}}                                                            #"
+      - "# account_user       | {{account_user}}#"
+      - "# account_name       | {{account_name}}                                               "
+      - "# account_apid       | {{account_apid}}     #"
+      - "# account_environment| {{account_environment}} #"
+      - "# account_ccosting   | {{account_ccosting}}#"
+      - "# account_email_team | {{account_email_team}} #"
+      - "# account_sm_team    | {{account_sm_team}} #"
+      - "# account_tl_team    | {{account_tl_team}} #"
+      - "# account_manager    | {{account_manager}} #"
+      - "# account_region     | {{account_region}} #"
+        #      - "# account_domain     | {{account_domain}} #"
+      - "################################################################################################"
+

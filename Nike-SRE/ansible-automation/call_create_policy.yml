@@ -1,0 +1,10 @@
+---
+- hosts: localhost
+  tasks:
+    - name: create policy
+      include_tasks: aws_create_policy.yml
+      with_items: 
+       - '{{account}}'
+      loop_control:
+        lop_var: account
+### SDG ###

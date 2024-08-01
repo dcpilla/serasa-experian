@@ -1,0 +1,10 @@
+---
+- hosts: localhost
+  gather_facts: no
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+  tasks:
+    - import_role:
+        name: snow
+        tasks_from: incincident_create

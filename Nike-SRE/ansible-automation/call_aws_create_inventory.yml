@@ -1,0 +1,100 @@
+---
+- hosts: spobrnikeworker
+  gather_facts: no
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    AWS_REGION: sa-east-1
+  tasks:
+    - name: remove existent inventory
+      become: yes
+      file:
+        state: absent
+        path: '{{item}}'
+      with_items:
+        - '{{inventory_all_instances_path}}'
+        - '{{inventory_emr_path}}'
+        - '{{inventory_s3_path}}'
+        - '{{inventory_eks_path}}'
+#        - '{{inventory_our_instance_path_linux}}'
+#        - '{{inventory_our_instance_path_windows}}'
+
+    - name: include task to call set ak sk role-task
+      include_tasks: aws_create_inventory.yml
+      with_items:
+        - '{{accounts}}'
+      loop_control:
+        loop_var: account
+
+                  
+    - name: slap in the file
+      become: yes
+      shell: '{{item}}'
+      loop:
+        - " egrep 'running|eec|Linux' {{inventory_all_instances_path}}   | egrep -v 'emr|EMR|node_group_on_demand_' | cut -d '|' -f2 > {{inventory_our_instance_path_linux}}"
+        - " egrep 'running|eec|Windows' {{inventory_all_instances_path}} | egrep -v 'emr|EMR|node_group_on_demand_' | cut -d '|' -f2 > {{inventory_our_instance_path_windows}}"
+#        - cat '{{inventory_our_instance_path}}' | egrep -v 'null|{|}'| cut -d ':' -f2 | sed 's/"//g'|grep -v '^ 100.'  > /home/Check/Inv/ec2-invetory_running.txt
+#        - tr -d ' ' < /home/Check/Inv/ec2-invetory_running.txt > /home/Check/Inv/ec2-dynamic_invetory_running.txt
+#        - rm -rf '{{inventory_our_instance_path}}' /home/Check/Inv/ec2-invetory_running.txt
+
+
+    - include_tasks: check_unreachable_hosts.yml
+    - include_tasks: check_emr_no_prod_uptime.yml
+
+    - name: block to send emailk when unreachable_list or emrfields_list is defined      
+      block:
+        - name: set fact all checks
+          set_fact:
+            email_title: "Check unreachable hosts br/>"
+            sub_title: 'This is an automatic process from Nike Program'
+            description: 'This job check hosts running from nike aws accounts to test unreachable connection'
+            report_date: "{{ lookup('pipe', 'date -d \"3 hour ago\" +\"%Y-%m-%d %H:%M:%S\"') }}"
+            body: ''
+            virgula: ','
+
+        - name: set fact to send email when unreachable_list is defined
+          set_fact:
+            body: "{{body}} <br/>
+                   <br>Process Name: Check unreachable hosts <br/>
+                   Server List: <br/>
+                   {{unreachable_list|regex_replace(',','<br/>')|regex_replace('}]',' ')}}|regex_replace('{','')|regex_replace('}','')"
+                   #               {{unreachable_list|regex_replace('}, {','<br/>')|regex_replace('[{','')|regex_replace('}]','')}}"
+          when: unreachable_list is defined
+
+        - debug:
+            var: emr_running_more_than_a_day
+
+#        - name: set fact to send email when emr_running_more_than_a_day skipped is false
+#          set_fact:
+#            body: "{{body}}<br/>
+#                   ############################################## <br/>
+#                   ############################################## <br/>
+#                   #            EMR RUNNING MORE A DAY          # <br/>
+#                   ############################################## <br/>
+#                   ############################################## <br/>
+#                   {{emr_running_more_than_a_day.stdout_lines| regex_replace('virgula','<br/>') }}    <br/>"
+#
+#                   # {{unreachable_list|regex_replace(',','<br/>')|regex_replace('}]',' ')}}|regex_replace('{','')|regex_replace('}','')"
+#                   # {{unreachable_list|regex_replace('}, {','<br/>')|regex_replace('[{','')|regex_replace('}]','')}}"
+#                   #
+#          when: emr_running_more_than_a_day.stdout != ''
+
+    
+        - name: send email when unreachable_list is defined
+          become: false
+          ignore_errors: yes
+          mail:
+            host: '{{mail_host}}'
+            port: '{{mail_port}}'
+            from: '{{mail_from}}'
+            to:
+              - '{{suport_email}}'
+#              - '{{mail_copy}}'
+#              - '{{mail_operation}}'
+#              - 'alessandro.bahia@br.experian.com'
+            subject: 'unreachable hosts detected'
+            subtype: html
+            body: "{{ lookup('template', '{{mail_template}}') }}"
+          when: unreachable_list is defined or emr_running_more_than_a_day.stdout != ''
+
+### SDG ###

@@ -1,0 +1,19 @@
+---
+- hosts: localhost
+  gather_facts: false
+  connection: local
+  tasks:
+    - name: Set host to run standalone
+      add_host:
+        name: '{{ item }}'
+        group: hosts_invent
+      with_items: '{{ hosts_list }}'
+
+- hosts: hosts_invent 
+  become: yes
+  become_user: root
+  gather_facts: yes
+  tasks:
+    - import_role:
+        name: tanium
+        tasks_from: tanium_reinstall.yml

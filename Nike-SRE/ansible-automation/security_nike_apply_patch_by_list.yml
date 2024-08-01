@@ -1,0 +1,120 @@
+---
+- hosts: localhost
+  gather_facts: false
+  connection: local
+#- hosts: spobrnikeworker
+  tasks:
+    - name: set fact to load PATCH variables 
+      set_fact:
+        change_type: 'instance_patch'
+
+    - name: Get start date with sambarilove
+      become: false
+      shell: 'date "+%Y-%m-%d %H:%M:%S" -d "5 hour ago"'
+      register: st_teste
+
+    - debug:
+        msg: 
+          - "{{ lookup('pipe', 'date -d \"5 hour ago\" +\"%Y-%m-%d %H:%M:%S\"') }}"
+          - "{{lookup('pipe', 'date +\"%Y-%m-%d %H:%M:%S\"') }}"
+          - "{{st_teste}}"
+
+    - name: create change to patch
+      include_role:
+        name: snow
+        tasks_from: change_standard_create.yml
+
+    - debug:
+        var: server_list
+
+    - name: create dynamic inventory
+      add_host: 
+        name: '{{item}}'
+        group: dynamic_hosts
+      with_items:
+        - '{{server_list}}'
+
+
+    - name: set fact to send email started patching for the '{{ambiente}}' group
+      set_fact:
+        email_title: "started patch {{chg_num}}<br/>
+                      {{ambiente}}"
+        sub_title: 'This is an automatic process from Nike Program'
+        description: 'The update process is performed automatically by prior scheduling of the environment administrators'
+        report_date: "{{ lookup('pipe', 'date -d \"3 hour ago\" +\"%Y-%m-%d %H:%M:%S\"') }}"
+        body: "<br>Process Name: {{ambiente}} automatic patch {{chg_num}} <br/> 
+               {{chg_environment}} environ<br/>
+               Server List: <br/>
+               {{server_list|replace(',','<br/>')|replace('[','')|replace(']','')}}"
+
+    - name: send email started patch '{{chg_environment}}' group
+      become: false
+      #      delegate_to: "{{workerexec}}"
+      ignore_errors: no
+      mail:
+        host: '{{mail_host}}'
+        port: '{{mail_port}}'
+        from: '{{mail_from}}'        
+        to: 
+          - '{{suport_email}}'
+          - '{{mail_copy}}'
+          - '{{mail_operation}}'
+#        to: 'alessandro.bahia@br.experian.com'
+        subject: 'Started {{ambiente}} Automatic Patch'
+        subtype: html
+        body: "{{ lookup('template', '{{mail_template}}') }}"
+
+- hosts: dynamic_hosts
+  environment:
+    https_proxy: https://spobrproxy.serasa.intranet:3128
+    http_proxy: http://spobrproxy.serasa.intranet:3128
+#  vars:
+#    ansible_user: "{{vault_user}}"
+#    ansible_ssh_private_key_file: "{{vault_key}}"
+  tasks:
+    - name:
+      include_role:
+        name: patch
+        tasks_from: apply.yml
+  become: yes
+
+- hosts: localhost
+  gather_facts: false
+  connection: local
+  #- hosts: spobrnikeworker
+  tasks:
+    - name: close change to patch
+      include_role:
+        name: snow
+        tasks_from: close_change.yml
+
+    - name: set fact to send email finished patch from the '{{chg_environment}}' group
+      set_fact:
+        email_title: "Finished patch {{chg_num}}<br/>
+                      {{ambiente}}"
+        sub_title: 'This is an automatic process from Nike Program'
+        description: 'The update process is performed automatically by prior scheduling of the environment administrators'
+        report_date: "{{ lookup('pipe', 'date -d \"3 hour ago\" +\"%Y-%m-%d %H:%M:%S\"') }}"
+        body: "<br>Process Name: {{ambiente}} automatic patch {{chg_num}}<br/>
+               {{chg_environment}} environ<br/>
+               Server List: <br/>
+               {{server_list|replace(',','<br/>')|replace('[','')|replace(']','')}}"
+
+    - name: send email Finished patch '{{ambiente}}' group
+      become: false
+      #      delegate_to: "{{workerexec}}"
+      ignore_errors: yes
+      mail:
+        host: '{{mail_host}}'
+        port: '{{mail_port}}'
+        from: '{{mail_from}}'
+        to: 
+          - '{{suport_email}}'
+          - '{{mail_copy}}'
+          - '{{mail_operation}}'
+#        to: 'alessandro.bahia@br.experian.com'        
+        subject: 'Finished {{ambiente}} Automatic Patch'
+        subtype: html
+        body: "{{ lookup('template', '{{mail_template}}') }}"
+
+### SDG ###        

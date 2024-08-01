@@ -1,0 +1,20 @@
+---
+- name: Stop service
+  service:
+    name: ir_agent
+    state: stopped
+  ignore_errors: yes
+
+- name: Remove config file  
+  file:
+    path: /opt/rapid7/ir_agent/components/insight_agent/common/config/agent.jobs.tem_realtime.json
+    state: absent
+
+- name: Remove snapshots
+  shell: 'rm -rf /opt/rapid7/ir_agent/components/insight_agent/common/snapshots/*'
+
+- name: Start service
+  service:
+    name: ir_agent
+    state: started
+  ignore_errors: yes 

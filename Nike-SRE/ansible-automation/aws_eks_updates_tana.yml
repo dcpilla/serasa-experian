@@ -1,0 +1,79 @@
+---
+- hosts: localhost
+  gather_facts: no
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    AWS_REGION: sa-east-1
+  tasks:
+    - name: Block variable required
+      block:
+        - name: include connection
+          include_role: 
+            name: aws
+            tasks_from: sts_connection
+
+        - name: include role with task kubectl_config_cluster.yml
+          include_role:
+            name: k8s
+            tasks_from: kubectl_config_cluster.yml    
+
+        - name: get CrashLoopBackOff pods
+          shell: '/usr/local/bin/kubectl get pods -A | grep "CrashLoopBackOff"'
+          ignore_errors: yes
+          register: crash_Loop_backOff
+
+        - name: debug crash_Loop_backOff
+          debug:
+            var: crash_Loop_backOff.stdout_lines
+
+        - name: set fact to notify CrashLoopBackOff after update
+          set_fact:
+            notify_type: mail
+            title: 'CrashLoopBackOff after Eks-Update {{cluster_name}}'
+            descr: "CrashLoopBackOff after Eks-Update <br/>Cluster Name: {{cluster_name}} <br/> account: {{account}}"
+            msg: 'CrashLoopBackOff: <br/> {{crash_Loop_backOff.stdout_lines}}'
+            msg_to:
+               #- "{{suport_email}}"
+               - alessandro.bahia@br.experian.com
+          when: crash_Loop_backOff.stdout_lines != ''
+         
+        - name: list current cluster version
+          shell: /usr/local/bin/aws eks describe-cluster --name {{cluster_name}} --profile sts_cli --query "cluster.version"
+          register: cluster_old_version
+
+        - debug:
+            msg: 
+              - "#########################"
+              - "##   Current Version   ##"
+              - "##      {{cluster_old_version.stdout}}       ##"
+              - "#########################"
+
+         - name: Update Cluster {{cluster_name}} to {{new_version}} version
+           shell: '/usr/local/aws eks update-cluster-version --name {{cluster_name}} --profile sts_cli --kubernetes-version {{new_version}}'
+           register: updatecluster
+
+         - name: set status to wait update
+           set_fact: 
+             status: ''   
+         
+         - name: check status
+           shell: /usr/local/bin/aws eks describe-cluster --name {{cluster_name}} --profile sts_cli --query "cluster.status" --output text
+           when : status != 'ACTIVE'
+
+
+         - name: get images
+
+ 
+
+      when: account is defined and cluster_name is defined and new_version is defined
+
+
+    - name: msg when not defined
+      debug:
+        msg:
+          - " variables needs defined"
+          - "account"
+          - "cluster_name"
+          - "new_version"
+      when: account is not defined or cluster_name is not defined or new_version is not defined

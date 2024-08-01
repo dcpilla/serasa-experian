@@ -1,0 +1,51 @@
+---
+- name: check if Tanium is installed
+  shell: 'rpm -qa | grep TaniumClient'
+  register: tanium_installed
+  args:
+    warn: false  
+  ignore_errors: yes
+
+- name: remove Tanium when installed
+  shell: '{{item}}'
+  with_items:
+    - 'yum remove -y `rpm -qa | grep TaniumClient`'
+    - 'rm -rf /opt/Tanium/*'
+  when: tanium_installed is defined and tanium_installed.stdout != ''
+
+- name: Install Tanium client when bigger then rhel 8
+  yum:
+    name: TaniumClient 
+    state: present
+    enablerepo: Serasa_Experian_MANDATORY_COLLECTION_RH8_Security_Agents_RH8
+    disable_gpg_check: yes
+  when: not inventory_hostname.startswith('awsbr') and  ansible_distribution_major_version|int == 8
+
+- name: Install Tanium client when bigger then rhel 7
+  yum:
+    name: TaniumClient 
+    state: present
+    enablerepo: Serasa_Experian_MANDATORY_COLLECTION_RH7_Security_Agents_RH7
+    disable_gpg_check: yes
+  when: not inventory_hostname.startswith('awsbr') and  ansible_distribution_major_version|int == 7
+
+- name: Install Tanium client when rhel 6
+  yum:
+    name: TaniumClient 
+    state: present
+    enablerepo: Serasa_Experian_MANDATORY_COLLECTION_RH6_Security_Agents_RH6
+    disable_gpg_check: yes
+  when: not inventory_hostname.startswith('awsbr') and ansible_distribution_major_version|int == 6
+
+- name: Set tanium config Server is {{ServerName}} Port is {{ServerPort}}
+  shell: '{{item}}'
+  with_items:
+    - '/opt/Tanium/TaniumClient/TaniumClient config set ServerName {{ServerName}}'
+    - '/opt/Tanium/TaniumClient/TaniumClient config set ServerPort {{ServerPort}}'
+
+- name: Copy tanium-init.dat file to /opt/Tanium/TaniumClient/tanium-init.dat
+  copy:
+    src: files/tanium-init.dat
+    dest: /opt/Tanium/TaniumClient/tanium-init.dat
+  notify:
+      - restart taniumclient

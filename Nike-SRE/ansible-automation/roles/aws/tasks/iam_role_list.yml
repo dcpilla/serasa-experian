@@ -1,0 +1,11 @@
+---
+- name: list roles
+  shell: "/usr/local/bin/aws iam list-roles --query 'Roles[].RoleName' --profile=sts_cli"
+  ignore_errors: yes
+  register: name_roles
+
+
+
+- name: list role names
+  debug:
+    var: name_roles.stdout_lines

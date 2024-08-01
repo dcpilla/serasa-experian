@@ -1,0 +1,146 @@
+---
+### mandatory variale
+# server_name = need server name of windows
+# action = create or remove
+
+- name: register other_name
+  delegate_to: spobrbastion
+  shell: ping -c 1 {{server_name}} | head -1 | awk {'print $2'}
+  register: dns_name
+
+- set_fact:
+    maintenance_name: "{{window_group}}-{{maintenance_type}}-{{server_name}}"
+    server_other_name: '{{dns_name.stdout}}'
+
+
+- name: set maintenance window {{maintenance_name}}  when action is create
+  delegate_to: spobrbastion
+  ignore_errors: yes
+  block:
+    - name: Create a maintenance window {{maintenance_name}} with original server_name
+      zabbix_maintenance:
+        name: '{{maintenance_name}}'
+        host_name: '{{server_name}}'
+        state: present
+        minutes: '{{time_minutes}}'
+        server_url: '{{zabbix_server}}'
+        login_user: '{{zabbix_login}}'
+        login_password: '{{zabbix_pass}}'
+      register: create_window
+
+    - debug:
+        var: create_window
+
+    - name: reset maintenance name when is failed
+      set_fact:
+        maintenance_name: "{{window_group}}-{{maintenance_type}}-{{server_name| upper}}"
+      when: create_window.failed
+
+    - name: Create a maintenance window {{maintenance_name}} with uppercase original server_name
+      zabbix_maintenance:
+        name: '{{maintenance_name}}'
+        host_name: '{{server_name| upper}}'
+        state: present
+        minutes: '{{time_minutes}}'
+        server_url: '{{zabbix_server}}'
+        login_user: '{{zabbix_login}}'
+        login_password: '{{zabbix_pass}}'
+      register: create_window
+      when: create_window.failed
+  
+    - name: reset maintenance name when is failed
+      set_fact:
+        maintenance_name: "{{window_group}}-{{maintenance_type}}-{{server_other_name}}"
+      when: create_window.failed
+
+    - name: Create a maintenance window {{maintenance_name}} with fqdn 
+      zabbix_maintenance:
+        name: '{{maintenance_name}}'
+        host_name: '{{server_other_name}}'
+        state: present
+        minutes: '{{time_minutes}}'
+        server_url: '{{zabbix_server}}'
+        login_user: '{{zabbix_login}}'
+        login_password: '{{zabbix_pass}}'
+      register: create_window
+      when: create_window.failed
+
+    - name: reset maintenance name when is failed
+      set_fact:
+        maintenance_name: "{{window_group}}-{{maintenance_type}}-{{server_other_name|upper}}"
+      when: create_window.failed
+
+    - name: Create a maintenance window {{maintenance_name}} with uppercase fqd
+      zabbix_maintenance:
+        name: '{{maintenance_name}}'
+        host_name: '{{server_other_name|upper}}'
+        state: present
+        minutes: '{{time_minutes}}'
+        server_url: '{{zabbix_server}}'
+        login_user: '{{zabbix_login}}'
+        login_password: '{{zabbix_pass}}'
+      register: create_window
+      when: create_window.failed
+
+  when: action == 'create'
+
+
+- name: remove maintenance window {{maintenance_name}} when action is remove
+  delegate_to: spobrbastion
+  ignore_errors: yes
+  block:
+    - name: Remove maintenance window {{maintenance_name}}
+      zabbix_maintenance:
+        name: '{{maintenance_name}}'
+        state: absent
+        server_url: '{{zabbix_server}}'
+        login_user: '{{zabbix_login}}'
+        login_password: '{{zabbix_pass}}'
+      register: remove_window
+
+    - name: reset maintenance name when is failed
+      set_fact:
+        maintenance_name: "{{window_group}}-{{maintenance_type}}-{{server_name|upper}}"
+      when: remove_window.failed
+
+    - name: Remove a maintenance window {{maintenance_name}} with upper original server_name
+      zabbix_maintenance:
+        name: '{{maintenance_name}}'
+        state: absent
+        server_url: '{{zabbix_server}}'
+        login_user: '{{zabbix_login}}'
+        login_password: '{{zabbix_pass}}'
+      register: remove_window
+      when: remove_window.failed
+
+    - name: reset maintenance name when is failed
+      set_fact:
+        maintenance_name: "{{window_group}}-{{maintenance_type}}-{{server_other_name}}"
+      when: remove_window.failed
+
+    - name: Remove a maintenance window {{maintenance_name}} with fqdn
+      zabbix_maintenance:
+        name: '{{maintenance_name}}'
+        state: absent
+        server_url: '{{zabbix_server}}'
+        login_user: '{{zabbix_login}}'
+        login_password: '{{zabbix_pass}}'
+      register: remove_window
+      when: remove_window.failed
+
+    - name: reset maintenance name when is failed
+      set_fact:
+        maintenance_name: "{{window_group}}-{{maintenance_type}}-{{server_other_name|upper}}"
+      when: remove_window.failed
+
+    - name: Remove a maintenance window {{maintenance_name}} with uppercase fqdn
+      zabbix_maintenance:
+        name: '{{maintenance_name}}'
+        state: absent
+        server_url: '{{zabbix_server}}'
+        login_user: '{{zabbix_login}}'
+        login_password: '{{zabbix_pass}}'
+      register: remove_window
+      when: remove_window.failed
+
+  when: action == 'remove'

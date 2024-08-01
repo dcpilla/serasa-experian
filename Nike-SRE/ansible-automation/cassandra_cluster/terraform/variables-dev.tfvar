@@ -1,0 +1,58 @@
+# AWS Account and project name
+project_name                     = "cassandra-cluster001"
+account_id                       = "928193545380"
+BU                               = "Reports"
+
+# Region and Environment
+aws_region                       = "sa-east-1"
+env                              = "dev"
+                                    
+# Instance
+ami                              = "ami-0b21481987a03e80f"
+instance_type                    = "c5.xlarge"
+keypair_name                     = "sre-suport"
+#security_group_ids               = ["?"]
+number_of_cassandra_nodes_az_a   = 1
+number_of_cassandra_nodes_az_b   = 1 
+#number_of_cassandra_nodes_az_c   = 0
+
+# Volumes mounted in / data
+disk_size                        = 40
+iops                             = 500
+type                             = "gp3"
+throughput                       = 125
+
+# ELB
+lb_log_enabled                   = true
+lb_ssl_arn                       = "arn:aws:acm:sa-east-1:928193545380:certificate/4f33cd9c-8740-47b4-81e3-141d1b2590f7"
+lb_internal                      = true
+#lb_bucket                        = "serasaexperian-eks-uat-tf-state"
+lb_bucket                        = "serasaexperian-cassandra-dev-tf-state"
+lb_bucket_prefix                 = "cassandra-elb"
+
+lb_ports                         = {"tls"  = {name = "tls"
+                                              protocol  = "TLS"
+                                              port      = 9042
+                                             }
+                                   }
+
+metadata_options                 = {
+                                    http_endpoint               = "enabled"
+                                    http_tokens                 = "optional"
+                                   }
+
+
+
+# DNS Rout53
+hosted_zone_id                   = "Z09560742PDQSSVJYW2HY"
+#aws_route53_record_name          = {"a":"seed001_az_a", "b":"seed001_az_b","c":"seed001_az_c"}
+
+# Networking
+vpc_id                           = "vpc-0a834e3bc9a66e91a"
+subnet                           = {"1a": "aws-landing-zone-PrivateSubnet1A",
+                                    "1b": "aws-landing-zone-Private subnet 2A"
+                                   }
+# Tagging
+tags                             = {"ResourceOwner": "nikesre@br.experian.com"                                    
+                                    }
+volume_tags                      = {}

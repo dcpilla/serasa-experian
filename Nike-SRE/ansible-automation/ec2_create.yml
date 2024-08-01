@@ -1,0 +1,22 @@
+---
+- hosts: localhost
+  tasks:
+   - include_vars: var.yml
+   - name: Provision os in AWS
+     ec2:
+      key_name: "sre-suport" #/keypair to be attached to the instance  
+      instance_type: "t2.micro"
+      image: "ami-0ab7e43d31f803116"  #//amazon linux 
+      count: 1
+      wait: yes
+      vpc_subnet_id: "subnet-05b75edb1c66fbc9b"
+      region: "sa-east-1" #//asia-pecific-south region of AWS
+      state: present
+      assign_public_ip: yes
+      group_id: "sg-009fc9fd67f0b7678" #//security group 
+      aws_access_key: "{{AK}}"
+      aws_secret_key: "{{SK}}"
+     register: ec2   
+
+   - debug:
+       var: ec2.instances[0].public_ip

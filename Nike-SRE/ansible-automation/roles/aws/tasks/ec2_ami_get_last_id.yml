@@ -1,0 +1,79 @@
+---
+#- name: get last ami {{ami_name}}
+#  become: no
+#  shell: aws ec2 describe-images --owners 363353661606 --filters "Name=name,Values={{ami_name}}*"  --query "sort_by(Images, &CreationDate)[-1].[ImageId,CreationDate,Name]" --output text
+#  args:
+#    executable: /bin/bash
+#  register: last_eec_image
+#  ignore_errors: yes
+#
+##- debug:
+##    var: last_eec_image
+#
+#- name: blcok result when have return
+#  block:
+#    - name: set resultes of ami consult 
+#      set_fact:
+#        last_image_ID: "{{last_eec_image.stdout.split('\t')[0]}}"
+#        last_image_CreationDate: "{{last_eec_image.stdout.split('\t')[1].split('T')[0]}}"
+#        last_image_name: "{{last_eec_image.stdout.split('\t')[2]}}"
+#    
+#    
+#    
+#    - debug:
+#        msg: 
+#          - '#########################################################################' 
+#          - '##                          eec images retuns                          ##' 
+#          - '#########################################################################' 
+#          - '## last_image_ID          = {{last_image_ID}}                      ##'
+#          - '## last_image_CreationDate= {{last_image_CreationDate}}                                 ##'
+#          - '## last_image_name        = {{last_image_name}}##'
+#          - '#########################################################################'
+#             ## last_image_name        = eec_aws_amzn-lnx_2_1680101442_1.153.82.1928
+#
+#  when: last_eec_image.stdout != 'None'
+
+
+- name: gather inf about ami {{ami_name}}  owner 363353661606
+  ec2_ami_info:
+    aws_access_key: "{{ assumed_role_ak }}"
+    aws_secret_key: "{{ assumed_role_sk }}"
+    security_token: "{{ assumed_role_token }}"
+    region: '{{account_region}}'
+    validate_certs: no
+
+    owners: 363353661606
+    filters:
+      name: "{{ami_name}}*"
+  register: ami_info_return
+
+#- name: show ami_info_return variable
+#  debug:
+#    var: ami_info_return
+
+- name: bock when have image return
+  block:
+
+    - name: set resultes of ami consult 
+      set_fact:
+        last_image_ID: "{{ami_info_return.images[-1].image_id}}"
+        last_image_CreationDate: "{{ami_info_return.images[-1].creation_date.split('T')[0]}}"
+        last_image_name: "{{ami_info_return.images[-1].name}}"
+    
+    - debug:
+        msg:
+          - '###################################################################################' 
+          - '#                                 eec images retuns                               #' 
+          - '###################################################################################' 
+          - '#     Return Variables    |                         Values                        #'  
+          - '###################################################################################' 
+          - "# last_image_ID           | {{last_image_ID }}                                 #"
+          - "# last_image_CreationDate | {{last_image_CreationDate }}                                            #"
+          - "# last_image_name         | {{last_image_name}}  "
+          - '###################################################################################'
+             ## last_image_name         | eec_aws_eks_amzn-lnx_2_1.24_1686678482_1.163.85.2078##",
+
+  when: ami_info_return.images != []      
+
+
+## SDG ###  

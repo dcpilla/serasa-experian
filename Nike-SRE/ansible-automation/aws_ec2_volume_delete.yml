@@ -1,0 +1,20 @@
+---
+- hosts: spobrnikeworker
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    AWS_REGION: sa-east-1 
+  become: yes 
+  tasks:
+    - import_role:
+        name: aws
+        tasks_from: sts_connection.yml
+
+    - include_tasks: roles/aws/tasks/ec2_volume_delete.yml
+      with_items: 
+        - '{{volumes_list}}'
+      loop_control:
+        loop_var: volume_name
+
+
+###SDG###        

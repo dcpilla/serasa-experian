@@ -1,0 +1,20 @@
+---
+- name: Incluir Assume-Role
+  include_tasks: sts_connection.yml
+
+- name: get_users from {{account}}
+  shell: /usr/local/bin/aws --profile=sts_cli iam list-users --query 'Users[*].UserName'  
+  register: list_users
+  
+- name: print list_users
+  debug: 
+    var: list_users  
+
+- name: convert list_users to json 
+  set_fact: 
+   list_users: '{{list_users.stdout|from_json}}'
+
+- name: print list_users
+  debug: 
+    var: list_users  
+

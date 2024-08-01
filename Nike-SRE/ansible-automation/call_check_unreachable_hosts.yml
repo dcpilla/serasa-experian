@@ -1,0 +1,7 @@
+---
+- hosts: localhost
+  become: yes
+  tasks:
+    - include_tasks: check_unreachable_hosts.yml
+
+### SDG ###      

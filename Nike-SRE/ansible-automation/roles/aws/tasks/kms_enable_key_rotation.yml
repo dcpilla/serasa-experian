@@ -1,0 +1,19 @@
+---
+- name: enable key rotation of kms_customer_enable_list variable list from {{account}} account km_key_id {{km_key_id}}
+  shell: "/usr/local/bin/aws kms enable-key-rotation --key-id {{km_key_id}} --profile sts_cli" 
+  ignore_errors: yes
+  register: enabled_key_rotation
+
+#- debug:
+#    var: enabled_key_rotation  
+
+
+- name: create dictonary array to enable_rotatios_errors
+  set_fact:
+    enable_rotatios_errors: "{{enable_rotatios_errors |default([])+ [{'CONTA': account, 'KEYID': km_key_id, 'ERROR': enabled_key_rotation.stderr}] }}"
+  when: enabled_key_rotation.failed
+
+- name: create dictonary array to enabled_rotatios
+  set_fact:
+    enabled_rotatios: "{{enabled_rotatios |default([])+ [{'CONTA': account, 'KEYID': km_key_id}] }}"
+  when: enabled_key_rotation.failed is false

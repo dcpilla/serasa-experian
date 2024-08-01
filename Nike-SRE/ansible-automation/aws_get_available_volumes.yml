@@ -1,0 +1,60 @@
+---
+- name: include task list volumes from aws role
+  import_role:
+    name: aws
+    tasks_from: sts_connection
+
+- name: include task list volumes from aws role
+  import_role:
+    name: aws
+    tasks_from: volumes_list.yml
+
+
+#- name: check available state
+#  debug:
+#    var: volumes_out
+
+- name: check available state
+  debug:
+    var: volumes_out.volumes
+
+#- name: Display all volumes when json_query status==available 
+#  ansible.builtin.debug:
+#    var: item
+#  loop: "{{ volumes_out | community.general.json_query(vquery) }}"
+#  vars:
+#    vquery: "volumes[?status=='available'].id"
+
+
+- name: clean available_volumes
+  set_fact:
+    available_volumes: [] 
+
+- name: set available_volumes when json_query status==available
+  set_fact:
+     available_volumes : '{{available_volumes|default([])+[item]}}'
+  loop: "{{ volumes_out | json_query(vquery) }}"
+  vars:
+    vquery: "volumes[?status=='available'].id"
+
+- debug:        
+    var: available_volumes
+
+
+- name: block when available_volumes is definede
+  block:
+    - name: show available_volumes
+      debug:
+        var: available_volumes
+    
+    
+    - name: add available_volumes in {{voume_available_path}}
+      lineinfile:
+        path: '{{voume_available_path}}'
+        line: '{{account}}|{{item}}'
+        state: present
+        create: true
+      with_items: '{{available_volumes}}'
+    
+  when: available_volumes is defined and available_volumes != []
+### SDG ###

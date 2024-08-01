@@ -1,0 +1,62 @@
+---
+
+#- name: block when emrfields_list is defined
+#  block:
+
+#- name: get dates to compare in {{inventory_emr_path}} file
+#  become: yes
+#  shell: "cat {{inventory_emr_path}} |grep -v prod | cut -d '|' -f6 | cut -d 'T' -f1"
+#  register: date_to_compare
+
+- name: Include Assume-Role account {{account}}
+  include_role:
+    name: aws
+    tasks_from: sts_connection.yml
+
+- name: remove existent inventory
+  become: yes
+  file:
+    state: absent
+    path: '{{inventory_emr_path}}'
+
+- name: include task to call aws_create_inventory_emr.yml
+  include_tasks: aws_create_inventory_emr.yml
+
+- include_tasks: check_emr_no_prod_uptime.yml 
+  when: emrfields_list != []
+#
+
+- debug:
+    var: emr_running_more_hours_define.stdout_lines
+  ignore_errors: yes
+
+- name: block to terminate cluster 
+  block:
+    
+    - name: list result of check_emr_no_prod_uptime.yml
+      debug:
+        var: emr_running_more_hours_define 
+    
+    - debug:
+        msg: "{{emr_id_to_terminate.stdout| replace('\n',' ')}}"
+ 
+    
+    - name: Terminete emr cluster with  emr_id_to_terminate variable from task check_emr_no_prod_uptime.yml  account {{account}}
+#      shell: "/usr/local/bin/aws emr terminate-clusters --cluster-ids {{emr_id_to_terminate.stdout| replace('\n',' ')}} --profile sts_cli"
+      include_tasks: roles/aws/tasks/emr_terminate.yml
+      with_items:
+        - '{{emr_id_to_terminate.stdout_lines}}'
+      loop_control: 
+        loop_var: emr_job_id
+    
+#    - name: register action of terminate cluster with emr_running_more_hours_define variable from task check_emr_no_prod_uptime.yml  account {{account}}
+#      become: yes
+#      lineinfile:
+#        path: /home/Check/Inv/emr_terminated.txt
+#        line: '{{ansible_date_time.date}}-{{ansible_date_time.time}}|{{item}}'
+#        state: present
+#        create: true
+#      with_items:
+#        - '{{emr_running_more_hours_define.stdout_lines}}'
+  when: uptime_emr_list is defined and uptime_emr_list !=  []
+### SDG ###  

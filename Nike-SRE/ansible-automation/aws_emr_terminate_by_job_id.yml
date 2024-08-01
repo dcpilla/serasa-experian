@@ -1,0 +1,15 @@
+---
+- hosts: localhost
+  gather_facts: no
+  become: yes
+  tasks:
+    - import_role:
+        name: aws
+        tasks_from: sts_connection
+
+    - import_role:
+        name: aws
+        tasks_from: emr_terminate.yml
+
+
+### SDG ###  

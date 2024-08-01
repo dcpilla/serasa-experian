@@ -1,0 +1,132 @@
+---
+  - name: Erase output file when TCP
+    delegate_to: "{{workerexec}}"
+    file:
+      path: /tmp/check_agents/tanium_check.csv
+      state: absent
+
+  - name: Create output file when TCP
+    delegate_to: "{{workerexec}}"
+    file:
+      path: /tmp/check_agents/tanium_check.csv
+      state: touch
+      owner: root
+      group: root
+      mode: 755
+
+  - name: append output on file
+    delegate_to: "{{workerexec}}"
+    delegate_facts: true
+    lineinfile:
+      dest: /tmp/check_agents/tanium_check.csv
+      state: present
+      insertafter: BOF
+      line: "hostname|IP|Linux-version|application name|Installed|Version|Status|Connection"
+
+  - name : check if package is istalled
+    shell: "rpm -qa | grep -i TaniumClient"
+    args:
+      warn: False
+    register: package_installed
+    ignore_errors: yes
+   
+  - set_fact:
+      tanium_installed: 'instaleed'
+    when: package_installed.stdout != ' '
+
+  - block: 
+         #check service tanium and set variable tanium_status
+      - name : check Tanium service when package is installed
+        import_tasks: tanium_check_service.yml
+
+      - name: Restart Tanium Service when package is installed
+        import_tasks: tanium_service_restart.yml
+        when: service_status == 'not_running'
+
+      - name: Check Tanium Client Version
+        import_tasks: tanium_check_version.yml
+
+      - name: Check conections TCP port on Tanium Server when package is installed
+        import_tasks: tanium_check_port.yml
+
+    when: tanium_installed == 'instaleed'
+
+  # verification when package is not istalled
+  - block:
+      - name: Tanium Install
+        import_tasks: tanium_install.yml
+
+      - set_fact:
+          tanium_installed: 'instaleed'
+
+      - name : check Tanium service
+        import_tasks: tanium_check_service.yml
+
+      - name: Restart Tanium Service
+        import_tasks: tanium_service_restart.yml
+        when: service_status == 'not_running'
+
+      - name: Check Tanium Client Version
+        import_tasks: tanium_check_version.yml
+
+      - name: Check conections TCP port on Tanium Server
+        import_tasks: tanium_check_port.yml
+
+    when: package_installed.stdout  == ''
+
+#  - debug:
+#      var: '{{ item }}'
+#    with_items:
+#      - ansible_nodename
+#      - ansible_default_ipv4.address
+#      - ansible_distribution_major_version
+#      - tanium_installed
+#      - tanium_version
+#      - service_status
+#      - connection_state
+
+  - name: append output on file
+    delegate_to: "{{workerexec}}"
+    delegate_facts: true
+    lineinfile:
+      dest: /tmp/check_agents/tanium_check.csv
+      state: present
+      insertafter: EOF
+      line: "{{ ansible_nodename }}|{{ ansible_default_ipv4.address }}|{{ ansible_distribution_major_version }}|'Tanium Client'|{{ tanium_installed }}|{{ tanium_version }}|{{ service_status }}|{{ connection_state }}"
+    when: connection_state != 'ok' or tanium_installed == 'instaleed' or tanium_status == 'not_running'
+
+  - name: Get number of failures
+    shell: wc -l /tmp/check_agents/tanium_check.csv | awk {'print $1'}
+    register: failures
+
+
+  - block:
+#      - set_fact: 
+#          email_server: spobrintragw02
+
+#      - name: send file for email server '{{ email_server }}'
+#        shell: scp -i ~/fpssh/id_rsa_foreman_proxy /tmp/check_agents/tanium_check.csv {{ email_server }}:/tmp/tanium_check.csv
+#        delegate_to: "{{workerexec}}"
+
+#      - name: semd email
+#        command: mail -a /tmp/tanium_check.csv -s "Tete File" alessandro.bahia@br.experian.com < /dev/null
+#        delegate_to: '{{ email_server }}'
+
+
+#ultimo comentado
+      - set_fact:
+          recipient: alessandro.bahi@br.experian.com
+
+#      - set_fact:
+#          subject: Teste-Tanium
+
+#      - mail:
+#          host: correiosmtp
+#          port: 25
+#          from: '{{ mail_from | default("alessandro.bahi@br.experian.com") }}'
+#          to: '{{ recipient }}'
+#          cc: '{{ cc | default("") }}'
+#          subject: '{{ subject }}'
+#          body: 'TESTE TAnium'
+
+    when: failures > 1

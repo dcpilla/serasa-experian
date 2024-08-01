@@ -1,0 +1,55 @@
+---
+#- name: Ensure file exists /usr/scripts/descricao.txt
+#  lineinfile:
+#    path: /usr/scripts/descricao.txt
+#    line: 'BU:{{ambiente}}:ADP:AWS:000000000:xxxxxxxxx'
+#    state: present
+#    create: yes
+  
+
+# /etc/redhat-release must exist otherwise
+# centrify-sshd does not install  
+- name: Ensure file exists (/etc/redhat-release)
+  copy:
+    content: ""
+    dest: /etc/redhat-release
+    force: no
+    owner: root
+    group: root
+    mode: 0644
+
+    #- name: Cleaning Repos
+    #  shell: rm -rf /etc/yum.repos.d/*
+
+- name: Set Serasa Repo 
+  template:
+    src: serasa.repo 
+    dest: /etc/yum.repos.d/serasa.repo 
+    owner: root
+    mode: 0544
+
+    #- name: Update packages 
+    #  yum:
+    #    name: '*'
+    #    state: latest
+
+- name: Set Brazil timezone
+  timezone:
+    name: America/Sao_Paulo
+
+- stat:
+    path: /etc/cloud/cloud.cfg 
+  register: stat_cloud_init
+
+- name: Avoid CloudInit change resolv.conf
+  lineinfile:
+    path: /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
+    line: 'network: {config: disabled}'
+    create: yes
+  when: stat_cloud_init.stat.exists == True
+
+- name: Avoid DHCP change resolv.conf
+  copy:
+    src: files/dhclient-enter-hooks
+    dest: /etc/dhcp/dhclient-enter-hooks
+    mode: 0751

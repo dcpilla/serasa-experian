@@ -1,0 +1,13 @@
+helm_charts: 
+  - name: "istio-base"
+    chart: "istio/base"
+    namespace: "istio-system"
+    values_file: "{{ role_path }}/templates/istio-base-values.yaml"
+  - name: "istiod"
+    chart: "istio/istiod"
+    namespace: "istio-system"
+    values_file: "{{ role_path }}/templates/istiod-values.yaml"
+  - name: "istio-ingress"
+    chart: "istio/gateway"
+    namespace: "istio-system"
+    values_file: "{{ role_path }}/templates/istio-ingress-values"

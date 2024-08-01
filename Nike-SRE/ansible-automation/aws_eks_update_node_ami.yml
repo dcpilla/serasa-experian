@@ -1,0 +1,100 @@
+---
+- hosts: spobrnikeworker
+  gather_facts: yes
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    AWS_REGION: sa-east-1
+  become: yes
+  tasks:        
+    - name: role to create autentication of account {{account}}
+      import_role:
+        name: aws
+        tasks_from: sts_connection.yml
+
+    - name: set aws_region to use in template roles/aws/templates/fixami_ansible.py and open change
+      set_fact:
+        aws_region: '{{account_region}}'
+        bu: ES
+        ami_id: latest
+        chg_environment: '{{account_environment}}'
+
+    - name: role to create noude_group_list.nodegroups variable from eks {{eks_cluster_name}} of account {{account}} 
+      include_tasks: roles/aws/tasks/eks_list_node_groups.yml
+
+
+    - name: Block when have noude_group_list in cluster
+      block:    
+        - name: show nodegroup_with_desiredSize > 0
+          debug:
+            var: nodegroup_with_desiredSize
+
+        - name: set fact to notify
+          set_fact:
+            notify_type: mail
+            title: 'Started Eks-Noude Group Update {{eks_cluster_name}}'
+            descr: "Started Eks-Noude Group Update <br/>Cluster Name: {{eks_cluster_name}} <br/> account: {{account}}"
+            msg: 'Noud Group List: <br/> {{nodegroup_with_desiredSize}}'
+            msg_to:
+               - "{{suport_email}}"
+                 #              - alessandro.bahia@br.experian.com
+        
+        - name: call to create change when openchange is yes .... cuurent is {{openchange}}
+          block:
+            - name: set fact to load variables of change type
+              set_fact:
+                change_type: 'eks_ami_patch'
+
+            - name:                 
+              import_role:
+                name: snow
+                tasks_from: change_standard_create.yml
+
+            - name: set fact to notify with change
+              set_fact: 
+                descr: '{{descr}} <br/> {{chg_num}}'
+
+    
+          when: openchange == 'yes'
+
+
+        - name: notify started 
+          import_role:
+            name: notify           
+                   
+        - name: include role to update eks ami node of account {{account}}
+          include_tasks: roles/aws/tasks/eks_update_node_ami.yml
+          with_items: '{{nodegroup_with_desiredSize}}'
+          loop_control:
+            loop_var: eks_nodegroup_name
+
+        - name: set fact to notify
+          set_fact:
+            notify_type: mail
+            title: 'Finished Eks-Noude Group Update {{eks_cluster_name}}'
+            descr: "Finished Eks-Noude Group Update <br/>Cluster Name: {{eks_cluster_name}} <br/> account: {{account}}"
+            msg: 'Noud Group List: <br/> {{nodegroup_with_desiredSize}}'
+            msg_to:
+               - "{{suport_email}}"
+                 #              - alessandro.bahia@br.experian.com
+
+        - name: call to close change
+          block:
+            - import_role:
+                name: snow
+                tasks_from: close_change.yml
+
+            - name: set fact to notify with change
+              set_fact: 
+                descr: '{{descr}} <br/> {{chg_num}}'
+     
+          when: openchange == 'yes'
+
+        - name: notify Finished
+          import_role:
+            name: notify
+
+      when: nodegroup_with_desiredSize != [] 
+
+
+      ###SDG###      

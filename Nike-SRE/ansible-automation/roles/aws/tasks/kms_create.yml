@@ -1,0 +1,8 @@
+---
+- name: Create KMS 
+  shell: "/usr/local/bin/aws kms create-key --description 'Onboarding-test-key' --region {{account_region}} --profile=sts_cli"
+  register: kms_created
+  ignore_errors: yes
+  
+- debug:
+    var: kms_created     

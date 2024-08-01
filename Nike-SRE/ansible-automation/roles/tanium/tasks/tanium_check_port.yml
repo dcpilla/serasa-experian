@@ -1,0 +1,31 @@
+---
+  - name: Granted nc rpm installed in rh5
+    shell: yum install nc -y
+    when: ansible_distribution_major_version|int == 5
+
+  - name: Granted nc rpm installed in rh6+
+    yum:
+      name: nc
+      state: present
+    when: ansible_distribution_major_version|int >= 6
+
+  - name: Check conections TCP port 17472 to connection on Tanium-Server
+    shell: nc -v 10.8.40.80 17472 -z -w 5
+    register: port_test
+    ignore_errors: yes
+
+  - debug:
+      var: register
+
+  - name: define resulted  fact  when is ok
+    set_fact:
+      connection_state: ok
+    when: port_test.stderr is search('Connected to') or port_test.stdout is search('succeeded')
+
+  - name: define resulted  fact  when is not-ok
+    set_fact:
+      connection_state: "{{ port_test.stderr }}"
+    when: connection_state is not defined
+
+  - debug:
+     var: connection_state

@@ -1,0 +1,10 @@
+---
+- name: set etc hosts 
+  lineinfile:
+    path: /etc/hosts
+    line: '{{item}}'
+    state: present
+  with_items:
+    - '10.96.170.188   spobrsatellite1.br.experian.local spobrsatellite1'
+    - '10.96.170.146   spobrsatellite.br.experian.local spobrsatellite'
+    - '10.96.170.146   spobrbastion.br.experian.local spobrbastion'

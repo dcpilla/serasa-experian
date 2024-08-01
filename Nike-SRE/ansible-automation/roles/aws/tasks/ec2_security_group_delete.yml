@@ -1,0 +1,59 @@
+---
+- name: get sg details
+  include_tasks: ec2_security_group_describe.yml
+
+- name: list resource using this security group {{sg_id}} {{sg_name}}
+  shell: "/usr/local/bin/aws ec2 describe-network-interfaces --filters Name=group-id,Values={{sg_id}} --region {{account_region}} --output json --profile=sts_cli"  
+  register: resource_using
+
+- name: convert resource_using to json
+  set_fact:
+    resource_using: '{{resource_using.stdout|from_json}}'  
+
+- name: tasks when without resource_using
+  block:
+
+    - name: call delete rules
+      include_tasks: ec2_security_group_delete_rule.yml
+      with_items: 
+        - '{{rules_fields}}'
+      loop_control:
+        loop_var: rule
+      when: rules_fields is defined
+
+
+    - name: delete SG {{sg_id}} {{sg_name}}
+      shell: "/usr/local/bin/aws ec2 delete-security-group --group-id {{sg_id}} --region {{account_region}} --profile=sts_cli"
+      register: sg_deleted
+
+
+  when: resource_using.NetworkInterfaces == []
+
+- name: tasks when with resource_using
+  block:
+    - debug:
+        var: resource_using
+
+    - name: show resource_using
+      debug:
+        msg:
+          - "################################################"
+          - "## resource using this SG {{sg_id}} {{sg_name}}"
+          - "## Resources:                                  "
+          - "## {{resource_using.NetworkInterfaces[0].PrivateIpAddress}}"
+          - "################################################"            
+
+    - debug:
+        msg: '{{resource.PrivateIpAddress |  resource.PrivateDnsName}}'
+      with_items:
+        - "{{resource_using.NetworkInterfaces}}"        
+      loop_control:
+        loop_var: resource
+
+  when: resource_using.NetworkInterfaces != []
+
+#- name: delete roles of security group
+#  with_items: '{{list_roiles}}'
+
+
+  ###SDG###  

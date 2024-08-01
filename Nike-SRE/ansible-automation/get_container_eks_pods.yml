@@ -1,0 +1,49 @@
+---
+- name: block when found == false
+  block: 
+
+    - debug:
+        msg:
+          - "#############################################"
+          - "##                {{account}}              ##"
+          - "#############################################"
+          - "##                                         ##"
+          - "##   Found                 | {{found}}         ##" 
+          - "##   cluster               | {{cluster_name}}  ##" 
+          - "##   start search namespace| {{ns}}            ##" 
+          - "##                                         ##"
+          - "#############################################"
+          - "#############################################"
+    
+    - name: get pods of  namespaces {{ns}} cluster {{cluster_name}} account {{account}}
+      become: false
+      shell: "/usr/local/bin/kubectl get pods -n  '{{ns}}' | grep -v READY | awk '{print $1}'"
+      register: pods_of_ns
+    
+    - debug:
+        var: pods_of_ns.stdout_lines
+    
+    
+    #- name: creat list or array of pods
+    #  set_fact:
+    #    pods_to_find: "{{pods_to_find|default([])+ [{'POD': pod, 'NS': ns }] }}"
+    #  with_items:
+    #    - '{{podsofns.stdout_lines}}'
+    #  loop_control:
+    #    loop_var: pod
+    
+    
+    
+    - name: find vulnerability local of sha {{sha}}
+      include_tasks: get_container_eks_pods_describe.yml
+      with_items:
+        - '{{pods_of_ns.stdout_lines}}'
+    #    - '{{pods_to_find}}'
+      loop_control:
+        loop_var: pod
+      when: found == false and pods_of_ns.stdout_lines != []
+
+
+  when: found == false
+
+###SDG###

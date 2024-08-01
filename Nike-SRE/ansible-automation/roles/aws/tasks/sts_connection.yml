@@ -1,0 +1,100 @@
+---
+- name: set role to role_to_assume
+  set_fact:
+   role_to_assume: BURoleForSREAutomation
+
+
+- debug:
+    var: account
+
+- name: load profile from account {{account}}
+  set_fact:
+    prof_account: "{{ profile[ account ]}}"
+  
+- name:  ansible module assume role in account {{account}}  arn:aws:iam::{{prof_account.id}}:role/{{role_to_assume}} 
+  become: yes
+  #amazon.aws.sts_assume_role:
+  ignore_errors: yes
+  sts_assume_role:
+  #community.aws.sts_assume_role:
+    aws_access_key: '{{AUTOMATION_AK}}'
+    aws_secret_key: '{{AUTOMATION_SK}}'
+    region: sa-east-1
+    #   profile: sts_cli
+    role_arn: "arn:aws:iam::{{prof_account.id}}:role/{{role_to_assume}}"
+    role_session_name: "{{role_to_assume}}_session"
+    validate_certs: no
+  register: assumed_role
+
+#- name: debug assumed_role 
+#  debug:
+#    var: assumed_role
+
+- name: set variables of credetials from assumed_role
+  set_fact :
+    aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+    aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+    security_token: "{{ assumed_role.sts_creds.session_token }}"
+
+    assumed_role_ak: "{{ assumed_role.sts_creds.access_key }}"
+    assumed_role_sk: "{{ assumed_role.sts_creds.secret_key }}"
+    assumed_role_token: "{{ assumed_role.sts_creds.session_token }}"
+    assumed_role_time: "{{ assumed_role.sts_creds.expiration  }}"
+    assumed_role_user_arn: "{{assumed_role.sts_user.arn }}"
+    assumed_role_id:  "{{assumed_role.sts_user.assumed_role_id}}"
+
+#- debug:
+#    msg: 
+#      - "######################################################################"
+#      - "#                         Details Assumed Role                       #"
+#      - "######################################################################"
+#      - "#    Return  Variables    |                 Values                   #"
+#      - "######################################################################"
+#      - "# assumed_role_ak         | {{assumed_role_ak}}                     #"
+#      - "# assumed_role_sk         | {{assumed_role_sk}} #"
+#      - "# assumed_role_token      | {{assumed_role_token}}"
+#      - "#                                                                    #"        
+#      - "# assumed_role_time       | {{assumed_role_time}}                #"
+#      - "#                                                                    #"        
+#      - "# assumed_role_user_arn   | {{assumed_role_user_arn}}                #"
+#      - "# assumed_role_id         | {{assumed_role_id}}                      #"
+#      - "######################################################################"
+#
+
+
+- name: configure sts_cli profile to exec aws-cli comands in {{account}}
+  shell: '{{item}}'
+  no_log: True  
+  with_items:
+      - '/usr/local/bin/aws configure set aws_access_key_id {{assumed_role_ak}} --profile sts_cli'
+      - '/usr/local/bin/aws configure set aws_secret_access_key {{assumed_role_sk}} --profile sts_cli'
+      - '/usr/local/bin/aws configure set aws_session_token {{assumed_role_token}} --profile sts_cli'
+      - '/usr/local/bin/aws configure set default.region {{prof_account.region}} --profile sts_cli'
+
+
+
+
+#- name: create profile to exec aws-cli comands
+#  lineinfile:
+#    path: ~/.aws/credentials
+#    insertafter: '[cliprofile]'
+#    line: "{{ item }}"
+#    state: present 
+#  with_items:
+##    - "aws_access_key_id        = {{assumed_role_id.split(':'[0])}}"
+#    - "aws_access_key_id        = {{assumed_role_ak}}"
+#    - 'aws_secret_access_key    = {{assumed_role_ak}}'
+#    - 'aws_session_token        = {{assumed_role_token}}'
+#    - 'aws_security_token       = {{assumed_role_token}}'
+#    - 'x_principal_arn          = {{assumed_role_user_arn}}'
+#    - 'x_security_token_expires = {{assumed_role_time}}'
+#    - 'region                   = sa-east-1'
+
+
+- name: get account id {{account}}
+  include_tasks: account_info.yml
+
+- name: load default tags
+  include_tasks: tag_load_default.yml
+
+### SDG ###

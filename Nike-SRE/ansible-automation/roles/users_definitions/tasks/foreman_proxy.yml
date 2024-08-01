@@ -1,0 +1,8 @@
+---
+- name: Set foreman key in authorized_key
+  authorized_key:
+    user: root
+    state: present
+    key: http://spobrbastion/pub/id_rsa_foreman_proxy.pub
+    validate_certs: False
+    manage_dir: yes

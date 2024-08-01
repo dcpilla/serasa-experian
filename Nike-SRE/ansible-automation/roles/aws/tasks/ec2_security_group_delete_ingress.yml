@@ -1,0 +1,11 @@
+---
+- name: remove ingress sg_rule_id {{sg_rule_id}} from  sg {{sg_name}}
+  shell: '/usr/local/bin/aws ec2 revoke-security-group-ingress --group-id {{sg_id}} --security-group-rule-ids {{sg_rule_id}}  --profile=sts_cli --region {{account_region}}'
+  ignore_errors: yes
+  register: removed_igress
+
+- debug:
+    var: removed_igress
+
+    ###SDG###    
+

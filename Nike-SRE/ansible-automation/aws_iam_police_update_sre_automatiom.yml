@@ -1,0 +1,23 @@
+---
+- name: chama role aws iam_policy_create.yml
+  import_role:
+    name: aws
+    tasks_from: sts_connection
+
+- name: set role and policy sre_automation
+  set_fact:
+    name_policy: BUPolicyForSREAutomation
+    name_role: BURoleForSREAutomation
+
+- name: call role aws iam_policy_create.yml
+  import_role:
+    name: aws
+    tasks_from: iam_role_create.yml
+#    tasks_from: iam_role_create_attach_policie.yml
+
+- name: call role aws am_role_attach_policie.yml to attach {{name_policy}}
+  import_role:
+    name: aws
+    tasks_from: iam_role_attach_policie.yml
+
+###SDG###    

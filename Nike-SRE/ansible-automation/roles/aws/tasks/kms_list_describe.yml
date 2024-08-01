@@ -1,0 +1,80 @@
+---
+- set_fact:
+    kms_key: '{{kms.KeyId}}'
+
+
+- name: describle  kms {{kms_key}} 
+  shell: "/usr/local/bin/aws kms describe-key --key-id {{kms_key}}  --profile sts_cli"
+  register: kms_decribe
+
+- name: convert kms_decribe to json
+  set_fact: 
+    kms_decribe: '{{kms_decribe.stdout|from_json}}'
+
+- debug:
+    var: kms_decribe  
+
+
+- name: dictonary list when kms_decribe.KeyMetadata.KeyManager is CUSTOMER  and kms_decribe.KeyMetadata.KeyState is Enabled current {{kms_decribe.KeyMetadata.KeyManager}} and {{kms_decribe.KeyMetadata.KeyState}}
+  set_fact: 
+    kms_customer_enable_list: "{{kms_customer_enable_list|default([])+[ kms_decribe.KeyMetadata.KeyId  |string]}}"
+  when: kms_decribe.KeyMetadata.KeyManager == 'CUSTOMER' and kms_decribe.KeyMetadata.KeyState == 'Enabled'
+
+
+- name: dictonary list when kms_decribe.KeyMetadata.KeyManager is CUSTOMER kms_decribe.KeyMetadata.KeyState is Disabled current {{kms_decribe.KeyMetadata.KeyManager}} and {{kms_decribe.KeyMetadata.KeyState}}
+  set_fact: 
+    kms_customer_disable_list: "{{kms_customer_disable_list|default([])+[ kms_decribe.KeyMetadata.KeyId  |string]}}"
+  when: kms_decribe.KeyMetadata.KeyManager == 'CUSTOMER' and kms_decribe.KeyMetadata.KeyState == 'Disabled'
+
+
+
+- name: block check rotation status of kms {{kms_key}} account {{account}}
+  block:
+
+    - name: check rotation status of kms {{kms_key}} account {{account}}
+      shell: "/usr/local/bin/aws kms get-key-rotation-status --key-id {{kms_key}} --profile sts_cli"
+      ignore_errors: yes
+      register: kms_rotation_status
+
+    - name: block when kms_rotation_status is not failed
+      block:
+
+        - name: show result kms_rotation_status
+          debug:
+            msg:
+              - '#########################################################' 
+              - 'kms-id: {{kms_decribe.KeyMetadata.KeyId}}'
+              - '{{kms_rotation_status.stdout}}'
+              - '#########################################################' 
+          when: kms_rotation_status.stdout is search("false")
+    
+    
+        - name: Create and increment dictonary list when kms_rotation_status when KeyRotationEnabled == false current {{kms_decribe.KeyMetadata.KeyId}} state {{kms_rotation_status.KeyRotationEnabled|string}}
+          set_fact:
+            kms_rotation_disabled_list: "{{kms_rotation_disabled_list|default([])+[ kms_decribe.KeyMetadata.KeyId |string ]}}"
+          when: kms_rotation_status.stdout is search("false")
+
+      when: kms_rotation_status.failed == false
+
+    - name: block when kms_rotation_status is failed
+      block:
+        - name: set fact to notify
+          set_fact:
+            notify_type: mail
+            title: 'Error in check rotation status of kms {{kms_key}} account {{account}}'
+            descr: "Error in check rotation status <br/> kms: {{kms_key}} <br/>account: {{account}}"
+            msg: 'Error: <br/>{{kms_rotation_status.stderr_lines}}'
+            msg_to:
+#             - "{{suport_email}}"
+              - alessandro.bahia@br.experian.com
+
+        - include_role:
+            name: notify
+
+      when: kms_rotation_status.failed
+
+
+  when: kms_decribe.KeyMetadata.KeyManager == 'CUSTOMER'
+
+  
+  ### SDG ###

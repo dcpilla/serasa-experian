@@ -1,0 +1,129 @@
+---
+# Use the assumed role above to tag an instance in account 123456789012
+- name: set tag in ec2 instsance id {{instance_id}} from account {{account}}
+  ignore_errors: yes
+  ec2_tag:
+    aws_access_key: "{{ assumed_role_ak }}"
+    aws_secret_key: "{{ assumed_role_sk }}"
+    security_token: "{{ assumed_role_token }}"
+    validate_certs: no
+    resource: '{{instance_id}}'
+    state: '{{tag_state}}'
+    tags:
+      "{{tag}}"
+  when: resources == 'instance'
+
+  #create a bucket, add a policy from a file, enable requester pays, enable versioning and tag
+- name: block when tag in s3 
+  block: 
+    - name: set tag in s3 {{s3name}} from account {{account}}
+      s3_bucket:   # https://docs.ansible.com/ansible/2.9/modules/s3_bucket_module.html#s3-bucket-module
+        aws_access_key: "{{ assumed_role_ak }}"
+        aws_secret_key: "{{ assumed_role_sk }}"
+        security_token: "{{ assumed_role_token }}"
+        validate_certs: no
+        state: present
+  #        bucket_key_enabled : true
+        public_access:
+          block_public_acls: yes
+          ignore_public_acls: true    
+    
+        name: '{{s3name}}'
+    #   policy: "{{ lookup('file','policy.json') }}"
+    #   requester_pays: yes
+    #   versioning: yes
+        purge_tags: no
+        tags:
+          "{{tag}}"
+      ignore_errors: yes
+      register: set_s3_tag
+
+      
+
+    - name: blcok when set_s3_tag is true
+      block:
+              #        - name: debug set_s3_tag
+              #          debug:
+              #            var: set_s3_tag
+
+        - name: debug set_s3_tag
+          debug:
+            var: set_s3_tag.msg
+
+        - name: set fact to notify
+          set_fact:
+            notify_type: mail
+            title: 'Error to set tag in  {{s3name}} S3 from {{account}} account'
+            descr: "Error to set tag in  {{s3name}} S3 from {{account}} account"
+            msg: '{{set_s3_tag.msg}}'            
+            msg_to:
+#              - "{{suport_email}}"
+              - alessandro.bahia@br.experian.com
+
+        - include_role:
+            name: notify
+
+      when: set_s3_tag.failed
+
+
+    - name: default config enable Server access logging properties and set Target bucket
+      include_tasks: s3_server_acces_loggin_enable.yml
+
+    - name: call to Default Config Enable encryption
+      include_tasks: s3_encription_enable.yml
+
+  when: resources == 's3'
+
+- name: set tag in eks {{eksname}} arn {{eksarn}} from account {{account}} 
+  block:
+    - include_role:
+        name: aws      
+        tasks_from: sts_connection.yml
+
+
+    - name: debug defaults tags
+      debug:
+        msg: "{{item}}={{tag[item]}}"
+      with_items: '{{tag.keys()|list}}'
+
+
+    - name: set default tags in {{resources}}  anr {{eksarn}} account {{account}}
+      #      shell: "/usr/local/bin/aws --profile sts_cli eks tag-resource --resource-arn {{eksarn}} --tags {{default_tag}}"
+      shell: "/usr/local/bin/aws --profile sts_cli eks tag-resource --resource-arn {{eksarn}} --tags {{item}}={{tag[item]}}"
+      with_items: '{{tag.keys()|list}}'
+
+#      #    - name: Create an EKS cluster
+#      community.aws.eks_cluster:
+#        name: '{{eksname}}'
+##        version: 1.14
+##        role_arn: my_eks_role
+##        subnets:
+##          - subnet-aaaa1111
+##        security_groups:
+##          - my_eks_sg
+##          - sg-abcd1234
+#      register: cluster_register
+#
+#    - debug:
+#        var: cluster_register
+
+  when: resources == 'eks'
+
+#- name: block whem resource is dynamodb
+#  block:
+#    - name: set tag in daynamodb {{daynamo_name}} from account {{account}}
+#      community.aws.dynamodb_table:
+#        aws_access_key: "{{ assumed_role_ak }}"
+#        aws_secret_key: "{{ assumed_role_sk }}"
+#        security_token: "{{ assumed_role_token }}"
+#        validate_certs: no
+#        state: present
+#        name: '{{daynamo_name}}'
+#        tags: "{{tag}}"
+#      register: dynamotag
+#
+#  
+#
+#  when: resources == 'dynamodb'
+
+### SDG ###  

@@ -1,0 +1,68 @@
+---
+- name: Get CyberArk credentials for "{{ username }}"
+  uri:
+    url: "{{ CCP_URL }}/AIMWebService/api/Accounts?AppID={{ app_id }}&Object={{cyberark_ObjectName}}"
+    method: GET
+    validate_certs: no
+  register: cyberark_password
+
+- name: "Get API Token"
+  uri:
+    url: "{{ PVWA_URL }}/PasswordVault/API/Auth/CyberArk/Logon"
+    method: POST
+    body_format: json
+    body: {"Username": "{{ username }}", "Password": "{{ cyberark_password.json.Content }}" }
+    return_content: no
+    validate_certs: no
+  register: api_token_output
+  run_once: true
+
+- name: "Get Token Fact"
+  set_fact:
+    api_token: "{{ api_token_output.json  }}"
+  run_once: true
+
+- name: Get Accounts in {{win_search_safe}} Safe
+  uri:
+    url: "{{ PVWA_URL }}/PasswordVault/API/Accounts?search={{win_search_safe}}&limit=1000"
+    method: GET
+    validate_certs: no
+    headers:
+      Authorization: "{{ api_token }}"
+  register: win_accounts
+
+- name: Get Accounts in {{unx_search_safe}} Safe
+  uri:
+    url: "{{ PVWA_URL }}/PasswordVault/API/Accounts?search={{unx_search_safe}}&limit=1000"
+    method: GET
+    validate_certs: no
+    headers:
+      Authorization: "{{ api_token }}"
+  register: unx_accounts
+
+- name: Logoff From Cyberark
+  uri:
+    url: "{{ PVWA_URL }}/PasswordVault/API/Auth/Logoff"
+    method: POST
+    body_format: json
+    validate_certs: no
+    headers:
+      Authorization: "{{ api_token }}"
+
+- name: Clear Table
+  become: yes
+  shell: /opt/mssql-tools/bin/sqlcmd -S spobrsqlprd14,1433 -U '{{sqluser}}' -P '{{sqlpasswd}}' -Q "use linux_reports ; DELETE FROM dbo.Cyberark_Inventory"
+
+- name: Populate Table - Win Accounts
+  become: yes
+  shell: /opt/mssql-tools/bin/sqlcmd -S spobrsqlprd14,1433 -U '{{sqluser}}' -P '{{sqlpasswd}}' -Q "use linux_reports ; insert into dbo.Cyberark_Inventory (Name,Modified,Status,Address,Adm_User) values ('{{item.name}}','{{item.secretManagement.lastModifiedTime}}','{{item.secretManagement.status}}','{{item.address }}','{{item.userName}}')"
+  with_items: '{{win_accounts.json.value}}'
+  when: item | length > 0 and item.platformAccountProperties.Domain != "WORKGROUP" and item.secretManagement.status is defined
+  register: win_inserts
+
+- name: Populate Table - Unx Accounts
+  become: yes
+  shell: /opt/mssql-tools/bin/sqlcmd -S spobrsqlprd14,1433 -U '{{sqluser}}' -P '{{sqlpasswd}}' -Q "use linux_reports ; insert into dbo.Cyberark_Inventory (Name,Modified,Status,Address,Adm_User) values ('{{item.name}}','{{item.secretManagement.lastModifiedTime}}','{{item.secretManagement.status}}','{{item.address }}','{{item.userName}}')"
+  with_items: '{{unx_accounts.json.value}}'
+  when: item | length > 0 and item.platformAccountProperties.Domain != "WORKGROUP" and item.secretManagement.status is defined
+  register: unx_inserts

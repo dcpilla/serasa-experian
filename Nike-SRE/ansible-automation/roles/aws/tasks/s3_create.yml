@@ -1,0 +1,45 @@
+---
+- include_tasks: sts_connection.yml
+
+- name: Create dictionary variable with requeride tags
+  set_fact:
+    tag:
+      CostString: '{{account_ccosting}}'
+      AppID: '{{account_apid}}'
+      Environment: '{{account_environment}}'            # prd   stg      uat      tst      dev      sbx
+#      map-migrated: d-server-02n52mmgua5hr6
+#      Service: latam_nike
+#      project: nike
+#      wiz_cig: true
+#      Name: NOMEDOCLUSTER
+
+
+- name: create {{s3name}} s3 bucket
+  s3_bucket:   # https://docs.ansible.com/ansible/2.9/modules/s3_bucket_module.html#s3-bucket-module
+    aws_access_key: "{{ assumed_role_ak }}"
+    aws_secret_key: "{{ assumed_role_sk }}"
+    security_token: "{{ assumed_role_token }}"
+    region: '{{account_region}}'
+    validate_certs: no
+
+    bucket_key_enabled : true
+#    encryption: "none"
+    public_access:
+      block_public_acls: yes        
+      ignore_public_acls: true
+
+    purge_tags: no
+    state: present
+    name: '{{s3name}}'
+    #   policy: "{{ lookup('file','policy.json') }}"
+    #requester_pays: yes
+    #versioning: yes
+    tags:
+      "{{tag}}"
+
+- name: default config enable Server access logging properties and set Target bucket
+  include_tasks: s3_server_acces_loggin_enable.yml
+#  when: s3name != 'aws-logs-{{account_id}}-{{account_region}}'
+
+- name: call to Default Config Enable encryption
+  include_tasks: s3_encription_enable.yml 

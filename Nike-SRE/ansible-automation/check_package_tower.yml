@@ -1,0 +1,43 @@
+---
+- hosts: spobrbastion
+  gather_facts: false
+  connection: local
+  tasks:
+    - set_fact:
+        my_hosts: '{{ hosts_list|from_json }}'
+
+    - add_host:
+        name: '{{ item }}'
+        group: to_be_installed
+      with_items:
+          '{{ my_hosts["hosts"] }}'
+
+    - name: Erase output file when TCP
+      file:
+        path: /tmp/check_package.csv
+        state: absent
+      ignore_errors: yes
+      become: true
+
+    - name: Create File
+      file:
+        path: /tmp/check_package.csv
+        state: touch
+        owner: root
+        group: root
+        mode: 775
+      become: true
+      ignore_errors: yes
+    
+- hosts: to_be_installed
+  tasks:
+    - include_role:
+        name: check_package
+        tasks_from: check_package.yml
+  become: true  
+        
+- hosts: spobrbastion
+  tasks:
+    - include_role:
+        name: check_package
+        tasks_from: send_email.yml

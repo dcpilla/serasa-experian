@@ -1,0 +1,35 @@
+- import_role:
+    name: mcafee
+    tasks_from: uninstall_mcafee.yml 
+
+#- import_role:
+#    name: disk
+#    tasks_from: clean.yml
+
+- import_role:
+    name: mcafee
+    tasks_from: check_if_installed.yml
+
+- import_role:
+    name: mcafee
+    tasks_from: check_disk_space.yml
+
+- block:
+    - import_role:
+        name: mcafee
+        tasks_from: install_agent.yml
+
+    - import_role:
+        name: mcafee
+        tasks_from: install_antivirus.yml
+  rescue:
+      - import_role:
+          name: mcafee
+          tasks_from: cleanup.yml
+      - set_fact:
+            has_cleaned_up: True
+
+- import_role:
+    name: mcafee
+    tasks_from: cleanup.yml
+  when: has_cleaned_up is not defined

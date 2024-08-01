@@ -1,0 +1,15 @@
+chg_assignment_group: 'Brazil Nike SRE'
+chg_assigned_to: '{{chg_assigned_to}}'
+chg_template_name: 'Brazil Automation Distributed Systems Patches'
+chg_justification: 'Security First'
+chg_short_description: 'Brazil Nike SRE CloudOps EKS Patches - squad: {{account}}'
+chg_description: 'Cluster contemplados nesta janela de patch: {{servers_list}}'
+chg_state: 'Authorize'
+chg_business_service: 'Other'
+chg_plan_implementation: '1) Brazil Distributed Systems-CloudOps: Aplicar update cluster eks {{servers_list}}'
+chg_environment: 'UAT'
+chg_test_results: 'Dev e Uat.'
+chg_impact_analysis: 'Baixo.'
+chg_ci: patch
+chg_backout_pla: "Restaurar versões anteriores ao update."
+en: chag_type == 'patch'

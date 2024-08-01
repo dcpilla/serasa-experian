@@ -1,0 +1,7 @@
+---
+- hosts: '{{ host }}'
+  tasks:
+    - include_role:
+        name: config_machine
+        tasks_from: config_amazon_serasa_repos.yml
+  become: yes

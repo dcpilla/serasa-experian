@@ -1,0 +1,34 @@
+---
+- name: Include change order vars
+  include_vars: "{{ item }}"
+  with_items:
+  - "patch/Linux/prod_A.yml"
+  - credentials.yml
+
+- name: Get start date
+  shell: "date +%Y-%m-%d%t%H:%M:%S"
+  register: start_dt
+
+- name: Get end date
+  shell: date +%Y-%m-%d%t%H:%M:%S -d "6 hours"
+  register: end_dt
+
+- set_fact:
+     start: "{{ start_dt.stdout | replace('\t', ' ')}}"
+
+- set_fact:
+     end: "{{ end_dt.stdout | replace('\t', ' ')}}"
+
+- name: Close Change
+  shell: |
+    curl --user "{{sd_username}}":"{{sd_password}}" \
+    --request PATCH \
+    --header 'accept: application/json' \
+    --header 'content-type: application/json' \
+    --data '{"close_code":"sucessful","close_notes":"{{om_close_note}}","work_start":"{{start}}","work_end":"{{end}}"}' \
+    https://experiantest.service-now.com/api/eplc/exp/closeStandardChange/c719bacfdb9f97402511fa910f96192e/closeStandardChange?searchVal="{{chg}}"
+  register: tst
+
+- debug:
+    var: tst
+

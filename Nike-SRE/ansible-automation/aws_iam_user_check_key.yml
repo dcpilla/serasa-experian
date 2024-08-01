@@ -1,0 +1,34 @@
+---
+- include_role:
+    name: aws
+    tasks_from: iam_user_list
+
+
+- name: clean key_user_90
+  set_fact:
+    key_user_90: []  
+
+- include_tasks: roles/aws/tasks/iam_user_access_keys_list.yml
+  with_items: '{{list_users}}'
+  loop_control: 
+    loop_var: user_name      
+    
+- name: set fact to notify    
+  block:
+    - name: set fact to notify
+      set_fact:
+        notify_type: mail
+        title: 'AWS iam user check key from {{account}} account'
+        descr: "AWS iam user check key from {{account}} account"
+        msg: '{{key_user_90}}'
+        msg_to:
+          - heber.santos@br.experian.com
+#         - "{{suport_email}}"
+          - alessandro.bahia@br.experian.com
+
+    - include_role:
+        name: notify
+  when: key_user_90 != []
+   
+
+### SDG ###

@@ -1,0 +1,116 @@
+---
+- hosts: localhost
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    AWS_REGION: sa-east-1
+  gather_facts: false
+  tasks:
+    - name: get id of instance
+      shell: "grep {{ip}} /home/Check/Inv/ec2-invetory_all_instances.txt | cut -d '|' -f1"
+      register:  id
+
+    - debug:
+        var: id
+
+    - name: Set variable of instance
+      set_fact:
+        instanceid: '{{id.stdout}}'
+#      set_stats:
+#        data:
+#          instance_id: '{{id.stdout}}'
+#        per_host: false
+
+    - debug:
+        var: instanceid
+
+
+#    - name: Set host to run standalone
+#      add_host:
+#        name: '{{ip}}'
+#        group: centrify_host
+    
+
+    - name:  include connection to {{account}}
+      include_role:
+        name: aws
+        tasks_from: sts_connection
+
+    - name: set dictonary of centrify tags to instanceid {{instanceid}}
+      set_fact:
+        tag:
+          ResourceName: '{{eec_standard_name|lower}}'
+          adDomain: '{{domain}}'
+          CentrifyUnixRole: '{{centrify_ad_group}}'
+          ResourceOwner: nikesre@br.experian.com
+          ResourceCostCenter:  '{{account_ccosting}}' 
+          ResourceBusinessUnit: EITS
+          #         PatchInstance: true
+          proxy: yes
+        resources: instance
+        tag_state: present
+    
+     
+        
+    - name: include 
+      include_role:
+        name: aws
+        tasks_from: tag_set
+
+
+    - name: rename and scp to {{ip}}-{{instanceid}} server from {{account}}
+      #      become_user: c96974a      
+      shell: '{{item}}'
+      with_items:
+        - 'ssh -i ~/sre-suport.pem ec2-user@{{ip}} "sudo mv /opt/post-scripts /opt/post-scripts-OLD"'
+        - "scp -r -i ~/sre-suport.pem /home/c96974a/post-scripts/  ec2-user@{{ip}}:/home/ec2-user/"
+        - 'ssh -i ~/sre-suport.pem ec2-user@{{ip}} "sudo mv /home/ec2-user/post-scripts /opt/"'
+
+          
+
+    - name: replace hostnam_instance with {{eec_standard_name}}
+      delegate_to: '{{ip}}'
+      become: yes
+      lineinfile: 
+        path: '/opt/post-scripts/roles/dns/tasks/main.yml'
+        regexp: '^  set_fact: hostname_instance=' 
+        line: '  set_fact: hostname_instance={{eec_standard_name|lower}}' 
+        #
+    
+    - name: replace ad_domain with {{domain}}
+      delegate_to: '{{ip}}'
+      become: yes
+      lineinfile: 
+        path: '/opt/post-scripts/roles/centrify/tasks/main.yml'
+        regexp: '^  set_fact: ad_domain=' 
+        line: '  set_fact: ad_domain={{domain|lower}}' 
+
+    - name: replace centrify_unix_role with {{centrify_ad_group}}
+      delegate_to: '{{ip}}'
+      become: yes
+      lineinfile: 
+        path: '/opt/post-scripts/roles/centrify/tasks/main.yml'
+        regexp: '^  set_fact: centrify_unix_role=' 
+        line: '  set_fact: centrify_unix_role={{centrify_ad_group|lower}}' 
+
+    - name: change the hostname of instance {{ip}} - {{instanceid}} account {{account}}
+      delegate_to: '{{ip}}'
+      become: yes
+      shell: hostnamectl set-hostname  '{{eec_standard_name|lower}}'
+
+
+    - name: Set Centrify to execute playbook
+      delegate_to: '{{ip}}'
+      template:
+        src: roles/aws/templates/centrify.yml
+        dest: /opt/post-scripts/centrify.yml
+#        owner: root
+#        group: root
+#        mode: 0644
+
+    
+    - name: execute ansible in instance {{ip}} - {{instanceid}} account {{account}}
+      delegate_to: '{{ip}}'
+      shell: sudo ansible-playbook /opt/post-scripts/configure_agents.yml --tags gather_instance_metadata,dns,centrify
+      #shell: sudo ansible-playbook /opt/post-scripts/centrify.yml --tags gather_instance_metadata,dns,centrify
+    

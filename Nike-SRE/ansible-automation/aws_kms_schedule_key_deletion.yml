@@ -1,0 +1,16 @@
+---
+- name: list kms and define enable and disable list
+  include_role:
+    name: aws
+    tasks_from: kms_list.yml
+
+- name: delete kms_customer_disable_list variable list from {{account}} account
+  
+  with_items: '{{kms_customer_disable_list}}'
+  include_tasks: roles/aws/tasks/kms_schedule_key_deletion.yml
+  loop_control:
+    loop_var: km_key_id    
+  when: kms_customer_disable_list != []
+
+
+ ### SDG ###

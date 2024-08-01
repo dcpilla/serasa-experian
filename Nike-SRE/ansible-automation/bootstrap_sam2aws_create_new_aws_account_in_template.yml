@@ -1,0 +1,25 @@
+---
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: criar sam to okta in saml2aws  template
+      import_role:
+        name: bootstrap
+        tasks_from: sam2aws_create_new_aws_account_in_template.yml
+    
+    - name:  blco to replica all user
+      become: yes
+      block:
+        - include_vars: roles/bootstrap/vars/user_list.yml
+
+        - debug:
+            var: user_list
+
+        - name: call task roles/bootstrap/tasks/sam2aws_replica_all_users.yml
+          include_tasks: roles/bootstrap/tasks/sam2aws_replica_all_users.yml
+          loop: '{{user_list}}'
+          loop_control:
+            loop_var: user
+      when: replica_all_user == 'yes'
+
+###SDG###

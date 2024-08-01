@@ -1,0 +1,24 @@
+---
+- hosts: spobrnikeworker
+  #  gather_facts: no
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    AWS_REGION: sa-east-1
+  tasks:
+    - name: remove existent inventory
+      become: yes
+      file:
+        state: absent
+        path: '{{item}}'
+      with_items:
+        - '{{inventory_emr_path}}'
+
+    - name: include task to call set ak sk role-task only no prod accounts
+      include_tasks: aws_emr_terminate.yml
+      loop:
+        - '{{accounts_no_prod}}'
+      loop_control:
+        loop_var: account           
+
+### SDG ###

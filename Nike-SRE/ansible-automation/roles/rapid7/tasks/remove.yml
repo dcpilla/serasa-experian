@@ -1,0 +1,39 @@
+---
+- name: rapid7 console search
+  uri:
+    url: "{{ api_url }}assets/search"
+    user: "{{ rapid_usr }}"
+    password: "{{ rapid_pass }}"
+    method: POST
+    force_basic_auth: yes
+    body: 
+      match: "any"
+      filters:
+        - field: "host-name"
+          operator: "is"
+          value: "{{ hostname }}" 
+    body_format: json
+    validate_certs: no
+  register: asset
+
+- debug:
+    msg: "Asset {{ hostname }} not found"
+  when: asset.json.page.totalResources == 0 
+
+- name: remove asset
+  block:
+   
+    - name: rapid7 console removal
+      uri:
+        url: "{{ api_url }}assets/{{asset.json.resources[0].id}}"
+        user: "{{ rapid_usr }}"
+        password: "{{ rapid_pass }}"
+        method: DELETE
+        force_basic_auth: yes
+        validate_certs: no
+      register: result
+
+    - debug:
+        msg: "Asset {{asset.json.resources[0].hostName}} removed"
+
+  when: asset.json.page.totalResources != 0

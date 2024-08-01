@@ -1,0 +1,55 @@
+---
+- set_fact:
+    major: '{{ ansible_distribution_major_version|int }}'
+
+- set_fact:
+    architecture: '{{ ansible_architecture }}'
+
+- name:  Configuration File for Encase on sysV
+  template:
+    src: enlinuxpc
+    dest: /etc/init.d/enlinuxpc
+    owner: root
+    group: root
+    mode: 0755
+  when: ansible_distribution_major_version|int == 6
+
+- name:  Configuration File for Encase on SystemD
+  template:
+    src: enlinuxpc.service
+    dest: /etc/systemd/system/enlinuxpc.service
+    owner: root
+    group: root
+    mode: 0644
+  when: ansible_distribution_major_version|int >= 7
+
+- name: Create directory for binary encase
+  file:
+    path: /usr/local/encase
+    state: directory
+    mode: 0755
+
+- name:  Binary File for Encase x86_64
+  get_url:
+    url: http://spobrbastion/pub/program/encase/enlinuxpc64
+    dest: /usr/local/encase/enlinuxpc
+    owner: root
+    group: root
+    mode: 0755
+  when: architecture == "x86_64"
+  
+- name:  Binary File for Encase not x86_64
+  get_url:
+    url: http://spobrbastion/pub/program/encase/enlinuxpc
+    dest: /usr/local/encase/enlinuxpc
+    owner: root
+    group: root
+    mode: 0755
+  when: architecture != "x86_64"
+  
+- name: enable encase service
+  service:
+    name: enlinuxpc
+    enabled: yes
+    state: restarted
+  when: ansible_distribution_major_version|int >= 6

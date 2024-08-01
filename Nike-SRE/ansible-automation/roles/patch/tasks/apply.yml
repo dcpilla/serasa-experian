@@ -1,0 +1,84 @@
+---
+- name: check proxy yum
+  lineinfile:
+    path: /etc/yum.conf 
+    line: 'proxy=http://spobrproxy.serasa.intranet:3128'
+    regexp: '^proxy='
+
+- name: stop McAfee Agent for update rpm packages
+  service:
+    name: '{{ item }}'
+    state: stopped
+  with_items:
+    - ma
+    - isectpd
+    - isecespd
+  ignore_errors: yes
+
+#- set_fact:
+#    ami_aws_enable_repos: '{{ ami_aws_rhel_6_enable_repos }}'
+#    when: major == "6" and ansible_distribution == "RedHat"
+#
+#- set_fact:
+#    ami_aws_enable_repos: '{{ ami_aws_rhel_7_enable_repos }}'
+#  when: major == "7" and ansible_distribution == "RedHat"
+
+- set_fact:
+    update_dir: /root/updates
+    date: "{{lookup('pipe','date +%Y%m%d%H%M')}}"
+    major: '{{ ansible_distribution_major_version|int }}'
+
+- name: Ensure directory update
+  file:
+    path: '{{ update_dir }}/{{ date }}'
+    state: directory
+
+- name: Log current kernel
+  shell: 'rpm -qa | grep -E "^kernel(|(-PAE))-[0-9].*" > {{ update_dir }}/{{ date }}/pre-installed_kernels 2>&1'
+
+- name: Get current packages
+  shell: 'rpm -qa | sort > {{ update_dir }}/{{ date }}/pre-installed_packages 2>&1'
+
+- name: Clean repository
+  command: yum clean all
+
+- name: Remove /var/cache/yum
+  file:
+    path: /var/cache/yum
+    state: absent
+
+#- name: Update all
+#  yum:
+#    name: '*'
+#    state: latest
+#    skip_broken: yes
+#    disablerepo: '*'
+#    enablerepo: '{{ ami_aws_enable_repos|join(",") }}'
+#  when: ansible_distribution == "RedHat"
+
+- name: Update all
+  yum:
+    name: '*'
+    state: latest
+    skip_broken: yes
+    # when: ansible_distribution != "RedHat"
+  when: ansible_python_version != '3.6.12'
+
+- name: Update all
+  shell: 'export https_proxy=http://spobrproxy.serasa.intranet:3128;export http_proxy=http://spobrproxy.serasa.intranet:3128; yum update -y '
+  # vars:
+  #   ansible_python_interpreter: /usr/bin/python2.6
+  # yum:
+  #   name: '*'
+  #   state: latest
+  #   skip_broken: yes
+  when: ansible_python_version == '3.6.12'
+
+- name: Log kernel installed
+  shell: 'rpm -qa | grep -E "^kernel(|(-PAE))-[0-9].*" > {{ update_dir }}/{{ date }}/pos-installed_kernels 2>&1'
+
+- name: Log packages installed
+  shell: 'rpm -qa | sort > {{ update_dir }}/{{ date }}/pos-installed_packages 2>&1'
+
+- name: Exec reboot
+  command: shutdown -r +1 'Reboot devido a atualizacoes de pacotes (ciclo mensal)'

@@ -1,0 +1,1 @@
+%sistdis ALL=NOPASSWD: SOFTWARE,NETWORKING,SERVICES,STORAGE,DRIVERS,/opt/tivoli/tsm/client/ba/bin/dsmc

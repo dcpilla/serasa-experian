@@ -1,0 +1,22 @@
+---
+- hosts: spobrnikeworker
+  gather_facts: no
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    AWS_REGION: sa-east-1
+  become: no
+  tasks:
+    #- name: include task to call k8s_helm_update.ym
+    #  include_tasks: k8s_helm_update.yml
+    - name: Istio Update
+      include_role:
+        name: istio
+#      with_items:
+#        - datahubpdev
+##        - '{{accounts}}'
+#        - ssrmprod
+#      loop_control:
+#        loop_var: account
+#
+#          ###SDG###          

@@ -1,0 +1,5 @@
+---
+- name: Create bootstrap register
+  shell: /opt/mssql-tools/bin/sqlcmd -S spobrsqlprd14,1433 -U '{{sqluser}}'  -P '{{sqlpasswd}}' -Q "use linux_reports ; insert into Bootstrap_Register (Hostname,Os_type,Memory,CPU,Ambiente,BU,Gear_ID,Gear_App,Change,Date) values ('{{Hostname}}','{{Os_type}}','{{Memory}}','{{CPU}}','{{Ambiente}}','{{BU}}','{{Gear_ID}}','{{Gear_App}}','{{Change}}',(SELECT GETDATE ( )))"
+  delegate_to: "{{workerexec}}"
+  ignore_errors: yes

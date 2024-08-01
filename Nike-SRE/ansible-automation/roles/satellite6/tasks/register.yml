@@ -1,0 +1,99 @@
+---
+- debug:
+    msg: 
+      - "################################################"
+      - "#       Register by {{activationkey}}"
+      - "################################################"
+      - "---------------------+--------------------------"  
+      - "| Server Name:.......| {{ansible_fqdn}}"
+      - "| activationkey:.....| {{activationkey}}"
+      - "| group:.............| {{group}}"
+      - "| so:................| RHEL {{ansible_distribution_major_version}}"
+      - "################################################"  
+
+- name: Register on Satellite 6 
+  block:
+
+    - name: Set satellite_6_rhel_8_enable_repos when major 8
+      set_fact:
+        satellite_6_enable_repos: '{{ satellite_6_rhel_8_enable_repos }}'
+      when: major == "8"
+
+    - name: Set satellite_6_rhel_7_enable_repos when major 7
+      set_fact:
+        satellite_6_enable_repos: '{{ satellite_6_rhel_7_enable_repos }}'
+      when: major == "7"
+
+    - name: Set satellite_6_rhel_6_enable_repos when major 6
+      set_fact:
+        satellite_6_enable_repos: '{{ satellite_6_rhel_6_enable_repos }}'
+      when: major == "6"
+
+    - name: Set satellite_6_rhel_5_enable_repos when major 5
+      set_fact:
+        satellite_6_enable_repos: '{{ satellite_6_rhel_5_enable_repos }}'
+      when: major == "5"
+
+    - name: Set fqdn is not defined or fqdn is blank
+      set_fact:
+        fqdn_name: '{{ ansible_fqdn }}'
+      when: fqdn is not defined or fqdn == ''
+
+    - name: Set fqdn is defined and fqdn is not blank
+      set_fact:
+        fqdn_name: '{{ fqdn }}'
+      when: fqdn is defined and fqdn != ''
+
+    - debug: 
+        msg: 'Using FQDN = {{ fqdn_name }}'
+
+    - name: Set hostname on /etc/hosts
+      lineinfile:
+        dest: /etc/hosts
+        line: '{{ ansible_default_ipv4.address }} {{ fqdn_name }} {{ ansible_hostname }}'
+        state: present
+
+    - name: Set hostname Satellite 6 on /etc/hosts
+      lineinfile:
+        dest: /etc/hosts
+        line: '10.96.170.188 spobrsatellite1.br.experian.local spobrsatellite1'
+        state: present
+    
+    - name: clean /var/tmp/bootstrap.py
+      file:
+        path: /var/tmp/bootstrap.py
+        state: absent
+          
+    - name: get .py to register
+      copy:
+        src: bootstrap.py
+        dest: /var/tmp/bootstrap.py
+        mode: '0775'
+
+    - name: Call bootstrap.py (Satellite 6 registration script) through bootstrap.sh wrapper
+      script: roles/satellite6/files/bootstrap.sh
+          '{{api_satellite_username}}'
+          '{{schedlin_password}}'
+          '{{ activationkey }}'
+          'RHEL {{ ansible_distribution_major_version }}'
+          '{{ fqdn_name }}'
+          '{{ satellite_6_enable_repos|join(",") }}'
+          '{{group}}'
+      register: satellite_reg
+
+    - name: Workaround to subscribe physical machine
+      shell: "subscription-manager register --org='Serasa_Experian' --activationkey={{activationkey}} --force"
+      when: group is defined and group == "HADOOP_CORPORATIVO"
+
+    - debug:
+        var: satellite_reg 
+
+    - name: Remove hostname in hosts
+      lineinfile:
+        path: /etc/hosts
+        state: absent
+        regexp: '.*{{ ansible_hostname }}.*'
+
+  when: activationkey is defined
+  tags:
+    - setsatellite6register

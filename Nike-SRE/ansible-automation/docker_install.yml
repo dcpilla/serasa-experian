@@ -1,0 +1,88 @@
+---
+
+- hosts: '{{dst_host}}'
+  gather_facts: false
+  become: yes
+  tasks: 
+    - name: Create a directory if it does not exist
+      ansible.builtin.file:
+        path: /etc/systemd/system/docker.service.d
+        state: directory
+        mode: '0755'
+    - name: create file http-proxy.conf on directory 
+      ansible.builtin.file:
+        path: /etc/systemd/system/docker.service.d/http-proxy.conf
+        state: touch
+        mode: u+rw,g-wx,o-rwx
+    - name: Add a line to a file if the file does not exist, without passing regexp
+      ansible.builtin.lineinfile:
+        path: /etc/systemd/system/docker.service.d/http-proxy.conf
+        line: '{{item}}'
+        state: present
+      with_items: 
+        - '[Service]'
+        - Environment="HTTP_PROXY=http://10.96.215.26:3128"
+        - Environment="HTTP_PROXY=http://10.96.215.26:3128/"
+        - Environment="NO_PROXY=localhost,127.0.0.0/8"
+
+
+
+##Comando para instalar docker na aws
+#
+##criar a pasta docker.service.d e o arquivo http-proxy.conf
+#
+#mkdir /etc/systemd/system/docker.service.d
+#vi /etc/systemd/system/docker.service.d/http-proxy.conf
+#
+##setando os valores dentro do arquivo http-proxy.conf
+#
+#[Service]
+#Environment="HTTP_PROXY=http://10.96.215.26:3128"
+#Environment="HTTP_PROXY=http://10.96.215.26:3128/"
+#Environment="NO_PROXY=localhost,127.0.0.0/8"
+
+
+##set proxy
+#export http_proxy=http://spobrproxy.serasa.intranet:3128
+#export https_proxy=http://spobrproxy.serasa.intranet:3128
+#
+##atualizando SO
+#sudo yum update
+#
+##find docker
+#sudo yum search docker
+#
+##informação do docker
+#sudo yum info docker
+#
+##instalando docker
+#sudo yum install docker
+#
+##dando permissão para o user ec2-user executar o docker
+#sudo usermod -aG docker ec2-user
+#
+##comando para fazer reload no deamon
+#sudo systemctl daemon-reload
+#
+##comando para pegar o proxy na config docker
+#sudo systemctl show docker --property Environment
+#
+##comando para restartar o serviço docker
+#sudo systemctl start docker
+#
+##Habilite o serviço docker no momento da inicialização da AMI:
+#sudo systemctl enable docker.service
+#
+#
+#
+##Install Docker-compose
+#
+#wget https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)
+#sudo mv docker-compose-$(uname -s)-$(uname -m) /usr/local/bin/docker-compose
+#sudo chmod -v +x /usr/local/bin/docker-compose
+#
+#####OBS###
+#VERIFICAR PASTA /usr/local/bin/
+#se o arquivo docker-compose está com o user ec2-user se tiver como root
+#
+#chown ec2-user:ec2-user docker-compose

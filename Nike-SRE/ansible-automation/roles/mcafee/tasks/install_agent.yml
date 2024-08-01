@@ -1,0 +1,26 @@
+---
+- name: Disable proxy if configured
+  shell: unset '{{item}}'
+  with_items:
+    - http_proxy
+    - https_proxy
+
+
+- name: Ensures Unzip packege on rhel >= 6
+  yum:
+    name: unzip.x86_64
+    state: present
+  when: ansible_distribution_major_version|int >= 6
+
+- name: Ensures Unzip packege on rhel5
+  shell: yum install -y unzip
+  when: ansible_distribution_major_version|int == 5
+
+- name: Download the agent installer on {{ install_path }}
+  unarchive:
+      src: '{{ agent_installer_url }}'
+      dest: '{{ install_path }}'
+      remote_src: yes
+
+- name: Run the agent intaller
+  command: '/bin/sh {{ install_path }}/install.sh -i -r'

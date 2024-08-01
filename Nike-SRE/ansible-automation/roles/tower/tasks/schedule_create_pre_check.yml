@@ -1,0 +1,5 @@
+---
+- name: set precheck 
+  set_fact:
+    precheck: true
+### SDG ###

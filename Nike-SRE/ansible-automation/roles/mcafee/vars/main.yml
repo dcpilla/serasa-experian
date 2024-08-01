@@ -1,0 +1,6 @@
+---
+agent_version: '5.7.6'
+antivirus_version: '10.7.0'
+agent_installer_url: http://spobrbastion/pub/program/mcafee/McAfee_Agent_for_Linux/last_version_rpms_MFE
+antivirus_installer_url: http://spobrbastion/pub/program/mcafee/McAfee_Endpoint_Security/last_version_rpm_mcafee
+antivirus_installer_url_rhel5: http://spobrbastion/pub/program/mcafee/McAfee_Endpoint_Security/mes10.5.zip

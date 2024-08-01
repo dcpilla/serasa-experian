@@ -1,0 +1,6 @@
+- name: Set Serasa Repo
+  template:
+    src: serasa.repo
+    dest: /etc/yum.repos.d/serasa.repo
+    owner: root
+    mode: 0544

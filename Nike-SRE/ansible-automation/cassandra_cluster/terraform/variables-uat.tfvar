@@ -1,0 +1,63 @@
+# AWS Account and project name
+project_name                     = "cassandra-cluster001"
+account_id                       = "220171963593"
+BU                               = "ScoreBI"
+
+# Region and Environment
+aws_region                       = "sa-east-1"
+env                              = "uat"
+
+# Instance
+ami                              = "ami-00ec0ebed07a6805f"
+# NOVA UMAGEM COM KERNEL 5.10
+#ami                              = "ami-0b21481987a03e80f"
+instance_type                    = "m5.large"
+keypair_name                     = "cassandra_bi_uat"
+#security_group_ids               = ["?"]
+number_of_cassandra_nodes_az_a   = 2
+number_of_cassandra_nodes_az_b   = 2
+number_of_cassandra_nodes_az_c   = 2
+
+userdata                         = <<EOF
+#!/bin/bash -xe
+sudo amazon-linux-extras install kernel-5.15 -y && sudo reboot
+EOF
+
+# Volumes
+disk_size                        = 40
+iops                             = 3000
+type                             = "gp3"
+throughput                       = 125
+
+# ELB
+lb_log_enabled                   = true
+lb_ssl_arn                       = "arn:aws:acm:sa-east-1:220171963593:certificate/d4b3ae88-d9f9-40d1-856a-4333ccac34e9"
+lb_internal                      = true
+lb_bucket                        = "serasaexperian-eks-uat-tf-state"
+lb_bucket_prefix                 = "cassandra-elb"
+
+lb_ports                         = {"tls"  = {name = "tls"
+                                              protocol  = "TLS"
+                                              port      = 9042
+                                             }
+                                    }
+metadata_options                 = {
+                                    http_endpoint               = "enabled"
+                                    http_tokens                 = "optional"
+                                   }
+
+# DNS Rout53
+hosted_zone_id                   = "Z10404258RE7HK3JM479"
+#aws_route53_record_name          = {"a":"seed001_az_a", "b":"seed001_az_b","c":"seed001_az_c"}
+
+# Networking
+#vpc_id                           = "vpc-0529d9c847693b233"
+subnet                           = {"1a": "aws-landing-zone-PrivateSubnet1A",
+                                    "1b": "aws-landing-zone-PrivateSubnet2B",
+                                    "1c": "aws-landing-zone-PrivateSubnet3C"}
+# Tagging
+tags                             = {"ResourceOwner": "tribesrecscross@br.experian.com", 
+                                    "ResourceCostCenter": "?",
+                                    "rc": "?"
+                                    }
+volume_tags                      = {}

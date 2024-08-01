@@ -1,0 +1,20 @@
+---
+- name: include role with task kubectl_config_cluster.yml
+  include_role:
+    name: k8s
+    tasks_from: kubectl_config_cluster.yml
+
+
+- name: get namespace
+  ignore_errors: yes
+  shell: /usr/local/bin/kubens    
+  register: kubenames
+
+- name: print kubenames
+  debug:
+    var: kubenames
+
+- name: print kubenames
+  debug:
+    var: kubenames.stdout_lines
+

@@ -1,0 +1,28 @@
+---
+#variaves a ser externalizadas caso ir para schedule
+chg_assignment_group: 'Brazil Nike SRE'
+chg_assigned_to: 'sjb6110'
+
+        #######        
+
+chg_template_name: 'Brazil Automation Distributed Systems Patches'
+chg_justification: 'Security First'
+chg_short_description: 'Brazil Nike SRE CloudOps Update AMI EKS - Nike-{{account}}'                                          
+chg_description: 'Account: {{account_name}}  --- NoudeGroups contemplados nesta janela de patch:   {{nodegroup_with_desiredSize}}'
+chg_state: 'Authorize' #state :#  "Implement" "Scheduled" "Draft" "Authorize"
+chg_business_service: 'Other'
+chg_plan_implementation: '1) Brazil Distributed Systems-CloudOps: Aplicar updates nos eks_nodes'
+
+#chg_environment: UAT Dev Production
+
+chg_test_results: 'Dev e Uat.'
+chg_impact_analysis: 'Baixo.'
+chg_ci: patch
+chg_backout_pla: "Restaurar versões anteriores ao update."
+
+
+#close notes
+chg_close_note: 'Patch Sucessfully Applied'
+
+
+###SDG###

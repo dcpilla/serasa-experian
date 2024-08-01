@@ -1,0 +1,24 @@
+
+#roles/bootstrap/templates/saml2aws
+---
+
+
+- set_fact:
+    current_user: "{{user.split(':')|first}}"
+    prefix_mail: "{{user|split(':')|last}}"
+
+
+- name: config files of user {{current_user}} email {{prefix_mail}}
+  ignore_errors: yes
+  become: yes         
+  shell: '{{item}}'
+  #      no_log: yes
+  with_items:
+    - 'rm -rf /home/{{current_user}}/.saml2aws'
+    - 'cp roles/bootstrap/templates/saml2aws /home/{{current_user}}/.saml2aws'
+    - "sed -i 's/prefix_mail@br.experian.com/{{prefix_mail}}/g' /home/{{current_user}}/.saml2aws"
+    - 'cp /home/svi4808-a/accesstoSaml2Aws.sh /home/{{current_user}}/'
+    - 'cp /home/svi4808-a/McAfee.pem /home/{{current_user}}/'
+    - 'chown -R {{current_user}}. /home/{{current_user}}/'
+
+      ###SDG###      

@@ -1,0 +1,14 @@
+---
+- name: install ngnix 
+  yum:
+    name: nginx
+    state: latest
+
+- name: Copy Config
+  template:
+    src: file.conf
+    dest: /etc/zabbix
+    owner: root
+    group: root
+    mode: 0644
+ 

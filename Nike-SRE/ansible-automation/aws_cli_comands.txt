@@ -1,0 +1,30 @@
+#### acessar servidor via session manager
+	para esse comando precisa ter instalado o plugin session-manager-plugin.rpm
+	sudo yum install -y https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm
+
+	aws ssm start-session --target i-06989fdf2d1415d2b  --profile devhub-dev --no-verify-ssl --profile=devhubdev
+
+#### start stop status terminate instanme
+	start
+		aws ec2 start-instances --instance-ids i-0c14e63aca47442b8
+	stop
+		aws ec2 stop-instances --instance-ids i-0c14e63aca47442b8
+	status
+	        aws ec2 describe-instance-status --instance-id i-0c14e63aca47442b8 | grep -i status
+        terminate
+		aws ec2 terminate-instances --instance-ids i-04bdae21f5c99992e --profile dsstage
+
+
+##### EKS
+        list cluster
+		aws eks list-clusters --profile=dsstage
+        list node groups
+        	aws eks  list-nodegroups --cluster-name ds-eks-01-uat    --profile=dsstage
+        get state
+		aws eks  describe-nodegroup  --cluster-name ds-eks-01-uat --nodegroup-name node_group_on_demand_general_large-20230328220636617100000015    --profile=dsstage | grep -i status
+
+
+##### S3
+ 	get tags
+    		aws s3api get-bucket-tagging --bucket my-bucket
+

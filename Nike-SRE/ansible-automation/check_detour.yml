@@ -1,0 +1,9 @@
+---
+- name: include role to load sts accounts
+  include_role:
+    name: aws
+    tasks_from: sts_connection.yml
+
+- name: check detour EMR TAGS
+  include_tasks: check_detour_emr_tag.yml
+

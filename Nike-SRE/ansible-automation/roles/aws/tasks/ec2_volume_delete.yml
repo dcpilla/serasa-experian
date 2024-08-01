@@ -1,0 +1,25 @@
+- name: delete  avilable volume {{volume_name}} from account {{account_name}}
+  ignore_errors: yes
+  shell: "/usr/local/bin/aws ec2 delete-volume --volume-id {{volume_name}}  --profile=sts_cli"
+#  ec2_vol:
+#    access_key: "{{ assumed_role_ak }}"
+#    secret_key: "{{ assumed_role_sk }}"
+#    session_token: "{{ assumed_role_token }}"
+#    region: '{{account_region}}'
+#    validate_certs: no
+#
+#    name: '{{volume_name}}'
+#    state: absent
+#
+  register: volume
+
+- debug:
+    var: volume 
+
+- name: write volume delete
+  lineinfile:
+    path: '/home/Check/Inv/ec2_volume_remove.txt'
+    line: "{{account}}|{{account_id}}|{{volume_name}}|{{ansible_date_time.date}}-{{ansible_date_time.time}}"
+    state: present
+    create: true
+  when: volume.failed == false

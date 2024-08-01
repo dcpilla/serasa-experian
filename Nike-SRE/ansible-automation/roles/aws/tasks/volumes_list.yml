@@ -1,0 +1,15 @@
+---
+- name: get list of volumes  from account {{account_name}}
+  ec2_vol_info:
+#  amazon.aws.ec2_vol_info:
+    aws_access_key: "{{ assumed_role_ak }}"
+    aws_secret_key: "{{ assumed_role_sk }}"
+    security_token: "{{ assumed_role_token }}"
+    validate_certs: no
+
+  register: volumes_out
+
+- debug:
+    var: volumes_out
+
+ ### SDG ###        

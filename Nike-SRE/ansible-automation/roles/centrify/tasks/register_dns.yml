@@ -1,0 +1,14 @@
+---
+- name: Register server on DNS
+  block:
+    - name: Get server domain
+      command: /usr/bin/adinfo --domain
+      register: domain_srv
+      
+    - name: Get domain server information
+      command: /usr/bin/adinfo --server
+      register: dns_srv
+
+    - name: Register host on DNS
+      command: /usr/sbin/addns -U -d "{{ domain_srv.stdout }}" -s "{{ dns_srv.stdout }}" -n "{{ ansible_hostname }}" -i "{{ ansible_default_ipv4.address }}" -V -m -f
+      when: domain_srv is defined

@@ -1,0 +1,32 @@
+---
+- import_role:
+    name: aws
+    tasks_from: sts_connection.yml
+
+
+#- import_role:
+#    name: aws
+#    tasks_from: vpc_list.yml
+
+- name: list vpc list from {{account}}    
+  shell: '/usr/local/bin/aws ec2 describe-vpcs --profile sts_cli --query "Vpcs[].CidrBlockAssociationSet[].CidrBlock"'
+  register: current_vpc_list
+
+
+#- name: show current_vpc_list
+#  debug:
+#    var: current_vpc_list
+
+- name: load vpc_list_all from account
+  set_fact:
+    vpc_list_all: "{{vpc_list_all|default([])+ [{'account':account, 'vpc':current_vpc_list.stdout|replace('[\n    \','')|replace('\n','')|replace('\n]','')|replace('\','') }] }}"
+#  loop: '{{current_vpc_list.stdout_lines}}'
+#  loop_control:
+#    loop_var: vpc
+
+#- name: show vpc_list_all
+#  debug:
+#    var: vpc_list_all
+
+
+    ###SDG###

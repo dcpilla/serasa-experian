@@ -1,0 +1,43 @@
+---
+
+- hosts: all
+  tasks:
+    - include_vars: proxy.yaml
+  tags:
+    - proxy
+
+- hosts: cassandra_seeds
+  become: yes
+  become_method: sudo
+  vars:
+    env: "dev"
+    cassandra_num_tokens: 16
+    cassandra_cluster_name: "cassandra-reports-dev"
+    cassandra_seeds:
+         - seed-az_a.nikereportsdev.br.experian.eeca
+  roles:
+    - cassandra
+    - node-exporter
+    - cassandra-exporter
+  tags:
+    - seeds
+
+- hosts: cassandra_nodes
+  become: yes
+  become_method: sudo
+  vars:
+    env: "dev"
+    cassandra_num_tokens: 16
+    cassandra_cluster_name: "cassandra-reports-dev"
+    cassandra_seeds:
+       - seed-az_a.nikereportsdev.br.experian.eeca
+  roles:
+    - cassandra
+    - node-exporter
+    - cassandra-exporter
+  tags:
+    - nodes
+
+- include: start-cassandra-seeds.yaml
+- include: start-cassandra-nodes.yaml
+#- include: rapid7.yaml

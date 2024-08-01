@@ -1,0 +1,74 @@
+---
+- name: check if the {{s3name}} buckt is enabled Encryption
+  shell: /usr/local/bin/aws --profile=sts_cli s3api get-bucket-encryption --bucket '{{s3name}}' | grep BucketKeyEnabled | cut -d':' -f2
+  register: s3_encrypt_status
+
+  #- set_fact:
+  #    s3_encrypt_status: '{{s3_encrypt_status.stdout|from_json}}'
+
+- name:  showw s3_encrypt_status result
+  debug:
+    msg: '{{s3_encrypt_status.stdout|trim}}'
+
+- name: block whem s3 is false current is {{s3_encrypt_status.stdout|trim}}
+  block:
+    - name: set json dictonary variable to execute in next task
+      set_fact:
+        rules: '{"Rules": [{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"},"BucketKeyEnabled": true}]}'
+    
+    #
+    #- debug:
+    #    var: rules
+    
+    - name: enable s3 encryption {{s3name}}
+      ignore_errors: yes
+      shell: /usr/local/bin/aws s3api put-bucket-encryption  --bucket '{{s3name}}'  --server-side-encryption-configuration '{{rules}}' --profile=sts_cli
+      register: s3_enabled_encryption
+    
+    - name: blcok when s3_enabled_encryption is success
+      block:
+        - name: debug s3_enabled_encryption
+          debug:
+            var: s3_enabled_encryption.stdout_lines
+    
+        - name: set fact to notify
+          set_fact:
+            notify_type: mail
+            title: 'Enabled S3 encryption {{s3name}} from {{account}} account'
+            descr: "Enabled S3 encryption <br/>s3: {{s3name}} <br/> account: {{account}}"
+            msg: '{{s3_enabled_encryption.stdout_lines}}'
+            msg_to:
+              - "{{suport_email}}"
+                #              - alessandro.bahia@br.experian.com
+    
+        - include_role:
+            name: notify
+    
+      when: s3_enabled_encryption.failed is false
+    
+    - name: blcok when s3_enabled_encryption failed is true
+      block:
+        - name: debug s3_enabled_encryption.failed
+          debug:
+            var: debug s3_enabled_encryption.stderr_lines
+    
+        - name: set fact to notify
+          set_fact:
+            notify_type: mail
+            title: 'Error in enabled {{s3name}} s3 encryptionfrom {{account}} account'
+            descr: "Error in enabled s3 <br/>s3: {{s3name}} <br/>account: {{account}}"
+            msg: 'Error: <br/>{{s3_enabled_encryption.stderr_lines}}'
+            msg_to:
+              - "{{suport_email}}"
+                #              - alessandro.bahia@br.experian.com
+    
+        - include_role:
+            name: notify
+    
+      when: s3_enabled_encryption.failed is true  
+
+  when: s3_encrypt_status.stdout|trim != 'true'
+## esta na task de criar s3 e tag
+# propriedade  
+#     bucket_key_enabled : true
+###SDG###

@@ -1,0 +1,10 @@
+---
+- name: remove egress sg_rule_id {{sg_rule_id}} from  sg {{sg_name}}
+  shell: '/usr/local/bin/aws ec2 revoke-security-group-egress --group-id {{sg_id}} --security-group-rule-ids {{sg_rule_id}}  --profile=sts_cli'
+  ignore_errors: yes
+  register: removed_egress
+
+- debug:
+    var: removed_egress
+
+###SDG###

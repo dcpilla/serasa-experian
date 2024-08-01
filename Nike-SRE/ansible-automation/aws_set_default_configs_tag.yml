@@ -1,0 +1,107 @@
+---
+- name: include role to load sts accounts
+  include_role:
+    name: aws
+    tasks_from: sts_connection
+
+
+- name: debug defaults tags
+  debug:
+    msg: "{{item}}={{tag[item]}}"
+  with_items: '{{tag.keys()|list}}'
+
+#############################################
+###### set requeried tags in instances ######
+#############################################
+- name: get instances id of account {{account}} from invetory path {{inventory_all_instances_path}}
+  import_role:
+    name: aws
+    tasks_from: ec2_list.yml
+#  shell: grep '{{account_id}}' '{{inventory_all_instances_path}}' |cut -d '|' -f1
+#  register: instancesid_of_account
+
+- debug:
+#    var: instancesid_of_account.stdout_lines
+    var: instances_list.instances|map(attribute='instance_id')|list
+
+- name: set fact recources to set tag in instances
+  set_fact:
+    tag_state: present
+
+- name: loop to include tasks roles/aws/tasks/tag_set_ec2.yml
+  include_tasks: roles/aws/tasks/tag_set_ec2.yml
+  with_items:
+#    -  '{{instancesid_of_account.stdout_lines}}'
+    - "{{instances_list.instances|map(attribute='instance_id')|list}}"
+  loop_control:
+    loop_var: instance_id
+
+#######################################
+####### set requeried tags in s3 ######
+#######################################
+
+- name: get s3 ids of account {{account}} from invetory path {{inventory_s3_path}}
+#  shell: "grep {{account_id}} {{inventory_s3_path}} | cut -d '|' -f3 "
+#  register: s3_name_of_account
+  import_role:
+    name: aws
+    tasks_from: s3_list.yml
+
+- debug:
+    var: "{{ s3_list.buckets|map(attribute='name')|list}}"
+
+#- name: set fact recources to set tag in s3
+#  set_fact:
+#    resources: s3
+
+- name: loop to include tasks roles/aws/tasks/tag_set.yml
+  include_tasks: roles/aws/tasks/tag_set_s3.yml 
+  with_items:
+    -  "{{s3_list.buckets|map(attribute='name')|list}}"
+  loop_control:
+    loop_var: s3name
+
+########################################
+####### set requeried tags in eks ######
+########################################
+    
+#- name: get eks ids of account {{account}} from invetory path {{inventory_eks_path}}
+#  shell: grep '{{account_id}}' {{inventory_eks_path}} |  cut -d '|' -f4
+#  register: eks_id_of_account
+#
+#- name: set fact recources to set tag in s3
+#  set_fact:
+#    resources: eks
+#
+#- name: loop to include tasks roles/aws/tasks/tag_set.yml
+#  include_tasks: roles/aws/tasks/tag_set.yml 
+#  with_items:
+#    -  '{{eks_id_of_account.stdout_lines}}'
+#  loop_control:
+#    loop_var: eksarn
+
+#############################################
+####### set requeried tags in dynamodb ######
+#############################################
+#    
+#- name: get dynamodb from account {{account}}
+#  include_role:
+#    name: aws
+#    tasks_from: dynamodb_list.yml
+#
+#- name: set fact recources to set tag in dynamodb
+#  set_fact:
+#    resources: dynamodb
+#
+#- debug:
+#    var: '{{dynamodb_list.TableNames}}'
+#
+#- name: loop to include tasks roles/aws/tasks/tag_set.yml
+#  include_tasks: roles/aws/tasks/tag_set.yml 
+#  with_items:
+#    -  '{{dynamodb_list.TableNames}}'
+#  loop_control:
+#    loop_var: daynamo_name
+
+
+### SDG ###    

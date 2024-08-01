@@ -1,0 +1,8 @@
+[Unit]
+Description=enlinuxpc64
+[Service]
+Type=simple
+ExecStart=/usr/local/encase/enlinuxpc -p /usr/bin/
+Restart=always
+[Install]
+WantedBy=multi-user.target

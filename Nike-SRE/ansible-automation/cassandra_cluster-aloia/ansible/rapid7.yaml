@@ -1,0 +1,14 @@
+---
+- hosts: all
+  tasks:
+    - include_vars: proxy.yaml
+  tags:
+    - proxy
+
+- hosts: all
+  become: yes
+  become_method: sudo
+  roles:
+    - rapid7
+  tags:
+    - rapid7

@@ -1,0 +1,7 @@
+---
+
+proxy: "http://spobrproxy.serasa.intranet:3128"
+
+proxy_env:
+  HTTP_PROXY: "http://spobrproxy.serasa.intranet:3128"
+  HTTPS_PROXY: "http://spobrproxy.serasa.intranet:3128"

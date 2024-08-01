@@ -1,0 +1,37 @@
+---
+  - name: Insert OOM killer exception list on RHEl 6
+        echo '-1000' > /proc/<pid>/oom_score_adj
+    lineinfile:
+      line: "*/1 * * * * root pgrep -f '{{ item }}' | while read PID; do echo -100 > /proc/$PID/oom_score_adj; done"
+      path: /etc/cron.d/oom_disable
+      state: present
+      create: yes
+    with_items:
+            #      - /opt/isec/ens/threatprevention/bin/isectpd
+            #      - /opt/isec/ens/esp/bin/isecespd
+      - /opt/McAfee/agent/bin/macompatsvc
+        #      - /opt/nimsoft/bin/nimbus
+        #      - nimbus(controller)
+      - /usr/sbin/zabbix_agentd
+      - /usr/share/centrifydc/sbin/sshd
+      - /usr/sbin/adclient
+    when: ansible_distribution_major_version|int >= 6 
+
+
+  - name: Inset OOM killer exception list on RHEL 5
+        echo '-17' > /proc/<pid>/oom_adj
+    lineinfile:
+      line: "*/1 * * * * root pgrep -f '{{ item }}' | while read PID; do echo -17 > /proc/$PID/oom_adj; done"
+      path: /etc/cron.d/oom_disable
+      state: present
+      create: yes
+    with_items:
+            #      - /opt/isec/ens/threatprevention/bin/isectpd
+            #      - /opt/isec/ens/esp/bin/isecespd
+      - /opt/McAfee/agent/bin/macompatsvc
+        #      - /opt/nimsoft/bin/nimbus
+        #      - nimbus(controller)
+      - /usr/sbin/zabbix_agentd
+      - /usr/share/centrifydc/sbin/sshd
+      - /usr/sbin/adclient
+    when: ansible_distribution_major_version|int < 6 

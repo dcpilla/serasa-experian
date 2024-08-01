@@ -1,0 +1,50 @@
+---
+- name: delete
+  no_log: true 
+  ignore_errors: yes
+  shell: export PGPASSWORD='{{pgs_pw}}';/usr/bin/psql  -h '{{pgs_host}}' -p 5432 -U '{{pgs_login}}' -d inventario -c "delete from tlmp where service='EKS' and account_id='{{account_id}}'";unset PGPASSWORD
+  register: delete
+
+- debug:
+    var: delete
+
+- include_role:
+    name: aws
+    tasks_from: eks_list.yml
+
+- name: block when ekslist.clusters is not clean
+  block:
+    - name: Clear eks_info_list
+      set_fact:
+        eks_info_list: []
+    
+    - name: Add values in list
+      set_fact:
+        eks_info_list: "{{ eks_info_list + [{'eks_name': item.eks_name, 'eks_image': item.eks_image}] }}"
+      loop: "{{ eksfields_list }}"
+    
+    - name: Exibir lista
+      debug:
+        var: eks_info_list
+    
+    - name: Criar arquivo CSV
+      local_action:
+        module: copy
+        content: |
+          {% for item in eksfields_list %}
+          {{ item.eks_name }}|{{ item.eks_image }}|{{account}}
+          {% endfor %}
+        dest: /tmp/eks_info.csv
+    
+    - name: Insert-Values  cluster {{item.eks_name}} version {{item.eks_image}}
+      no_log: true 
+      ignore_errors: yes
+      shell: export PGPASSWORD='{{pgs_pw}}';/usr/bin/psql  -h '{{pgs_host}}' -p 5432 -U '{{pgs_login}}' -d inventario -c "SET TIMEZONE TO 'America/Sao_Paulo';insert into tlmp (register,service,account_id,name,version) values (now(),'EKS','{{account_id}}','{{item.eks_name}}','{{item.eks_image}}')";unset PGPASSWORD
+      loop: "{{ eks_info_list }}"
+      register: insert
+    
+#    - debug:
+
+  when: ekslist.clusters != []
+  ###SDG###  
+

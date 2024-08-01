@@ -1,0 +1,42 @@
+---
+#this playbook need to called of a loop structure
+- name: convert dates in seconds to compare {{date_compare}} with current date to divide for secunds by  hour
+  shell: echo $((($(date -d `date "+%Y-%m-%dT%H:%M:%S"` +%s) - $(date -d "{{date_compare}}" +%s))/3600))
+#  shell: echo $((($(date -d `date "+%Y-%m-%d"` +%s) - $(date -d "{{emr_date}}" +%s))/86400))
+  register: diff_date
+
+- name: show diff_date
+  debug:
+    msg: 
+      - "####################@####################"
+      - "#           Cluster EMR Running         #"
+      - "#                   {{diff_date.stdout}}                   #"
+      - "#                 HOURS                 #"
+      - "####################@####################"
+
+- name: concat result
+  set_fact:
+    concat_result: '{{date_compare}}_{{diff_date.stdout}}'
+
+- name: set array-list date_diff_list to {{concat_result}} 
+  set_fact:
+    date_diff_list:   "{{date_diff_list|default([])+ [ concat_result  ] }}"
+
+- name: debug diff_date
+  debug:
+    var: diff_date
+
+
+- name: set array-list uptime_emr_list to {{date_compare}} greater than {{emr_terminate_hours}} current diff_date.stdout {{diff_date.stdout}}
+  set_fact:
+    uptime_emr_list:   "{{uptime_emr_list|default([])+ [ date_compare  ] }}"
+  when: diff_date.stdout|int > emr_terminate_hours|int
+
+- name: convert dates in seconds to compare {{date_compare}} with current date to divide for secunds by  hour
+  shell: echo $((($(date -d `date "+%Y-%m-%dT%H:%M:%S"` +%s) - $(date -d "{{date_compare}}" +%s))/86400))
+#  shell: echo $((($(date -d `date "+%Y-%m-%d"` +%s) - $(date -d "{{emr_date}}" +%s))/86400))
+  register: diff_dates_keys_user
+
+- debug:
+    var: diff_dates_keys_user  
+### SDG ###

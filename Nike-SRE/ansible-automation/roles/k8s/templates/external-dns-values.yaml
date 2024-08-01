@@ -1,0 +1,39 @@
+image:
+  # -- Image repository for the `external-dns` container.
+  repository: {{account_id}}.dkr.ecr.sa-east-1.amazonaws.com/chainguard/external-dns
+  # -- (string) Image tag for the `external-dns` container, this will default to `.Chart.AppVersion` if not set.
+  tag: "v0.14.2"
+  # -- Image pull policy for the `external-dns` container.
+domainFilters:
+- {{cluster_domain}}
+extraArgs:
+- --aws-zone-type=private
+extraEnv:
+  HTTP_PROXY: http://spobrproxy.serasa.intranet:3128
+  HTTPS_PROXY: http://spobrproxy.serasa.intranet:3128
+  NO_PROXY: 172.20.0.0/16,localhost,127.0.0.1,10.0.0.0/8,169.254.169.254,.internal,.s3.amazonaws.com,.s3.sa-east-1.amazonaws.com,api.ecr.sa-east-1.amazonaws.com,dkr.ecr.sa-east-1.amazonaws.com,.ec2.sa-east-1.amazonaws.com,.eks.amazonaws.com,.sa-east-1.eks.amazonaws.com,.experiannet.corp,.aln.experian.com,.mck.experian.com,.sch.experian.com,.experian.eeca,.experian.local,.experian.corp,.gdc.local,.41web.internal,metadata.google.internal,metadata,10.188.14.54,10.188.14.57,10.99.132.16
+logLevel: debug
+nodeSelector:
+  Worker: infra
+provider: aws
+resouces:
+  limits:
+    cpu: 200m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+sources:
+- ingress
+- istio-gateway
+- istio-virtualservice
+tolerations:
+- effect: NoSchedule
+  key: dedicated
+  operator: Equal
+  value: infra
+- effect: NoSchedule
+  key: Disabled
+  operator: Equal
+  value: ForKarpenter
+txtOwnerId: {{cluster_name}}

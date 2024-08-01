@@ -1,0 +1,17 @@
+# Apache Cassandra's metrics-reporter config file
+
+# metrics will be stored in : /tmp/serasa_cass_metrics_reporter_0.txt
+# metrics will be collected every ({{cassandra_metrics_collected}} seconds) - frequent collection will put extra load on Cassandra and has not proven to be useful.
+
+console:
+  -
+    outfile: '{{node_exporter_dir_textfile}}/serasa_cass_metrics_reporter_0.txt'
+    period: {{cassandra_metrics_collected}}
+    timeunit: 'SECONDS'
+    predicate:
+      color: "white"
+      useQualifiedName: true
+      patterns:
+{% for item in cassandra_metrics_patterns %}
+        - {{ item}}
+{% endfor %}

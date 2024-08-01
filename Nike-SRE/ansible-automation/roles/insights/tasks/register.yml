@@ -1,0 +1,23 @@
+---
+- name: Subscribe host on RedHat Insights
+  block:
+    - name: Remove redhat-access-insights if installed (RHEL>=6)
+      yum:
+          name: redhat-access-insights
+          state: absent 
+      when: ansible_distribution_major_version|int > 6
+
+    - name: Install redhat-access-insights package (RHEL>=6)
+      yum:
+          name: insights-client 
+          state: latest
+      when: ansible_distribution_major_version|int > 6
+
+    - name: Install redhat-access-insights package (RHEL5)
+      shell: yum install -y insights-client
+      when: ansible_distribution_major_version|int == 5
+
+    - name: Register the system in the Red Hat Insights portal
+      shell: insights-client --register
+  tags:
+    - setinsights

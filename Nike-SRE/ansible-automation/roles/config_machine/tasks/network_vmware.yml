@@ -1,0 +1,28 @@
+---
+- name: Add allocated IP 
+  lineinfile:
+    path: /etc/sysconfig/network-scripts/ifcfg-{{ ansible_default_ipv4.interface }}
+    state: present
+    line: IPADDR={{ allocated_ip }}
+  when: allocated_ip is defined and allocated_ip != ''
+
+- name: Add allocated netmask 
+  lineinfile:
+    path: /etc/sysconfig/network-scripts/ifcfg-{{ ansible_default_ipv4.interface }}
+    state: present
+    line: NETMASK={{ allocated_mask }}
+  when: allocated_mask is defined and allocated_mask != ''
+
+- name: Add allocated GW 
+  lineinfile:
+    path: /etc/sysconfig/network-scripts/ifcfg-{{ ansible_default_ipv4.interface }}
+    state: present
+    line: GATEWAY={{ allocated_gw }}
+  when: allocated_gw is defined and allocated_gw != ''
+
+- name: Remove DHCP option when Allocated IP
+  lineinfile:
+    path: /etc/sysconfig/network-scripts/ifcfg-{{ ansible_default_ipv4.interface }}
+    state: absent
+    regexp: '.*dhcp.*'
+  when: allocated_ip is defined and allocated_ip != ''

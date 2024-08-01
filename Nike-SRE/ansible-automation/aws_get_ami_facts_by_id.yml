@@ -1,0 +1,7 @@
+---
+- hosts: localhost
+  tasks:
+    - import_role:
+        name: aws
+        tasks_from: get_ami_facts_by_id.yml
+#  become: yes

@@ -1,0 +1,68 @@
+---
+- name: block describ pod when found == no
+  block:
+    - debug:
+        msg:
+          - "#############################################"
+          - "##                {{account}}              ##"
+          - "#############################################"
+          - "##                                         ##"
+          - "##   Found                 | {{found}}         ##"
+          - "##   cluster               | {{cluster_name}}  ##"
+          - "##   namespace             | {{ns}}            ##"
+          - "##   start search pod      | {{pod}}    ##"
+          - "##                                         ##"
+          - "##   sha: | {{sha}}   ##"
+          - "##                                         ##"
+          - "#############################################"
+          - "#############################################"
+
+    - name: describe pod {{pod}} from namespaces {{ns}} search sha {{sha}}
+      become: false
+      shell: "/usr/local/bin/kubectl describe pods {{pod}} -n {{ns}}  | grep {{sha}}"
+      ignore_errors: yes
+      register: poddescribe
+    
+    
+    
+    
+    - name: block when poddescribe is defined
+      block:
+        - debug:
+            var: poddescribe
+    
+        - name: "end play container located"
+          debug:
+            msg:
+              - "################################################################################################################################################################"
+              - "##                                                              Container located                                                                             ##"
+              - "################################################################################################################################################################"
+              - "##                                                                                                                                                            ##"
+              - "##    Pod:            {{pod}}"
+              - "##    NameSpace:      {{ns}}"
+              - "##    Cluster:        {{cluster_name}}"
+              - "##{{poddescribe.stdout}}"
+              - "##                                                                                                                                                            ##" 
+              - "################################################################################################################################################################"
+    
+        - name: add container definition in {{container_vulnerability_search}}
+          lineinfile:
+            path: '{{container_vulnerability_search}}'
+            line: '{{account}}|{{account_id}}|sha: {{sha}}|Pod: {{pod}}|NameSpace: {{ns}}|Cluster: {{cluster_name}}|{{ansible_date_time.date}}-{{ansible_date_time.time}}'
+            state: present
+            create: true
+            #    - meta: end_play  
+            #
+    
+        - name: ste fact found to true
+          set_fact:
+            found: true
+
+
+
+
+      when: poddescribe is defined and poddescribe.stdout != ''
+    
+  when: found == false
+
+###SDG###

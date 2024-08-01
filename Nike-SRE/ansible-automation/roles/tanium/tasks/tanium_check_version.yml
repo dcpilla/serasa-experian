@@ -1,0 +1,19 @@
+---
+  - name: Check TaniumClient Version
+    shell: "rpm -qi TaniumClient | grep ^Version | awk '{print $3}'"
+    args:
+      warn: False
+    register: value_version
+    ignore_errors: yes
+
+  - debug:
+      var: value_version
+
+  - name: Set Version
+    set_fact:
+      tanium_version: value_version.stdout
+    when: value_version is defined
+
+  - debug:
+      var: tanium_version
+

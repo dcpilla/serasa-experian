@@ -1,0 +1,95 @@
+---
+- name: Install and configure DNSMasq
+  shell: adinfo | head -n2 | tail -n1 | awk '{ print $4}'
+  ignore_errors: yes
+  register: adinfo
+  args:
+    warn: false
+
+- set_fact:
+    domain: brexperian
+  when: adinfo.stdout == 'br.experian.local'
+
+- set_fact:
+    domain: serasacliente
+  when: adinfo.stdout == 'serasacliente'
+
+- set_fact:
+    region: onpremise
+  when: not inventory_hostname.startswith('awsbr') and region is not defined
+
+- set_fact:
+    region: amazon
+  when: inventory_hostname.startswith('awsbr')
+
+- block:
+
+    - block:
+        - set_fact:
+            dns_servers: '{{ region_onpremise.brexperian }}'
+          when: domain == "brexperian" 
+
+        - set_fact:
+            dns_servers: '{{ region_onpremise.serasacliente }}'
+          when: domain == "serasacliente"
+ 
+      when: region == 'onpremise'
+
+    - set_fact:
+        dns_servers: '{{ region_amazon.serasacliente }}'
+      when: region == 'amazon' and domain == "serasacliente"
+
+    - name: Ensure DNSMasq installed RHEL > 5
+      yum:
+        name: dnsmasq
+        state: present
+      when: ansible_distribution_major_version|int != 5
+
+    - name: Ensure DNSMasq installed RHEL 5
+      shell: yum install dnsmasq -y
+      ignore_errors: yes
+      args:
+        warn: false
+      when: ansible_distribution_major_version|int == 5
+    
+    - name: Copy template resolv.conf
+      copy:
+        src: files/resolv.conf
+        dest: /etc/resolv.conf
+
+    - name: Copy template dnsmasq.conf
+      copy: 
+        src: files/dnsmasq.conf
+        dest: /etc/dnsmasq.conf
+        owner: root
+        group: root
+        mode: 0644 
+    
+    - name: Ensure that the file resolv.dnsmasq exists
+      file: 
+        path: /etc/resolv.dnsmasq
+        owner: root
+        group: root
+        mode: 0755
+        state: touch 
+    
+    - name: Set nameservers in resolv.dnsmasq by domain and environment
+      lineinfile:
+        dest: /etc/resolv.dnsmasq
+        line: '{{ item }}'
+      with_items:
+        - '{{ dns_servers }}'
+    
+    - name: Enable and restart DNSMasq service 
+      service:
+        name: dnsmasq
+        state: stopped
+
+    - name: Enable and restart DNSMasq service
+      service:
+        name: dnsmasq
+        enabled: yes
+        state: started
+
+  when: region is defined and region != '' and
+        domain is defined and domain != ''

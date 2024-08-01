@@ -1,0 +1,40 @@
+---
+# tasks file for roles/notify
+- name: block to send email
+  block:
+    - name: set facts to send email
+      set_fact:
+        report_date: "{{ lookup('pipe', 'date -d \"3 hour ago\" +\"%Y-%m-%d %H:%M:%S\"') }}"
+        email_title: '{{title}}'
+        sub_title:   'This is an automatic process from Nike Program'
+        description: '{{descr}}'
+        body:        '{{msg}}'
+
+    - name: send  notify by email when notify_type is mail .... current notify_type {{notify_type}}
+      become: false
+      ignore_errors: yes
+      mail:
+        host: '{{mail_host}}'
+        port: '{{mail_port}}'
+        from: '{{mail_from}}'
+        to:   '{{msg_to}}'
+        subject: '{{email_title}}'
+        subtype: html
+        body: "{{ lookup('template', '{{mail_template}}') }}"
+        
+  when: notify_type is search('mail')
+
+
+- name: block to send webHook Notifications
+  block:
+    - debug: 
+        msg: 'send webHook Notifications'
+
+#    - name: set facts to send webHook Notifications
+#      set_fact:
+      ##URL to send notify
+      # https://experian.webhook.office.com/webhookb2/51d91af7-690b-43c2-8258-c8708f453a80@be67623c-1932-42a6-9d24-6c359fe5ea71/IncomingWebhook/6abf219e77094379bd4c63c3e045c201/6e4329b6-dd70-425c-9cd7-81237edcb7e8
+
+  when: notify_type is search('teams')
+
+###SDG###

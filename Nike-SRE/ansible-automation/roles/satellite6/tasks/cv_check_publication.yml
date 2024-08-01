@@ -1,0 +1,20 @@
+---
+- name: set facts
+  set_fact:
+    cv_id: "{{item.split('-')[0]}}"
+    cv_name: "{{item.split('-')[1]}}"
+    cv_data_pub: "{{item.split('-')[2]}}"
+
+
+- name: check cv vencidos
+  debug:
+    msg:
+      - "{{cv_id}}"
+      - "{{cv_name}}"
+      - "{{cv_data_pub}}"
+
+
+        #- name: check cv emitido fora do prazo
+
+
+

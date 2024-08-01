@@ -1,0 +1,15 @@
+---
+
+- hosts: cassandra_nodetools
+  become: yes
+  become_method: sudo
+  roles:
+    - nodetools
+  tags:
+    - nodetools
+    - repair
+  vars:
+    nodetools_cmds:
+         - "ALTER KEYSPACE system_auth WITH replication = {'class': '{{cassandra_topology_class}}', '{{cassandra_topology_datacenter_name}}': '{{cassandra_allocate_tokens_for_local_replication_factor}}'}  AND durable_writes = true;"
+         - "ALTER KEYSPACE system_distributed WITH replication = {'class': '{{cassandra_topology_class}}', '{{cassandra_topology_datacenter_name}}': '{{cassandra_allocate_tokens_for_local_replication_factor}}'}  AND durable_writes = true;"
+         - "ALTER KEYSPACE system_traces WITH replication = {'class': '{{cassandra_topology_class}}', '{{cassandra_topology_datacenter_name}}': '{{cassandra_allocate_tokens_for_local_replication_factor}}'}  AND durable_writes = true;"

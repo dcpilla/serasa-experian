@@ -1,0 +1,7 @@
+---
+# tasks file for roles/config-ansible-to-aws
+- name: get 
+  shell: ansible-galaxy collection install amazon.aws
+  become: yes
+
+

@@ -1,0 +1,48 @@
+---
+- name: Include Assume-Role account {{account}}
+  include_tasks: sts_connection.yml
+
+- name: list kms
+  shell: /usr/local/bin/aws kms list-keys --profile sts_cli
+  register: kms_list
+
+
+- name: convert kms_list to json
+  set_fact:
+    kms_list: '{{kms_list.stdout|from_json}}'
+
+
+- debug:
+    var: kms_list
+
+- name: clear kms_customer_list 
+  set_fact:
+    kms_customer_enable_list: []
+    kms_customer_disable_list: []
+    kms_rotation_disabled_list: []
+
+- name: describle  kms to load kms_customer_list
+  include_tasks: kms_list_describe.yml
+  with_items: '{{kms_list.Keys}}'
+  loop_control:
+    loop_var: kms
+
+
+
+- name: show no filter kms_decribe
+  debug:
+    var: kms_decribe
+
+- name: show kms_customer_enable_list from kms_list_describe.yml task account {{account}}
+  debug:
+    var: kms_customer_enable_list
+
+- name: show kms_customer_disable_list from kms_list_describe.yml task account {{account}}
+  debug:
+    var: kms_customer_disable_list
+
+- name: show kms_rotation_disabled_list from kms_list_describe.yml task account {{account}}
+  debug:
+    var: kms_rotation_disabled_list
+
+    ### SDG ###

@@ -1,0 +1,14 @@
+---
+- hosts: '{{ host }}'   
+  tasks:
+    - name: debug var
+      debug:
+        var: ansible_date_time.date
+
+    - name: debug var
+      debug:
+        var: ansible_python_version
+
+#    - name: Print all available facts
+#      ansible.builtin.debug:
+#        var: ansible_facts

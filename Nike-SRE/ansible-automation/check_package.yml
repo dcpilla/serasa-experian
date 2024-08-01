@@ -1,0 +1,98 @@
+---
+- hosts: spobrbastion
+  gather_facts: yes
+  tasks:
+#    - name: Get hosts to apply the patch update
+#      shell: /opt/mssql-tools/bin/sqlcmd -S {{sqlserver}} -U {{sqluser}}  -P '{{sqlpasswd}}' -Q "USE linux_reports; SELECT sname as hostname from dbo.Patch_Linux2020 order by hostname" | egrep -iv 'hostname|--|rows|changed|#N'
+    - name: Get hosts
+      shell: cat /tmp/all_hosts
+      register: selecthosts
+      args:
+        warn: false
+        executable: /bin/bash
+        
+    - name: Create a dynamic group of hosts called dynamic_hosts and replace empty spaces returned during the query of hostname, sqlcmd bug
+      add_host:    
+        name: '{{ item }}'
+        group: dynamic_hosts
+      with_items:
+        - "{{selecthosts.stdout_lines|replace(' ','') }}"
+
+- hosts: dynamic_hosts
+  gather_facts: no  
+  tasks:
+    - set_fact:
+        Path_arquivo_gerado: /tmp/check_package
+
+    - name: Erase output file when TCP
+      delegate_to: "{{workerexec}}"
+      file:
+        path: '{{ Path_arquivo_gerado }}'
+        state: absent
+      become: yes
+
+    - name: Create output file when TCP
+      delegate_to: "{{workerexec}}"
+      file:
+        path: '{{ Path_arquivo_gerado }}'
+        state: touch
+        owner: root
+        group: root
+        mode: 775
+      become: yes
+
+    - name: append output on file
+      delegate_to: "{{workerexec}}"
+      delegate_facts: true
+      lineinfile:
+        dest: /tmp/check_port/check_tcp_port.csv
+        state: present
+        insertafter: BOF
+        line: "hostname|Release|Package name|Package Date"
+      become: yes
+
+    - name: get packege name
+      shell: rpm -qa | grep -i '{{package_name}}'
+      register: pack_name
+      become: yes
+      args:
+        warn: false
+      ignore_errors: yes      
+
+    - name: get installation date
+      shell: rpm -qa --last | grep -i '{{package_name}}' | awk {'print $1,$2,$3,$4,$5,$6,$7,$8'}
+      register: inst_date
+      become: yes
+      args:
+        warn: false
+      ignore_errors: yes      
+
+    - name: get release
+      shell: cat /etc/redhat-release
+      register: release
+      become: yes
+
+    - name: append output on file
+      delegate_to: "{{workerexec}}"
+      delegate_facts: true
+      lineinfile:
+        dest: '{{ Path_arquivo_gerado }}'
+        state: present
+        insertafter: EOF
+        line: "{{inventory_hostname}}|{{release.stdout_lines}}|{{pack_name.stdout_lines}}|{{inst_date.stdout_lines}}"
+      become: yes
+      ignore_errors: yes      
+
+    - name: send email
+      delegate_to: "{{workerexec}}"
+      mail:
+        host: correiosmtp
+        port: 25
+        from: '{{suport_email}}'
+        to: '{{email}}'
+        #        cc: 'lucas.pelegrino@br.experian.com'
+        subject: 'Linux Management: Package installed'
+        body: 'Report test'
+        attach:
+        - '{{Path_arquivo_gerado}}'
+      when: email is defined

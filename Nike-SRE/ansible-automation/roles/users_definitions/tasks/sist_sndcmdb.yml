@@ -1,0 +1,9 @@
+---
+- name: Ensure '#includedir /etc/sudoers.d' is present in the /etc/sudoers
+  lineinfile:
+      path: /etc/sudoers
+      state: present
+      line: '#includedir /etc/sudoers.d'
+
+- name: Ensure /etc/sudoers.d/sist_sndcmdb exists
+  copy: src=files/sist_sndcmdb dest=/etc/sudoers.d/sist_sndcmdb owner=root mode=0600

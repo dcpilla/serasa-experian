@@ -1,0 +1,73 @@
+---
+  - name: Get octeto second
+    shell: ping -c1 -W3 '{{ ansible_default_ipv4.address }}' | head -n1 | awk '{ print $2}' | cut -d'.' -f2
+    register: octeto_second
+
+  - name: Get octeto third
+    shell: ping -c1 -W3 '{{ ansible_default_ipv4.address }}' | head -n1 | awk '{ print $2}' | cut -d'.' -f3
+    register: octeto_third
+
+  - name: zabbix proxy 3 in 10.30
+    set_fact:
+      zabbix_proxy: 10.96.170.183
+    when: octeto_second.stdout == '30'
+
+  - name: zabbix proxy 4 in 10.12
+    set_fact:
+      zabbix_proxy: 10.12.0.178
+    when: octeto_second.stdout == '12'
+
+#  - name: zabbix proxy 5 in 10.104
+#    set_fact:
+#      zabbix_proxy: 10.52.0.103
+#    when: octeto_second.stdout == '104'
+
+  - name: zabbix proxy 7 in 10.96, 10.60 or 10.50
+    set_fact:
+      zabbix_proxy: 10.96.170.29
+    when: octeto_second.stdout == '96'or octeto_second.stdout == '60' or octeto_second.stdout == '50'
+
+  - name: zabbix proxy 10 in 10.96.224 and 10.96.222
+    set_fact:
+      zabbix_proxy: 10.96.170.70
+    when: octeto_second.stdout == '96' and octeto_third.stdout == '224' or octeto_third.stdout == '222'
+    
+  - name: zabbix proxy 11 in 10.53 or 10.104
+    set_fact:
+      zabbix_proxy: 10.96.170.148
+    when: octeto_second.stdout == '53' or octeto_second.stdout == '104'
+
+  - name: zabbix proxy 14 in 10.96.20 and 23 HDP
+    set_fact:
+      zabbix_proxy: 10.96.170.222
+    when: octeto_second.stdout == '96' and octeto_third.stdout == '20' or octeto_third.stdout == '21' or octeto_third.stdout == '22' or octeto_third.stdout == '23'
+
+  - name: zabbix proxy in 10.52 
+    block:
+
+      - name: zabbix proxy 06 in 10.52.29
+        set_fact:
+          zabbix_proxy: 10.52.29.11
+        when: octeto_third.stdout == '29'
+
+      - name: zabbix proxy 07 in 10.52.105
+        set_fact:
+          zabbix_proxy: 10.96.170.29
+        when: octeto_third.stdout == '105'
+
+    when: octeto_second.stdout == '52'
+
+  - name: zabbix proxy in AWSZBX01 10.99
+    set_fact:
+      zabbix_proxy: 10.99.188.197
+    when: octeto_second.stdout == '99'
+
+  - name: Set zabbix proxy when variable is not defined
+    set_fact:
+      zabbix_proxy: 10.99.188.197
+    when: zabbix_proxy is not defined
+
+  - name:
+    debug:
+      var: zabbix_proxy
+

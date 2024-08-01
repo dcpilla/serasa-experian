@@ -1,0 +1,13 @@
+---
+# handlers file for cassandra-exporter
+
+- name: Reenable cassandra exporter service
+  systemd:
+    daemon_reload: yes
+    enabled: yes
+    name: cassandra-exporter
+
+- name: Restart cassandra exporter
+  service:
+    name: cassandra-exporter
+    state: restarted

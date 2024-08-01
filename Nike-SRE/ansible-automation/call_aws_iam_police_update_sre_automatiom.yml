@@ -1,0 +1,23 @@
+---
+- hosts: localhost 
+  gather_facts: no
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    AWS_REGION: sa-east-1
+  become: yes
+  tasks:
+    - name: set role and policy name
+      set_fact:
+        name_policy: BUPolicyForSREAutomation
+        name_role: BURoleForSREAutomation
+
+    - name: include task to call role aws task iam_police_create.yml
+      include_tasks: aws_iam_police_update_sre_automatiom.yml
+      with_items:
+        - '{{accounts}}'
+      loop_control:
+        loop_var: account
+
+
+          ###SDG###          

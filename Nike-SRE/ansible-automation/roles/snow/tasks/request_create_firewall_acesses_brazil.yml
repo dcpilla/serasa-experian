@@ -1,0 +1,138 @@
+---
+- name: set Instance
+  set_fact:
+#    instance: experian
+    instance: experiantest
+#  instance: experianptnrdev
+
+- name: Create request from {{workerexec}}
+  #  delegate_to: '{{workerexec}}'
+  block:
+    #date register
+    - name: Get start date with sambarilove
+      become: false
+      shell: 'date "+%Y-%m-%d %H:%M:%S" -d "8 hour ago"'
+      register: st_day
+    
+    - name: get end day
+      set_fact:
+        end: "{{ lookup('pipe', 'date -d \"7 days \" +\"%Y-%m-%d %H:%M:%S\"') }}"
+
+    - set_fact:
+        start: '{{st_day.stdout}}'
+        real_start_to_close: '{{st_day.stdout}}'
+        #end: '{{end_day.stdout}}'
+    
+    #end date register
+    
+    - name: create Request Brazil Firewall Support from Brazil Nike SRE {{snow_login_nike}} user sd {{snow_login}}
+      become: false
+      ignore_errors: yes
+      environment:
+        https_proxy: https_proxy=https://spobrproxy:3128
+      uri:
+        url: https://{{instance}}.service-now.com/api/eplc/ritm_brazil_nike/firewall_support
+        #        user: "{{snow_login}}"
+        #        password: "{{snow_pass}}"
+        user: "{{snow_login_nike}}"
+        password: "{{snow_pass_nike}}"
+        force_basic_auth: yes
+        validate_certs: no
+        method: POST
+        return_content: yes
+        headers:
+         content-type: application/json
+         accept: application/json
+        body_format: json
+        body:
+          short_description: 'teste short_description brazi firewall'
+          description: 'teste description brazil firewall'
+          u_environment: 'latam'            #'Serasa Experian Environment'         brscan |  latam
+          u_regra_vpn_dns: 'Firewall Rule'  # 'Select a rule'  Customer VPN  |  Firewall Rule  |  Supplier VPN
+          #u_vpn_supplier_name: 'string'
+          #u_vpn_customer_name: 'string'
+          #u_vpn_contract_number: 'string'
+          #u_vpn_owner_ev: 'string'
+          #u_vpn_due_date: 'string'
+          #u_vpn_cnpj_ref: 'sys_id'
+          #u_vpn_chk_cnpj: 'bool'
+          #u_vpn_cnpj: 'string'
+          u_tipo_de_solicitacao: 'Release'        #'Request type'         Change|  CIRT Block |  u_consulting | Exclusion | Release
+          u_justificativa: '{{business_justification}}'
+          u_1_source_any_options: 'None of these' # 'Source Options'    Any |  Any Internal |  Internet Only |  None of these
+          u_1_source_source_type: 'CIDR'          # 'Source Type'    CIDR  |   Range |   Single |    Hostname
+          #u_1_source_lookup_hostname: 'sys_id'
+          #u_1_ad_group_name: 'string'
+          #u_1_source_lookup_IP: 'string'
+          #u_1_ad_group_description: 'string'
+          #u_1_source_lookup_environment: 'string'
+          #u_1_source_single_IP: 'string'
+          #u_1_source_single_IP_hostname: 'string'
+          #u_1_source_IP_range: 'string'
+          u_1_source_cidr_IP: '{{cidr_ip_source}}'
+          u_1_source_cidr_subnet: '{{cidr_subnet_source}}'
+          u_1_dest_any_options: 'None of these'  #'Destination Options' Any  | Any Internal|  None of these
+          u_1_dest_source_type: 'CIDR'           #'Destination Type' CIDR  |  Range  |   Single  |  Lookup
+          #u_1_dest_lookup_hostname: 'sys_id'
+          #u_1_dest_lookup_IP: 'string'
+          #u_1_dest_lookup_environment: 'string'
+          #u_1_dest_single_IP: 'string'
+          #u_1_dest_single_IP_hostname: 'string'
+          #u_1_dest_IP_range: 'string'
+          u_1_dest_cidr_IP: '{{cidr_ip_dest}}'
+          u_1_dest_cidr_subnet: '{{cidr_subnet_dest}}'
+          u_1_port_1_start: '{{port}}'
+          #u_1_port_1_end: '{{port}}'
+          u_1_protocol_1: '{{protocol}}'
+          
+          u_1_port_2_addtional_chkbox: 'bool'
+          #u_1_port_2_start: 'sys_id'
+          #u_1_port_2_end: 'sys_id'
+          #u_1_protocol_2: 'sys_id'
+          u_1_port_3_addtional_chkbox: 'bool'
+          #u_1_port_3_start: 'sys_id'
+          #u_1_port_3_end: 'sys_id'
+          #u_1_protocol_3: 'sys_id'
+          u_1_port_4_addtional_chkbox: 'bool'
+          #u_1_port_4_start: 'sys_id'
+          #u_1_port_4_end: 'sys_id'
+          #u_1_protocol_4: 'sys_id'
+          u_1_port_5_addtional_chkbox: 'bool'
+          #u_1_port_5_start: 'sys_id'
+          #u_1_port_5_end: 'sys_id'
+          #u_1_protocol_5: 'sys_id'
+          
+          #u_1_epoch_date: 'string'
+                    
+
+      register: req
+      
+    #get change number
+    - debug:
+        var: req
+
+
+#    - set_fact:
+#         inc_num: "{{ inc.content | regex_search('INC[0-9]{7}') }}"
+#
+#    - debug:
+#        var: inc_num
+
+#    - set_fact:
+#         chg_num: "{{ change.content | regex_search('CHG[0-9]{7}') }}"
+#
+#    - debug:
+#        var: chg_num
+    
+    ## to running this playbook you need this variables
+    ###Variables name####values definition##
+    # chg_template_name    # load from 
+    # chg_justification    # load from
+    #
+    # Returns
+    #   host_ip_infoblox
+   
+
+
+
+        ###SDG###        

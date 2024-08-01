@@ -1,0 +1,50 @@
+---
+- name: clean instances_fields dictonary
+  set_fact:
+    instances_fields: []
+
+- name: debug var instances_fields
+  debug:
+    var: instances_fields
+
+- import_role:
+    name: aws
+    tasks_from: ec2_list.yml
+
+- name: block to write group and inventory
+  block:
+    - name: ADD group {{account_name}} in {{inventory_all_instances_path}}  from account {{account}}
+      become: yes
+      lineinfile:
+        path: '{{item}}'
+        line: '[{{account_name}}]'
+        state: present
+        create: true
+      with_items:
+        - "{{inventory_all_instances_path}}"
+    
+    #- name: debug to check instances_fields variable from task ec2_list.yml
+    #  debug:
+    #    msg:
+    #      - '############################################' 
+    #      - 'item: {{item}}'
+    #      - 'account_name: {{account_name}}'
+    #      - 'instances_path:{{inventory_all_instances_path}}'
+    #      - 'instances_fields: {{instances_fields}}'
+    #      - '############################################' 
+        
+    
+    - name: ADD instances invetory in {{inventory_all_instances_path}} from group {{account_name}}
+      become: yes
+      lineinfile:
+        path: '{{inventory_all_instances_path}}'
+        line: "{{item.id}}|{{item.ip}}|{{item.tag_name}}|{{item.key}}|{{item.type}}|{{item.launch_time }}|{{item.state}}|{{account_id}}|{{item.so}}|{{item.iam}}|{{item.tags}}"
+        state: present
+        create: true
+      with_items: '{{ instances_fields }}'
+
+  when:  instances_fields != []
+
+
+
+### SDG ###  

@@ -1,0 +1,134 @@
+---
+- name: Create node exporter group
+  group:
+    name: "{{ node_exporter_group }}"
+    system: yes
+    state: present
+  tags:
+    - node_exporter
+    - configuration
+
+- name: Create node exporter user
+  user:
+    name: "{{ node_exporter_user }}"
+    system: yes
+    shell: "/sbin/nologin"
+    group: "{{ node_exporter_group }}"
+    createhome: no
+  tags:
+    - node_exporter
+    - configuration
+
+- name: Download Node exporter
+  get_url:
+    url: "{{node_exporter_url}}"
+    dest: /tmp/node_exporter.tar.gz
+  environment: "{{proxy_env}}"
+  tags:
+    - node_exporter
+    - configuration
+
+- name: Extract Node exporter
+  command: tar -xzpf /tmp/node_exporter.tar.gz -C /tmp
+  tags:
+    - node_exporter
+    - configuration
+
+- name: Moving Node Exporter
+  shell: mv /tmp/node_exporter-{{node_exporter_version}}.linux-amd64/node_exporter /usr/local/bin/node_exporter
+  tags:
+    - node_exporter
+    - configuration
+
+- name: Copy send_cass_metrics_to_prom.sh 
+  template:
+    src: "send_cass_metrics_to_prom.sh.j2"
+    dest: "/usr/local/bin/send_cass_metrics_to_prom.sh"
+  tags:
+    - node_exporter
+    - configuration
+
+- name: Creates a cron file under /etc/cron.d/send_cass_metrics_to_prom
+  cron:
+    name: send_cass_metrics_to_prom
+    minute: "*/5"
+    hour: "*"
+    day: "*"
+    month: "*"
+    weekday: "*"
+    user: "root"
+    job: "/bin/sh /usr/local/bin/send_cass_metrics_to_prom.sh"
+    cron_file: "send_cass_metrics_to_prom"
+  tags:
+    - node_exporter
+    - crontab
+
+- name: Change Node Exporter permission
+  shell: chmod +x /usr/local/bin/node_exporter && chown root.root /usr/local/bin/node_exporter
+  tags:
+    - node_exporter
+    - configuration
+
+- name: Change send_cass_metrics_to_prom.sh permission
+  shell: chmod +x /usr/local/bin/send_cass_metrics_to_prom.sh && chown root.root /usr/local/bin/send_cass_metrics_to_prom.sh 
+  tags:
+    - node_exporter
+    - configuration
+
+- name: Copy metrics-reporter.yaml
+  template:
+    src: "metrics-reporter.yaml.j2"
+    dest: "{{ cassandra_config_dir_base }}/metrics-reporter.yaml"
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - cassandra
+    - node_exporter
+    - configuration
+
+- name: Upload sysconfig Node Exporter
+  template:
+    src: node_exporter.j2
+    dest: /etc/sysconfig/node_exporter
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - node_exporter
+    - configuration
+
+- name: Create systemd service unit
+  template:
+    src: node_exporter.service.j2
+    dest: /etc/systemd/system/node_exporter.service
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - Reenable node exporter service
+    - Restart cassandra
+  tags:
+    - node_exporter
+    - configuration
+
+- meta: flush_handlers
+
+- name: Ensure node exporter service is enabled and started
+  systemd:
+    name: node_exporter
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  tags:
+    - node_exporter
+    - configuration
+
+- name: Ensure node exporter service is enabled and restarted
+  systemd:
+    name: node_exporter
+    state: restarted
+    daemon_reload: yes
+  tags:
+    - node_exporter
+    - configuration

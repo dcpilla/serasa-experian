@@ -1,0 +1,19 @@
+region_onpremise:
+  brexperian:
+    - 'nameserver 10.96.215.13' 
+    - 'nameserver 10.96.216.4'
+    - 'nameserver 10.96.216.20'
+  serasacliente:
+    - 'nameserver 10.96.215.16'
+    - 'nameserver 10.96.214.69'
+    - 'nameserver 10.96.214.84'
+region_amazon:
+  serasacliente:
+    - 'nameserver 10.99.16.117'
+    - 'nameserver 10.99.16.224'
+      #    - 'nameserver 10.52.16.40' Comentado atualização BAHIA
+      #    - 'nameserver 10.52.16.93' Comentado atualização BAHIA
+
+#    - 'nameserver 10.96.215.16'
+#    - 'nameserver 10.96.214.69'
+#    - 'nameserver 10.96.214.84'

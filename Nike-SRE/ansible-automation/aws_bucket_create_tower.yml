@@ -1,0 +1,15 @@
+---
+- hosts: spobrnikeworker
+  gather_facts: no
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+
+  tasks:
+    - import_role:
+        name: aws
+        tasks_from: sts_connection.yml
+
+    - import_role:
+        name: aws
+        tasks_from: bucket_create.yml

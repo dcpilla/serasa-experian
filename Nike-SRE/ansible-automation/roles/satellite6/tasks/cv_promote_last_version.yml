@@ -1,0 +1,20 @@
+---
+- set_fact:
+    COD_CV:  '{{item.split("-")[0]}}'
+
+- name: get last CV '{{item}}' version
+  delegate_to: spobrsatellite1
+  shell: hammer content-view version list --content-view-id '{{COD_CV}}'  | cut -d '|' -f1 | egrep -v "ID|----" | head -1
+  register: version_cv
+
+- name: promote to DEV  CV '{{item}}' version '{{version_cv.stdout}}' 
+  delegate_to: spobrsatellite1
+  shell: hammer content-view version promote --content-view-id '{{COD_CV}}' --id '{{version_cv.stdout}}'  --to-lifecycle-environment-id 2  --organization "Serasa_Experian"
+
+- name: promote to HOM  CV '{{item}}' version '{{version_cv.stdout}}' 
+  delegate_to: spobrsatellite1
+  shell: hammer content-view version promote --content-view-id '{{COD_CV}}' --id '{{version_cv.stdout}}'  --to-lifecycle-environment-id 3  --organization "Serasa_Experian"
+
+- name: promote to PROD  CV '{{item}}' version '{{version_cv.stdout}}' 
+  delegate_to: spobrsatellite1
+  shell: hammer content-view version promote --content-view-id '{{COD_CV}}' --id '{{version_cv.stdout}}'  --to-lifecycle-environment-id 4  --organization "Serasa_Experian"

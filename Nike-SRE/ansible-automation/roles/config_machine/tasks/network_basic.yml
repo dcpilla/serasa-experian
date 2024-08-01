@@ -1,0 +1,74 @@
+---
+- name: Grant local host on /etc/hosts
+  lineinfile: 
+    path: /etc/hosts
+    state: present
+    line: '127.0.0.1       localhost localhost.localdomain localhost4 localhost4.localdomain4'
+
+- name: Remove lines IPv6 
+  lineinfile:
+    path: /etc/sysconfig/network-scripts/ifcfg-{{ item }}
+    state: absent
+    regexp: '^IPV6.*$'
+  with_items:
+    - '{{ ansible_interfaces }}'
+  when: item is search("^ens.+$") or item is search("^eth.+$") or item is search("^bond.+$")
+  ignore_errors: yes
+
+- name: Disable IPv6 Init 
+  lineinfile:
+    path: /etc/sysconfig/network-scripts/ifcfg-{{ item }}
+    line: 'IPV6INIT=no'
+  with_items:
+    - '{{ ansible_interfaces }}'
+  when: item is search("^ens.+$") or item is search("^eth.+$") or item is search("^bond.+$")
+  ignore_errors: yes
+
+- name: Disable DNS received by DHCP
+  lineinfile:
+    path: /etc/sysconfig/network-scripts/ifcfg-{{ item }}
+    line: 'PEERDNS=no'
+  with_items:
+    - '{{ ansible_interfaces }}'
+  when: item is search("^ens.+$") or item is search("^eth.+$") or item is search("^bond.+$")
+  ignore_errors: yes
+
+- name: Disable ZEROCONFIG
+  lineinfile:
+    path: /etc/sysconfig/network
+    state: present
+    line: NOZEROCONF=yes
+
+- name: Enable Networking
+  lineinfile:
+    path: /etc/sysconfig/network
+    state: present
+    line: NETWORKING=yes
+
+- stat:
+    path: /etc/NetworkManager/NetworkManager.conf
+  register: stat_nm_config
+
+- name: Disable Network Manager change resolv.conf
+  lineinfile:
+    insertafter: '^\[main\]$'
+    path: /etc/NetworkManager/NetworkManager.conf
+    line: 'dns=none'
+  when: stat_nm_config.stat.exists == True
+
+- stat:
+    path: /etc/systemd/system/multi-user.target.wants/NetworkManager.service 
+  register: stat_nm_service
+
+- name: Restart Network Manager
+  service:
+    name:  NetworkManager
+    state: restarted
+  when: stat_nm_service.stat.exists == True
+
+# We should doesn't stop bootstrap only because network restart failed
+- name: Restart Network
+  service:
+    name: network 
+    state: restarted
+  ignore_errors: yes

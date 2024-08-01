@@ -1,0 +1,13 @@
+- name: Create dictionary variable with requeride tags
+  set_fact:
+    tag:
+      CostString: '{{account_ccosting}}'
+      AppID: '{{account_apid}}'
+      Environment: '{{account_environment}}'            # prd   stg      uat      tst      dev      sbx
+#      map-migrated: d-server-02n52mmgua5hr6
+#      Service: latam_nike
+#      project: nike
+#      wiz_cig: true
+#      Name: NOMEDOCLUSTER
+#
+

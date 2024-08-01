@@ -1,0 +1,8 @@
+---
+- hosts: spobrnikeworker
+  gather_facts: no
+  tasks:
+    - name: executa eansible na worker
+      shell: "ansible-playbook call_aws_set_default_configs.yml  --vault-password-file=~/key_cod_nike_automation"
+      become: yes
+### SDG ###                          

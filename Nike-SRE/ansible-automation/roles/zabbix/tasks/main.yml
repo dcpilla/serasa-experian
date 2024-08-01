@@ -1,0 +1,107 @@
+---
+- name: Zabbix Agent define
+  block:
+    - name: Disable proxy if configured
+      shell: unset http_proxy
+
+    - name: Get description
+      shell: awk -F ":" '{print $2}' /usr/scripts/descricao.txt
+      register: tag_server
+      ignore_errors: yes
+
+    - name: Define default permission to /var/log
+      file:
+        path: /var/log
+        state: directory
+        mode: 0755
+    
+#    - name: Uninstall Zabbix Agent Old
+#      yum:
+#        name: zabbix-agent
+#        state: absent
+ 
+    - name: Enable repos when region not is amazon
+      block:
+        - name: Serasa_Experian_MANDATORY_COLLECTION_RH8_Zabbix_RHEL_8_Server_x86_64 Repository
+          rhsm_repository:
+            name: Serasa_Experian_MANDATORY_COLLECTION_RH8_Zabbix_RHEL_8_Server_x86_64
+            state: enabled
+          when: ansible_distribution_major_version|int == 8
+
+        - name: Enable Serasa_Experian_MANDATORY_COLLECTION_RH7_Zabbix_RHEL_7_Server_RPMs_x86_64 Repository version {{ansible_distribution_major_version}}
+          rhsm_repository:
+            name: Serasa_Experian_MANDATORY_COLLECTION_RH7_Zabbix_Rhel_7_Server_x86_64
+            state: enabled
+          when: ansible_distribution_major_version|int == 7
+    
+        - name: Enable Serasa_Experian_MANDATORY_COLLECTION_RH6_Zabbix_RHEL_6_Server_RPMs_x86_64 Repository
+          rhsm_repository:
+            name: Serasa_Experian_MANDATORY_COLLECTION_RH6_Zabbix_Rhel_6_x86_64
+            state: enabled
+          when: ansible_distribution_major_version|int == 6
+    
+        - name: Enable Serasa_Experian_MANDATORY_COLLECTION_RH5_Zabbix_RHEL_5_RPMs_i386
+          shell: 'subscription-manager repos --enable=Serasa_Experian_MANDATORY_COLLECTION_RH5_Zabbix_RHEL_5_RPMs_i386'
+          when: ansible_distribution_major_version|int == 5 and ansible_architecture == "i386"
+    
+        - name: Enable Serasa_Experian_MANDATORY_COLLECTION_RH5_Zabbix_RHEL_5_RPMs_x86_64
+          shell: 'subscription-manager repos --enable=Serasa_Experian_MANDATORY_COLLECTION_RH5_Zabbix_RHEL_5_RPMs_x86_64'
+          when: ansible_distribution_major_version|int == 5 and ansible_architecture == "x86_64"
+
+      when: region is not defined or region != 'amazon'
+ 
+    - name: Install Zabbix Agent2 on Rhel >= 6
+      yum:
+        name: zabbix-agent2
+        state: present
+      when: ansible_distribution_major_version|int > 5
+
+    - name: Install Zabbix Agent on Rhel 5 32 bits
+      shell: yum install -y zabbix-agent.i386
+      when: ansible_distribution_major_version|int == 5 and ansible_architecture == "i386"
+
+    - name: Install Zabbix Agent on Rhel 5 64 bits
+      shell: yum install -y zabbix-agent.x86_64
+      when: ansible_distribution_major_version|int == 5 and ansible_architecture == "x86_64"
+    
+    - name: Zabbix_proxy
+      import_tasks: set_zabbix_proxy.yml
+    
+    - name: Copy Zabbix Agent config
+      template:
+        src: zabbix_agent2.conf
+        dest: /etc/zabbix
+        owner: root
+        group: root
+        mode: 0644
+      when: ansible_distribution_major_version|int > 5      
+
+    - name: Copy Zabbix Agent config
+      template:
+        src: zabbix_agentd.conf
+        dest: /etc/zabbix
+        owner: root
+        group: root
+        mode: 0644
+      when: ansible_distribution_major_version|int == 5
+
+    - name: Enable and start Zabbix Agent2
+      service:
+        name: zabbix-agent2
+        enabled: yes
+        state: restarted
+      when: ansible_distribution_major_version|int > 5
+
+    - name: Enable and start Zabbix Agent
+      shell: 'service zabbix-agent restart'
+      when: ansible_distribution_major_version|int == 5
+
+    #Utilizado para a task de acls que vem na sequencia
+    - set_fact:
+        filepath: /var/log/messages
+
+    - import_role:
+        name: acl
+        tasks_from: acl_set_zabbix_log_file
+  tags:
+    - setzabbix

@@ -1,0 +1,323 @@
+---
+#- debug:
+#    msg: '{{item}}'
+#  with_items:
+#    - '{{ cassandra_base_directory + item}}'
+#    - '{{ initial_token[inventory_hostname]}}'
+#    - '#############################################'      
+#    - '#############################################'      
+#    - '##################### {{ cassandra_cluster_name}} ############################'
+#    - '##################### {{ cassandra_num_tokens }} ############################'
+#    - '{{ cassandra_allocate_tokens_for_local_replication_factor }}'
+#    - '{{ cassandra_hinted_handoff_enabled }}'
+#    - '{{ cassandra_base_directory + cassandra_hints_directory_directory }}'
+#    - '{{ cassandra_base_directory + cassandra_commitlog_directory }}'
+#    - '{{ cassandra_disk_failure_policy }}'
+#    - '##################### {{ cassandra_commit_failure_policy }} #####################'
+#    - '{{ cassandra_base_directory + cassandra_saved_caches_directory }}'
+#    - "{{ cassandra_seeds | join(',')  }}"
+#    - '{{ ansible_eth0.ipv4.address }}'
+#    - '{{ cassandra_endpoint_snitch }}'
+#
+#
+#
+# tasks file for cassandra
+- fail:
+    msg: 'Please define the desired name of the Cassandra cluster'
+  when: cassandra_cluster_name == ""
+
+- fail:
+    msg: 'Please define the seeds of the Cassandra cluster'
+  when: cassandra_seeds | length == 0  
+
+- name: RPM Key for Azul Zulu
+  rpm_key:
+    state: present
+    key: "http://repos.azulsystems.com/RPM-GPG-KEY-azulsystems"
+  environment: "{{proxy_env}}"
+  tags:
+    - zulu
+    - repository
+
+- name: Set YUM proxy
+  lineinfile:
+    regexp: "^proxy="
+    dest:  "/etc/yum.conf"
+    line: "proxy={{proxy}}"
+  tags:
+    - configuration
+
+- name: Create a ext4 filesystem on /dev/nvme1n1 for data dir
+  filesystem:
+    fstype: ext4
+    dev: /dev/nvme1n1
+  tags:
+    - filesystem 
+
+- name: Yum update all packages
+  yum:
+    name: "*"
+    state: latest
+
+- name: Install Cassandra and dependencies
+  yum:
+    name: "{{ item }}"
+    state: latest
+  loop:
+    - "bzip2"
+    - "python2"
+    - "python2-pip"
+    - "jna"
+    - "gcc"
+  tags:
+    - packages
+    - repository
+
+- name: Clear previous cassandra download
+  file:
+    state: absent
+    path: "/var/tmp/cassandra-{{cassandra_release}}.rpm"
+  tags:
+    - cassandra
+    - packages
+    - repository
+
+- name: Download Cassandra 
+  get_url:
+    url: "{{cassandra_url}}/{{cassandra_version_base}}/cassandra-{{cassandra_release}}.rpm" 
+    dest: "/var/tmp/cassandra-{{cassandra_release}}.rpm"
+  environment: "{{proxy_env}}"
+  tags:
+    - cassandra
+    - packages
+    - repository
+
+- name: Install cassandra rpm from a local file
+  yum:
+    name: "/var/tmp/cassandra-{{cassandra_release}}.rpm"
+    state: present
+  tags:
+    - cassandra
+    - packages
+    - repository
+
+- name: Clear previous zulu8 download
+  file:
+    state: absent
+    path: /var/tmp/zulu8.62.0.19-ca-jdk8.0.332-linux.x86_64.rpm
+  tags:
+    - zulu
+    - packages
+    - repository
+
+- name: Download zulu8
+  get_url:
+    url: https://cdn.azul.com/zulu/bin/zulu8.62.0.19-ca-jdk8.0.332-linux.x86_64.rpm
+    dest: /var/tmp/zulu8.62.0.19-ca-jdk8.0.332-linux.x86_64.rpm
+  environment: "{{proxy_env}}"
+  tags:
+    - zulu
+    - packages
+    - repository
+
+- name: Install zulu8 rpm from a local file
+  yum:
+    name: /var/tmp/zulu8.62.0.19-ca-jdk8.0.332-linux.x86_64.rpm
+    state: present
+  tags:
+    - zulu
+    - packages
+    - repository
+
+- name: Clear previous jemalloc download
+  shell: rm -f /tmp/jemalloc.tar.bz2
+  tags:
+    - jemalloc 
+    - packages
+    - repository
+
+- name: Download jemalloc
+  get_url:
+    url: https://github.com/jemalloc/jemalloc/releases/download/5.2.1/jemalloc-5.2.1.tar.bz2
+    dest: /tmp/jemalloc.tar.bz2
+  environment: "{{proxy_env}}"
+  tags:
+    - jemalloc 
+    - packages
+    - repository
+
+- name: Extract jemalloc
+  command: tar -jxf /tmp/jemalloc.tar.bz2 -C /home/ec2-user
+  tags:
+    - jemalloc 
+    - packages
+    - repository
+
+- name: Build and install jemalloc
+  shell: ./configure && make && make install
+  args:
+    chdir: /home/ec2-user/jemalloc-5.2.1
+    creates: /usr/local/lib/libjemalloc.so
+  tags:
+    - jemalloc 
+    - packages
+    - repository
+
+- name: Copy template  cassandra-env.sh.j2 to {{cassandra_config_dir_base}}/cassandra-env.sh
+  template:
+    src: "cassandra-env.sh.j2"
+    dest: "{{ cassandra_config_dir_base }}/cassandra-env.sh"
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - cassandra
+    - configuration
+
+- name: Set linker configuration
+  template:
+    src: etc/ld.so.conf.d/cassandra.conf
+    dest: /etc/ld.so.conf.d/cassandra.conf
+  register: linker_conf_updated
+  tags:
+    - cassandra
+    - configuration
+
+- name: Set java zulu8
+  shell: update-alternatives --set java /usr/lib/jvm/zulu-8/jre/bin/java
+  tags:
+    - zulu
+    - configuration
+
+- name: Update ldconfig
+  command: ldconfig
+  when: linker_conf_updated.changed
+  tags:
+    - configuration
+
+- name: Install cqlsh
+  command: pip2 install -U cqlsh=={{cqlsh_version}}
+  environment: "{{proxy_env}}"
+  tags:
+    - packages
+
+- name: Set volume readahead block 
+  shell: blockdev --setra 16 /dev/nvme1n1
+  tags:
+    - filesystem 
+    - configuration
+
+- name: Set volume readahead block 
+  shell: echo 8 > /sys/block/nvme1n1/queue/read_ahead_kb
+  tags:
+    - filesystem 
+    - configuration
+
+- name: Mount data dir
+  mount:
+    path: /data/
+    src: /dev/nvme1n1
+    fstype: ext4
+    state: mounted
+  tags:
+    - filesystem 
+    - configuration
+
+- name: Create data directory
+  file:
+    path: "{{ cassandra_base_directory }}"
+    state: directory
+    owner: cassandra
+    group: cassandra
+    mode: 0755
+    recurse: true
+  tags:
+    - cassandra 
+    - configuration
+
+- name: Create data directories
+  file:
+    path: "{{ cassandra_base_directory }}{{ item }}"
+    state: directory
+    owner: cassandra
+    group: cassandra
+    mode: 0755
+    recurse: true    
+  loop:
+    - "{{ cassandra_data_base_directory }}"
+    - "{{ cassandra_saved_caches_directory }}"
+    - "{{ cassandra_hints_directory_directory }}"
+    - "{{ cassandra_commitlog_directory }}"
+    - "{{ cassandra_log_directory }}"
+  tags:
+    - cassandra 
+    - configuration
+
+- name: Create tmp directory
+  file:
+    path: "/var/lib/cassandra/tmp"
+    state: directory
+    owner: cassandra
+    group: cassandra
+    mode: 0755
+    recurse: true
+  tags:
+    - cassandra 
+    - configuration
+
+- name: Copy template cassandra.yaml.j2 to {{cassandra_config_dir_base}}/cassandra.yaml
+  template:
+    src: "cassandra.yaml.j2"
+    dest: "{{cassandra_config_dir_base}}/cassandra.yaml"
+    mode: 0644 
+  tags:
+    - cassandra 
+    - configuration
+
+- name: Copy template jvm.options to {{cassandra_config_dir_base}}/jvm.options
+  template:
+    src: "jvm.options.j2"
+    dest: "{{cassandra_config_dir_base}}/jvm.options"
+    mode: 0644 
+  tags:
+    - jvm
+    - cassandra 
+    - configuration
+
+- name: Remove cassandra-topology.propertie
+  file:
+    path: "{{ cassandra_config_dir_base }}/cassandra-topology.properties"
+    state: absent
+  tags:
+    - cassandra-topology
+    - cassandra 
+    - configuration
+
+#- name: Copy cassandra-topology.propertie
+#  template:
+#    src: "cassandra-topology.properties.j2"
+#    dest: "{{ cassandra_config_dir_base }}/cassandra-topology.properties"
+#    mode: 0644 
+#  tags:
+#    - cassandra-topology
+#    - cassandra 
+#    - configuration
+
+- name: Copy cassandra-rackdc.properties 
+  template:
+    src: "cassandra-rackdc.properties.j2"
+    dest: "{{ cassandra_config_dir_base }}/cassandra-rackdc.properties"
+    mode: 0644 
+  tags:
+    - cassandra-rackdc 
+    - cassandra 
+    - configuration
+
+- name: Ensure cassandra launcher
+  command: systemctl enable cassandra
+  tags:
+    - cassandra 
+    - configuration
+  notify:
+    - Reenable cassandra service
+    - Restart cassandra

@@ -1,0 +1,12 @@
+---
+- hosts: localhost
+  gather_facts: no
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    AWS_REGION: sa-east-1
+  tasks:
+    - include_role:
+        name: aws
+        tasks_from: s3_list_describe.yml
+ ### SDG ###

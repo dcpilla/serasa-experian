@@ -1,0 +1,148 @@
+---
+#- block:
+#    - name: Set lower hostname {{hostname}}.serasaclente.com.br 
+#      hostname: 
+#        name: '{{ hostname | lower }}.serasacliente.com.br'
+#      when: domain == 'serasacliente'
+#
+#    - name: Set lower hostname {{hostname}}.br.experian.local
+#      hostname: 
+#        name: '{{ hostname | lower }}.br.experian.local'
+#      when: domain == 'brexperian'
+#
+#    - name: Do facts module to get latest information
+#      setup:              
+#  when: hostname is defined and hostname != ''
+#
+#- name: set config when rhel 8
+#  block:
+#    - name: Insert conf to exclude crypto package 
+#      lineinfile:
+#        line: "exclude=crypto-policies*"
+#        dest: /etc/yum.conf
+#        state: present
+#  when: ansible_distribution_major_version|int == 8
+#
+#- name: Insert conf to send logs to spobrservlog
+#  lineinfile:
+#    line: "*.info;mail.none;authpriv.*;cron.none @spobrservlog"
+#    dest: /etc/rsyslog.conf
+#    state: present
+#  when: ansible_distribution_major_version|int >= 6
+#
+#
+#- name: Create scripts folder
+#  file:
+#    path: /usr/scripts
+#    state: directory
+#    mode: 0700
+#    owner: root
+#    group: root
+#
+#- name: Create and set description
+#  lineinfile:
+#    create: yes
+#    path: /usr/scripts/descricao.txt
+#    state: present
+#    line: '{{ description }}'
+#    owner: root
+#    group: root
+#    mode: 0744
+#  when: description is defined and description != ''
+#
+#- name: Create and set Patch Group
+#  lineinfile:
+#    create: yes
+#    path: /usr/scripts/patchgroup.txt 
+#    state: present
+#    line: '{{ activationkey }}'
+#    owner: root
+#    group: root
+#    mode: 0744
+#  when: activationkey is defined and activationkey != ''
+#
+#- name: Set hostname Satellite 6 for ssh purpose in hosts
+#  lineinfile:
+#    dest: /etc/hosts
+#    line: '{{item}}'
+#  with_items:
+##    - '10.96.170.146 spobrsatellite.br.experian.local spobrsatellite'
+#    - '10.96.170.188 spobrsatellite1.br.experian.local spobrsatellite1'
+#
+#- name: Import CA Serasa and WebProxy
+#  copy:
+#    src: files/{{ item }}
+#    dest: /etc/pki/ca-trust/source/anchors/
+#  with_items:
+#    - Serasa_Corporate_Issuing_CA_01.cer
+#    - Serasa_Corporate_Issuing_CA_02.cer
+#    - Serasa_Corporate_Issuing_CA_03.cer
+#    - Serasa_Corporate_Root_CA.cer
+#    - ExperianProxyCert2020.crt
+#
+#- name: Extract and add the Intermediate CA
+#  shell: update-ca-trust extract
+
+- name: Define issue banner
+  template:
+    src: issue 
+    dest: '/etc/{{ item }}'
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - issue
+    - issue.net
+
+- name: Try disable FirewallD
+  service:
+    name: firewalld
+    state: stopped
+    enabled: False
+  ignore_errors: yes
+
+#- name: Just try put in permissive mode before reboot
+#  selinux:
+#    policy: targeted
+#    state: permissive
+#  ignore_errors: yes
+#
+#- name: Try disable SELinux (Effect after reboot)
+#  selinux:
+#    state: disabled
+#  ignore_errors: yes
+
+- name: Check if TMOUT is set to 900 (15 min) in the /etc/profile file
+  lineinfile:
+    path=/etc/profile regexp="^TMOUT=" state=present line="TMOUT=900"
+
+- name: Set datetime history
+  copy:
+    src: files/history_date_time.sh
+    dest: /etc/profile.d/ 
+    mode: 0755
+
+- name: Validate python on server
+  stat:
+    path: /usr/bin/python3
+  register: py3
+
+- name: Validation link to python3
+  stat:
+    path: /usr/bin/python
+  register: link
+
+- name: Creating link for Python3
+  alternatives:
+    link: /usr/bin/python
+    name: python
+    path: /usr/bin/python3
+    priority: 1
+  when: py3.stat.exists == true and link.stat.exists == False
+
+#- name: Download and install katello
+#  shell: "{{item}}"
+#  with_items:
+#    - "curl --insecure --output katello-ca-consumer-latest.noarch.rpm https://spobrsatellite1.br.experian.local/pub/katello-ca-consumer-latest.noarch.rpm"
+#    - "yum localinstall katello-ca-consumer-latest.noarch.rpm -y"
+#  when: group is defined and group == "HADOOP_CORPORATIVO"

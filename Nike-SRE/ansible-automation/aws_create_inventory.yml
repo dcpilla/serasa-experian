@@ -1,0 +1,10 @@
+---
+- include_tasks: aws_create_inventory_ec2.yml
+
+- include_tasks: aws_create_inventory_emr.yml
+
+- include_tasks: aws_create_inventory_s3.yml
+
+- include_tasks: aws_create_inventory_eks.yml
+
+### SDG ###  

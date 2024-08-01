@@ -1,0 +1,27 @@
+---
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: create dynamic inventory
+      add_host:
+        name: '{{item}}'
+        group: server_hosts
+      with_items:
+        - '{{server_list}}'
+
+- hosts: server_hosts
+  gather_facts: yes
+  tasks:
+          
+    - import_role:
+        name: preconf
+        tasks_from: create.yml
+
+    - import_role:
+        name: tanium
+        tasks_from: install_ec2.yml
+
+    - import_role:
+        name: preconf
+        tasks_from: destroy.yml
+  become: yes

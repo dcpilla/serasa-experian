@@ -1,0 +1,46 @@
+---
+- name: check if Tanium is installed
+  shell: 'rpm -qa | grep TaniumClient'
+  register: tanium_installed
+  args:
+    warn: false  
+  ignore_errors: yes
+
+- name: remove Tanium when installed
+  shell: '{{item}}'
+  with_items:
+    - 'yum remove -y `rpm -qa | grep TaniumClient`'
+    - 'rm -rf /opt/Tanium/*'
+  when: tanium_installed is defined and tanium_installed.stdout != ''
+
+  #    - name : set serasa-repo
+  #      include_role:
+  #        name: config_machine
+  #        tasks_from: config_amazon_serasa_repos.yml
+
+- name: Install Tanium client in {{host}} version {{ansible_distribution_major_version}}
+  yum:
+    name: http://spobrsatellite1.br.experian.local/pulp/content/Serasa_Experian/Library/custom/MANDATORY_COLLECTION_RH7/Security_Agents_RH7/Packages/t/TaniumClient-7.4.4.1250-1.rhe7.x86_64.rpm
+    state: present
+    #       enablerepo: Serasa_Experian_MANDATORY_COLLECTION_RH7_Security_Agents_RH7
+    disable_gpg_check: yes
+
+- name: Set tanium config Server is {{ServerName}} Port is {{ServerPort}}
+  shell: '{{item}}'
+  with_items:
+    - '/opt/Tanium/TaniumClient/TaniumClient config set ServerName {{ServerName}}'
+    - '/opt/Tanium/TaniumClient/TaniumClient config set ServerPort {{ServerPort}}'
+
+- name: Copy tanium-init.dat file to /opt/Tanium/TaniumClient/tanium-init.dat
+  get_url:
+    url: http://spobrsatellite.br.experian.local/pub/agents/tanium/tanium-init.dat
+    dest: /opt/Tanium/TaniumClient/tanium-init.dat
+    #    mode: 0440  
+  #shell: wget http://spobrsatellite.br.experian.local/pub/agents/tanium/tanium-init.dat -O /opt/Tanium/TaniumClient/tanium-init.dat
+  #
+  #  copy:
+  #    src: files/tanium-init.dat
+  #    dest: /opt/Tanium/TaniumClient/tanium-init.dat
+  notify:
+      - restart taniumclient
+

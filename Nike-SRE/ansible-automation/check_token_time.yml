@@ -1,0 +1,27 @@
+---
+- name: get token of {{account}} profile
+  become: false
+  shell: "/usr/local/bin/aws iam list-account-aliases --profile={{account}}"
+  ignore_errors: yes
+  register: token
+
+- block:
+#    - debug:
+#        var: token
+#
+    - debug:
+        msg:
+          - '################################################################################'
+          - '##                            AUTENTICATION ERROR                             ##'
+          - '################################################################################'
+          - "## Befor execute:  ~/accesstoSaml2Aws.sh --profile={{account}}"
+          - '##                                                                              '
+          - '## Error: {{token.stderr}}'
+          - '##                                                                              '
+          - '################################################################################'
+          - '################################################################################'
+
+    - meta:  end_play
+
+  when: token.failed
+

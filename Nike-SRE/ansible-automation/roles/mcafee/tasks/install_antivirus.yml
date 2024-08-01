@@ -1,0 +1,58 @@
+---
+- name: Disable proxy if configured
+  shell: unset '{{item}}'
+  with_items:
+    - http_proxy
+    - https_proxy
+
+- name: Download the antivirus packages on  {{ install_path }} when rhel 5
+  block:
+    - name: Download the antivirus packages on  {{ install_path }}
+      unarchive:
+        src: '{{ antivirus_installer_url_rhel5 }}'
+        dest: '{{ install_path }}'
+        remote_src: yes
+
+    - name: set permisson '{{ install_path }}'/install-isectp.sh
+      shell: chmod 777 '{{ install_path }}'/install-isectp.sh
+    
+    - name: Run the antivirus installation script when rhel 5
+      command: '/bin/bash {{ install_path }}/install-isectp.sh silent oasoff'
+
+  when: ansible_distribution_major_version|int == 5 
+
+- name: Download the antivirus packages on  {{ install_path }} when rhel >= 6
+  block:
+    - name: Download the antivirus packages on  {{ install_path }} when rhel >= 6
+      unarchive:
+        src: '{{ antivirus_installer_url }}'
+        dest: '{{ install_path }}'
+        remote_src: yes
+
+    - name: Run the antivirus installation script when rhel >= 6
+      command: '/bin/bash {{ install_path }}/install-isectp.sh silent oasoff'
+  when: ansible_distribution_major_version|int >= 6
+
+- debug:
+    msg: '{{ item }}'
+  with_items:
+    - "Exit codes on failure in this script are"
+    - "1 - This script can be run by bash shell only."
+    - "3 - Invalid command line option passed during installation. Please see KB88299."
+    - "5 - Must be a root user to run this script."
+    - "6 - 64bit MFEcma 5.6.4-110 or above is required for installation to continue."
+    - "7 - Installation file is missing."
+    - "8 - Installation RPM or DEB file is missing."
+    - "9 - Installation failed."
+    - "10 - Failed to extract downloaded installation file."
+    - "11 - Installation aborted after EULA was rejected."
+    - "12 - Installation aborted as EULA could not be shown."
+    - "13 - Installation failed after DAT could not be extracted."
+    - "14 - Uninstallation failed."
+    - "15 - Installation was successful. Please reboot the system to complete the installation."
+    - "17 - Installation conflicts with existing FW installation."
+    - "19 - Product is unsupported on this distribution. Please see KB87073."
+    - "22 - Product Installation failed due to insufficient space in tmp directory."
+    - "24 - Product Installation failed due to insufficient space in install directory."
+    - "0 - Installation was successful"
+    - "NOTE: Exit codes are kept uniform for all installation and uninstallation scripts"

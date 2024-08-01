@@ -1,0 +1,10 @@
+---
+- name: get instance
+  include_tasks: ec2_describe.yml  
+
+- name: start instance
+  shell: "/usr/local/bin/aws ec2 start-instances --instance-ids={{instance_id}} --profile=sts_cli"
+  register: instance_status
+
+- debug:
+    var: instance_status

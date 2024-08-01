@@ -1,0 +1,118 @@
+---
+- name: get s3 {{s3name}}  to check if  server-acces-loggin-enable is-enabled
+  shell: "/usr/local/bin/aws --profile=sts_cli  s3api get-bucket-logging --bucket {{s3name}}"
+  ignore_errors: yes
+  register: s3_loggin_status
+
+- debug:
+    var: s3_loggin_status
+
+- name: block when s3_loggin_status failed
+  block: 
+    - name: set fact to notify
+      set_fact:
+        notify_type: mail
+        title: "Error get s3 {{s3name}} to check if  server-acces-loggin-enable is-enabled"
+        descr: "Error get s3 {{s3name}} to check if  server-acces-loggin-enable is-enabled <br/> account: {{account}}"
+        msg: 'Error: <br/> {{s3_loggin_status.stderr_lines}}'
+        msg_to:
+#          - "{{suport_email}}"
+          - alessandro.bahia@br.experian.com
+
+    - import_role:
+        name: notify
+
+  when: s3_loggin_status.failed
+
+- name: block when is disable s3_loggin_status.stdout is blanck
+  block:
+    - name: show s3_loggin_status
+      debug:
+        var: s3_loggin_status
+
+    - name: set path to run template
+      set_fact:
+        path_target: /home/Check/server_acces_loggin.json
+    
+    #- name: config enable Server access logging properties and set Target bucket when s3name diff aws-logs-{{account_id}}-{{account_region}}
+    #  block:
+    - name: check if exists s3://aws-logs-{{account_id}}-{{account_region}}
+      shell: /usr/local/bin/aws --profile=sts_cli s3api list-buckets --query "Buckets[].Name" | grep aws-logs-{{account_id}}-{{account_region}}
+      ignore_errors: yes
+      register: s3logs
+    
+    #- debug:
+    #    var: s3logs
+    
+    - name: block when not exist create s3://aws-logs-{{account_id}}-{{account_region}}
+      block:
+        - name: create s3://aws-logs-{{account_id}}-{{account_region}} when not exist
+          shell: 'ansible-playbook -e "account={{account}} s3name=aws-logs-{{account_id}}-{{account_region}}"  aws_s3_create.yml --vault-password-file=~/key_cod_nike_automation'
+          register:  created_s3_logs
+    
+        - debug:
+            var: created_s3_logs
+      when: s3logs.stdout == '' 
+     
+    
+    - name: set template to execute next comand
+      become: yes
+      template:
+        src: roles/aws/templates/server_acces_loggin.json
+        dest: '{{path_target}}'
+        owner: root
+        group: root
+        mode: 0644
+    
+        
+    - name: enable server acces loggin and set TargetBucket s3://aws-logs-{{account_id}}-{{account_region}}/{{s3name}}/  from account {{account}}
+      ignore_errors: yes
+      shell: "/usr/local/bin/aws s3api put-bucket-logging --bucket {{s3name}} --bucket-logging-status file://{{path_target}} --profile sts_cli"
+      register: s3_enabled_server_acces_loggin
+    
+    - name: block when s3_enabled_server_acces_loggin success
+      block:
+        - name: debug s3_enabled_server_acces_loggin
+          debug: 
+            var: s3_enabled_server_acces_loggin
+    
+        - name: set fact to notify
+          set_fact:
+            notify_type: mail
+            title: 'Enabled server acces loggin s3 {{s3name}}  <br/> account {{account}}'
+            descr: "Enabled server acces loggin <br/>s3: {{s3name}} <br/>account: {{account}}'"
+            msg: '{{s3_enabled_server_acces_loggin.stdout_lines}}'
+            msg_to:
+              - "{{suport_email}}" 
+                # - alessandro.bahia@br.experian.com
+    
+        - include_role:
+            name: notify
+      when: s3_enabled_server_acces_loggin.failed is false
+
+    - name: block when s3_enabled_server_acces_loggin is falide
+      block:
+        - name: debug s3_enabled_server_acces_loggin
+          debug: 
+            var: s3_enabled_server_acces_loggin
+    
+        - name: set fact to notify
+          set_fact:
+            notify_type: mail
+            title: 'Error in enabled server acces loggin s3 {{s3name}} from {{account}} account'
+            descr: "Error in enabled s3 <br/>s3: {{s3name}} <br/>account: {{account}}"
+            msg: 'Error: <br/>{{s3_enabled_server_acces_loggin.stderr_lines}}'
+            msg_to: 
+              - "{{suport_email}}" 
+                # - alessandro.bahia@br.experian.com
+    
+        - include_role:
+            name: notify
+      when: s3_enabled_server_acces_loggin.failed is true
+
+  when: s3_loggin_status.stdout == '' and s3_loggin_status.failed == 'false'
+
+
+#  when: s3name != 'aws-logs-{{account_id}}-{{account_region}}'
+
+###SDG###

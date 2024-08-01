@@ -1,0 +1,51 @@
+---
+
+- hosts: all
+  tasks:
+    - include_vars: proxy.yaml
+  tags:
+    - proxy
+
+- hosts: all
+  tasks:
+    - include_vars: topology.yaml
+  tags:
+    - topology 
+
+- hosts: all
+  tasks:
+    - include_vars: initial_token.yaml
+  tags:
+    - initial_token
+
+- hosts: cassandra_seeds
+  become: yes
+  become_method: sudo
+  vars:
+    cassandra_seeds:
+         - "{{ansible_default_ipv4.address}}"
+  roles:
+    - cassandra
+    - node-exporter
+    - cassandra-exporter
+  tags:
+    - seeds
+
+- hosts: cassandra_nodes
+  become: yes
+  become_method: sudo
+  vars:
+    cassandra_seeds:
+         - seed-az_a.nikereportsdev.br.experian.eeca
+         - seed-az_b.nikereportsdev.br.experian.eeca
+  roles:
+    - cassandra
+    - node-exporter
+    - cassandra-exporter
+  tags:
+    - nodes
+
+- include: start-cassandra-seeds.yaml
+- include: start-cassandra-nodes.yaml
+#- include: rapid7.yaml
+#- include: nodetools.yaml

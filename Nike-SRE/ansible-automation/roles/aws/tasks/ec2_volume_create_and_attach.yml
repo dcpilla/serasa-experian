@@ -1,0 +1,44 @@
+---
+- include_tasks: ec2_describe.yml
+
+- name: create {{volume_name}} of {{size}}GB in istance {{instance_id}} from account {{account_name}}
+  ec2_vol:
+    aws_access_key: "{{ assumed_role_ak }}"
+    aws_secret_key: "{{ assumed_role_sk }}"
+    security_token: "{{ assumed_role_token }}"
+    region: '{{account_region}}'
+    validate_certs: no
+
+    instance: '{{instance_id}}'       
+    name: '{{volume_name}}'
+    volume_size: '{{size}}'
+    delete_on_termination: true
+    tags:
+      '{{tag}}'
+      #      Name: '{{volume_name}}'
+
+  register: volume
+
+#- debug:
+#    var: volume
+
+- name: set volume retuns
+  set_fact:
+    volume_id: "{{volume.volume_id}}"
+    volume_device: "{{volume.device}}" #volume_device      | /dev/sdf
+
+- name: volume attached details
+  debug:
+    msg:
+      - "################################################################################################"
+      - "#                                      VOLUMES RETURNS                                         #"
+      - "################################################################################################"
+      - "#  Return Variables  |                            Values                                       #"
+      - "################################################################################################"
+      - "# volume_id          | {{volume_id}}                                                   #"
+      - "# volume_device      | {{volume_device}}                                                                #"
+      - "################################################################################################"
+ 
+
+
+ ### SDG ###        

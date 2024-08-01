@@ -1,0 +1,29 @@
+---
+- debug:
+    var: rule
+
+- set_fact:
+    sg_rule_id: '{{rule.rule_id}}'
+
+- name: remove InBound  {{rule.rule_id}}  of sg {{sg_name}} from {{account}}
+  include_tasks: ec2_security_group_delete_ingress.yml
+  when: rule.rule_outbound == false
+
+- name: remove OutBound  {{rule.rule_id}}  of sg {{sg_name}} from {{account}}
+  include_tasks: ec2_security_group_delete_egress.yml
+  when: rule.rule_outbound == true
+
+    ###SDG###    
+
+#- name: remove egress sg {{sg_name}}
+#  block:
+#    - name: remove OutBound  {{sg_rule_id}}
+#      shell: '/usr/local/bin/aws ec2 revoke-security-group-egress --group-id {{sg_id}} --security-group-rule-ids {{sg_rule_id}}  --profile=sts_cli --region {{account_region}}''
+#      ignore_errors: yes
+#      register: removed_egress
+#    
+#    - debug:
+#        var: removed_egress
+#  when: rule.outbound = true
+#
+###SDG###

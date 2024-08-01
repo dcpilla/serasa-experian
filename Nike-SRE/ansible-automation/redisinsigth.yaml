@@ -1,0 +1,104 @@
+# RedisInsight service with name 'redisinsight-service'
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: redisinsight
+  labels:
+    name: redisinsight
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: redisinsight
+  name: redisinsight-service       # name should not be 'redisinsight'
+                                   # since the service creates
+                                   # environment variables that
+                                   # conflicts with redisinsight
+                                   # application's environment
+                                   # variables `REDISINSIGHT_HOST` and
+                                   # `REDISINSIGHT_PORT`
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 8001
+  selector:
+    app: redisinsight
+---
+# RedisInsight deployment with name 'redisinsight'
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: redisinsight
+  name: redisinsight #deployment name
+  labels:
+    app: redisinsight #deployment label
+spec:
+  replicas: 1 #a single replica pod
+  selector:
+    matchLabels:
+      app: redisinsight #which pods is the deployment managing, as defined by the pod template
+  template: #pod template
+    metadata:
+      labels:
+        app: redisinsight #label for pod/s
+    spec:
+      containers:
+
+      - name:  redisinsight #Container name (DNS_LABEL, unique)
+        image: redislabs/redisinsight:latest #repo/image
+        imagePullPolicy: IfNotPresent #Always pull image
+        env:
+          - name: RILOGLEVEL
+            value: "DEBUG"
+          - name: RITRUSTEDORIGINS
+            value: "https://redisinsight.prod-ds.br.experian.eeca"
+#          - name: REDISINSIGHT_HOST
+#            value: "https://redisinsight.prod-ds.br.experian.eeca"
+#          - name: REDISINSIGHT_PORT
+#            value: 8080  
+        volumeMounts:
+        - name: db #Pod volumes to mount into the container's filesystem. Cannot be updated.
+          mountPath: /db
+        ports:
+        - containerPort: 8001 #exposed container port and protocol
+          protocol: TCP
+      volumes:
+      - name: db
+        emptyDir: {} # node-ephemeral volume https://kubernetes.io/docs/concepts/storage/volumes/#emptydir
+        
+        
+        
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: redisinsight-gw
+  namespace: redisinsight
+spec:
+  selector:
+    istio: ingress
+  servers:
+    - hosts:
+        - redisinsight.prod-ds.br.experian.eeca
+      port:
+        name: http
+        number: 8080
+        protocol: HTTP
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: redisinsight-vs
+  namespace: redisinsight
+spec:
+  gateways:
+    - redisinsight-gw
+  hosts:
+    - redisinsight.prod-ds.br.experian.eeca
+  http:
+    - route:
+        - destination:
+            host: redisinsight
+---
+

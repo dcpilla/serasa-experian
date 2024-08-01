@@ -1,0 +1,20 @@
+- name: describe eks nodegroup {{eks_nodegroup_name}} of {{eks_cluster_name}} from {{account}}
+  shell: "/usr/local/bin/aws eks describe-nodegroup  --cluster-name {{eks_cluster_name}} --nodegroup-name {{eks_nodegroup_name}}  --profile=sts_cli --region {{account_region}}"
+  register: eks_nodegroup_describe
+
+
+- name: convert eks_nodegroup_describe to json
+  set_fact:
+    eks_nodegroup_describe : '{{eks_nodegroup_describe.stdout|from_json}}'  
+
+- name: show eks_nodegroup_describe of eks nodegroup {{eks_nodegroup_name}} of {{eks_cluster_name}}
+  debug:
+    var: eks_nodegroup_describe
+
+- name: create dictonary type list of nodegroup_with_desiredSize when  eks_nodegroup_describe.nodegroup.scalingConfig.desiredSize  > 0
+  set_fact:
+    nodegroup_with_desiredSize: "{{nodegroup_with_desiredSize|default([])+[ eks_nodegroup_name |string]}}"
+          #    nodegroup_with_desiredSize: "{{nodegroup_with_desiredSize|default([])+[{'node_group_name': eks_nodegroup_name, 'desiredSize': eks_nodegroup_describe.nodegroup.scalingConfig.desiredSize  }]}}"
+  when: eks_nodegroup_describe.nodegroup.scalingConfig.desiredSize > 0
+
+    ###SDG###    

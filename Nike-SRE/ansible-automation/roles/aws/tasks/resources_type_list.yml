@@ -1,0 +1,16 @@
+---
+- name: list resources
+  shell: '/usr/local/bin/aws ram list-resource-types --profile=sts_cli '
+  ignore_errors: yes
+  register: resources_type
+
+- name: convert variable to json
+  set_fact:
+    resources_type: '{{resources_type.stdout|from_json}}'
+
+- debug:
+    var: resources_type
+
+- debug:
+    var: resources_type.resourceTypes[*]serviceName
+

@@ -1,0 +1,57 @@
+---
+#- name: Include change order vars
+#  include_vars: "{{ item }}"
+#  with_items:
+#  - "patch/Linux/prod_A.yml"
+#  - credentials.yml
+
+#- name: Get start date with sambarilove
+#  become: false
+#  shell: 'date "+%Y-%m-%d %H:%M:%S" -d "8 hour ago"'
+#  register: start_dt
+
+- name: Get end date
+  become: false
+  shell: 'date "+%Y-%m-%d%t%H:%M:%S" -d "8 hour ago"'
+  register: end_dt
+
+- set_fact:
+        #    start: "{{ start_dt.stdout | replace('\t', ' ')}}"
+    end: "{{ end_dt.stdout | replace('\t', ' ')}}"
+    chg: "{{chg_num}}"
+
+- name: Close Change {{chg_num}} start {{start}} end {{end}}
+  become: false
+  environment:
+    https_proxy: https_proxy=https://spobrproxy:3128
+  uri:
+    url: https://{{instance}}.service-now.com/api/eplc/exp/closeStandardChange/c719bacfdb9f97402511fa910f96192e/closeStandardChange?searchVal={{chg}}
+    user: "{{snow_login}}"
+    password: "{{snow_pass}}"
+    force_basic_auth: yes
+    method: PATCH
+    return_content: yes
+    headers:
+     content-type: application/json
+     accept: application/json
+    validate_certs: no
+    body_format: json
+    body:
+      close_code: "Successful"
+      close_notes: 'Patch Successfully Applied' #"{{chg_close_note}}"
+      work_start: "{{real_start_to_close}}"
+      work_end: "{{end}}" 
+
+#  shell: |
+#    curl --user "{{snow_login}}":"{{snow_pass}}" \
+#    --request PATCH \
+#    --header 'accept: application/json' \
+#    --header 'content-type: application/json' \
+#    --data '{"close_code":"sucessful","close_notes":"{{chg_close_note}}","work_start":"{{start}}","work_end":"{{end}}"}' \
+#    https://{{instance}}.service-now.com/api/eplc/exp/closeStandardChange/c719bacfdb9f97402511fa910f96192e/closeStandardChange?searchVal="{{chg}}"
+  register: close_change
+
+
+- debug:
+    var: close_change
+

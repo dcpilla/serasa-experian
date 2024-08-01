@@ -1,0 +1,59 @@
+---
+#- name: clean s3_list
+#  set_fact:
+#    s3_list: !!null
+#
+- name: Incluir Assume-Role
+  include_tasks: sts_connection.yml
+
+- name: list dynamodb_list account {{account}}
+  shell: "/usr/local/bin/aws dynamodb list-tables --profile=sts_cli"
+  register: dynamodb_list
+
+- name: debug dynamodb_list variable
+  debug:
+    var: dynamodb_list.stdout
+
+- name: convert to json
+  set_fact: 
+    dynamodb_list: '{{dynamodb_list.stdout}}'
+
+- name: debug dynamodb_list variable
+  debug:
+    var: dynamodb_list.TableNames
+
+
+    #- name: 
+    #  aws dynamodb list-tags-of-resource --resource-arn arn:aws:dynamodb:us-east-1:123456789012:table/Movies
+
+- name: describe dynamodb table
+  include_tasks: dynamodb_list_describe.yml
+  with_items:
+    - '{{dynamodb_list.TableNames}}'
+  loop_control:
+    loop_var: table_name
+#
+#- name: List s3
+#  debug:
+#    msg: "{{ s3_list['buckets']}}"
+
+
+#- name: Set s3_fields variable with fields selected
+#  set_fact:
+#    s3_fields: "{{s3_list|json_query(jmesquery)|list}}"
+#  vars:
+#    jmesquery: "buckets[*].{names:name}"
+#    #network_interfaces[].private_ip_address   tag_sched:tags.Instance-Scheduler    
+#  when: s3_list.buckets != []
+#
+#- name: show s3_fields from {{account}}
+#  debug:
+#    var: s3_fields
+#
+##- name: describe s3 fields
+##  include_tasks: s3_list_describe.yml
+##  with_items: '{{s3_fields}}'  
+##  loop_control:
+##    loop_var: bucket_name
+
+### SDG ###    

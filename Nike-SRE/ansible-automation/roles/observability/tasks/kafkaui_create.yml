@@ -1,0 +1,60 @@
+---
+- name: Create file_path variable to set file deploy in /tmp/{{kafka_ui_name}}.yaml
+  set_fact:
+    file_path: '/tmp/{{kafka_ui_name}}.yaml'
+
+- name: Create deploy file with namespaces {{name_spaces}} brooker_list {{brooker_list}} in /tmp/{{kafka_ui_name}}.yaml
+  template:
+    src: kafka-ui-logs.yaml
+    dest: '{{file_path}}'
+
+
+- name: include role with task kubectl_config_cluster.yml
+  include_role:
+    name: k8s
+    tasks_from: kubectl_config_cluster.yml
+
+
+- name: create kafka-ui {{kafka_ui_name}}  from eks {{eks_cluster_name}} account {{account}}
+  ignore_errors: yes
+  become: false
+  shell: '{{item}}'
+  with_items:
+    - '/usr/local/bin/kubectl create namespace {{name_spaces}}'
+    - '/usr/local/bin/kubectl delete -f {{file_path}} -n {{name_spaces}}' 
+    - '/usr/local/bin/kubectl apply -f {{file_path}} -n {{name_spaces}}'
+
+
+- name: get VS of {{kafka_ui_name}}
+  become: false
+  shell: /usr/local/bin/kubectl get vs -n '{{name_spaces}}' | awk {'print $3'} | grep -v HOSTS| cut -d '"' -f2
+  register: kafka_url
+
+- debug:
+    var: kafka_url
+
+- name: set facts to create secret_manager {{kafka_ui_name}}
+  set_fact:
+    secret_name: 'kafkaui-{{kafka_ui_name}}'
+    secret_string: "username: {{UI_USER}} passwor: {{UI_PWD}} URL: https://{{kafka_url.stdout}}"
+
+- name: create secret-manager
+  import_role:
+    name: aws
+    tasks_from: secrets_manager_create.yml
+
+- debug:
+    msg: 
+     - "########################################################################################"
+     - "##                                                                                    ##"
+     - "##    https://{{kafka_url.stdout}}                     "
+     - '##                                                                                    ##'
+     - "########################################################################################"
+
+      
+
+#- name: Erase '{{file_path}}'
+#  file:
+#    path: '{{file_path}}'
+#    state: absent
+

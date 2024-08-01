@@ -1,0 +1,41 @@
+- name: Describe EMR of cluster ID {{emr_id}}  from {{account_name}}
+  shell: "/usr/local/bin/aws --profile sts_cli  emr describe-cluster --cluster-id {{emr_id}}"
+  #  shell: "/usr/local/bin/aws --profile sts_cli  emr describe-cluster --cluster-id {{emr.emr_id}} --query Cluster.Tags"
+  #         aws emr describe-cluster --cluster-id j-XXXXXXXX |egrep -i "Service:|wiz_cig:"
+  register: emr_describe
+
+- name: convert emr_describe variable to json
+  set_fact: 
+    emr_describe: '{{emr_describe.stdout|from_json}}'
+
+#- debug:
+#    var: emr_describe
+
+
+#- name: ADD emr invetory_tag in {{inventory_emr_tag_path}} from group {{account_name}}
+#  become: yes
+#  lineinfile:
+#    path: '{{inventory_emr_tag_path}}'
+#    line: "{{prof_account.id}}|{{account_name}}|{{emr.emr_id}}|{{emr.emr_name}}|{{tag.Key}}|{{tag.Value}}"
+#    state: present
+#    create: true
+#  with_items: '{{tag_cluster}}'
+#  loop_control:
+#    loop_var: tag
+#  when:  tag_cluster != []
+
+- name: creat a dictonary  list or array of emrfields_list
+  ignore_errors: yes  # pode dar erro quando estiver com status PROVISIONING e não ter valor o campo emr.Status.Timeline.ReadyDateTime
+  set_fact:
+    emrfields_list: "{{emrfields_list|default([])+ [{'emr_id': emr.Id, 'emr_name': emr.Name , 'emr_creationdatetime': emr.Status.Timeline.CreationDateTime,'emr_readydatetime': emr.Status.Timeline.ReadyDateTime,'emr_arn': emr.ClusterArn, 'emr_tags': emr.Tags }] }}"
+  with_items:
+    - '{{emr_describe.Cluster}}'
+  loop_control:
+    loop_var: emr
+  when: emr_describe is defined
+
+#- name: show emr list from account {{account}}
+#  debug:
+#    var: emrfields_list
+
+### SDG ###

@@ -1,0 +1,201 @@
+---
+- hosts: all
+  become: yes
+  become_method: sudo
+  debugger: on_failed
+  gather_facts: no
+  tasks:
+    - name: remove package
+      yum:
+        name: cassandra
+        state: absent
+  tags:
+    - remove
+
+- hosts: all
+  become: yes
+  become_method: sudo
+  debugger: on_failed
+  gather_facts: no
+  tasks:
+    - name: remove repo
+      yum_repository:
+        name: cassandra
+        state: absent
+    - name: yum-clean-metadata
+      command: yum clean metadata
+      args:
+        warn: no
+  tags:
+    - remove
+
+- hosts: all
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: data cleaning 
+      file:
+        path: /data/*
+        state: absent
+        force: yes
+  tags:
+    - remove
+
+- hosts: all
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: Remove CQLSSH
+      shell: pip2 uninstall -y cqlsh
+  tags:
+    - remove
+
+- hosts: all
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: data cleaning 
+      shell: rm -rf /data/*
+  tags:
+    - remove
+
+- hosts: all
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: cassandra etc 
+      file:
+        path: /etc/cassandra
+        state: absent
+        force: yes
+  tags:
+    - remove
+
+- hosts: all
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: umount vol 
+      mount:
+        path: /data
+        state: unmounted
+  tags:
+    - remove
+
+- hosts: all
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: data cleaning 
+      file:
+        path: /data
+        state: absent
+  tags:
+    - remove
+
+#- hosts: all
+#  become: yes
+#  become_method: sudo
+#  tasks:
+#    - name: restart 
+#      shell: init 6
+#  tags:
+#    - remove
+
+- hosts: all
+  become: yes
+  become_method: sudo
+  debugger: on_failed
+  gather_facts: no
+  tasks:
+    - name: Pinging nodes and seeds
+      ping:
+      register: cmd_out
+    - debug:
+        var: cmd_out.stdout_lines
+  tags:
+    - ping
+
+- hosts: all
+  become: yes
+  become_method: sudo
+  debugger: on_failed
+  gather_facts: no
+  tasks:
+    - name: Nodetools count instances 
+      shell: nodetool status | grep -c ^UN
+      register: cmd_out
+    - debug:
+        var: cmd_out.stdout_lines
+  tags:
+    - nodetools
+
+- hosts: all
+  become: yes
+  become_method: sudo
+  debugger: on_failed
+  tasks:
+    - name: get service facts
+      service_facts:
+
+    - name: Cassandra status 
+      debug:
+        var: ansible_facts.services["cassandra.service"]
+  tags:
+    - cassandra_status
+
+- hosts: all 
+  become: yes
+  become_method: sudo
+  debugger: on_failed
+  gather_facts: no
+  tasks:
+    - name: Restart node_exporter
+      shell: systemctl restart node_exporter.service
+      register: cmd_out
+    - debug:
+        var: cmd_out.stdout_lines
+  tags:
+    - restart_node_exporter
+
+- hosts: all 
+  become: yes
+  become_method: sudo
+  debugger: on_failed
+  gather_facts: no
+  tasks:
+    - name: Restart cassandra-exporter
+      shell: systemctl restart cassandra-exporter.service
+      register: cmd_out
+    - debug:
+        var: cmd_out.stdout_lines
+  tags:
+    - restart_cassandra_exporter
+
+- hosts: cassandra_nodes
+  become: yes
+  become_method: sudo
+  debugger: on_failed
+  gather_facts: no
+  tasks:
+    - name: Cassandra restart nodes 
+      shell: systemctl restart cassandra.service
+      register: cmd_out
+    - debug:
+        var: cmd_out.stdout_lines
+  tags:
+    - restart_nodes
+
+- hosts: cassandra_seeds
+  become: yes
+  become_method: sudo
+  debugger: on_failed
+  gather_facts: no
+  tasks:
+    - name: Cassandra restart seeds 
+      shell: systemctl restart cassandra.service
+      register: cmd_out
+    - debug:
+        var: cmd_out.stdout_lines
+  tags:
+    - restart_seeds

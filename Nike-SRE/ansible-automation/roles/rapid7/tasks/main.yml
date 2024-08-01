@@ -1,0 +1,85 @@
+---
+- name: Install tar for physical linux
+  yum:
+    name: tar
+    state: present
+  when: group is defined and group == "HADOOP_CORPORATIVO"
+
+- name: create rapid7 directory
+  become: yes
+  file: 
+    path: ~/rapid7
+    state: directory
+
+- name: set proxy
+  shell: export HTTP_PROXY=spobrproxy.serasa.intranet:3128;export HTTPS_PROXY=spobrproxy.serasa.intranet:3128
+
+- name: get rapid7
+  become: yes
+  unarchive:
+    src: http://spobrbastion/pub/program/rapid7/Rapid7-Agents-Linux.zip
+    dest: ~/rapid7/
+    remote_src: true
+    mode: '0777'
+
+- name: install rapid7 - on region aws or azure
+  block:
+    - name: get ambeinte
+      shell: cat /usr/scripts/descricao.txt | cut -d':' -f2
+      register: ambiente
+
+    - name: install rapid7 - on aws ec2, team {{team_name}} ,Region Cloud Agent LATAM
+      become: yes
+      command: ./agent_installer.sh install_start --https-proxy=spobrproxy.serasa.intranet:3128 --attributes "{{team_name}},Cloud Agent LATAM,AWS {{account_id}} ,{{ambiente.stdout}}"
+      args:
+        chdir: ~/rapid7/
+        creates: /opt/rapid7/
+      ignore_errors: yes
+      when: region == 'amazon'
+    
+    - name: install rapid7 - on  azure , team {{team_name}} ,Region Cloud Agent LATAM
+      become: yes
+      command: ./agent_installer.sh install_start --https-proxy=spobrproxy.serasa.intranet:3128 --attributes "{{team_name}},Cloud Agent LATAM,AZURE {{account_id}} ,{{ambiente}}"
+      args:
+        chdir: ~/rapid7/
+        creates: /opt/rapid7/
+      ignore_errors: yes
+      when: region  == 'azure'  
+  when: region is defined
+
+- name: install rapid7 - rhel 6,7,8
+  become: yes
+  command: ./agent_installer.sh install_start --attributes "Servers LATAM, Cloud Agent LATAM"
+  args:
+    chdir: ~/rapid7/
+    creates: /opt/rapid7/
+  ignore_errors: yes
+  when: region is not defined
+
+- name: install rapid7 - rhel 5
+  become: yes
+  shell: ./agent_installer.sh install_start --attributes "Servers LATAM, Cloud Agent LATAM"
+  args:
+    chdir: ~/rapid7/
+    creates: /opt/rapid7/
+  ignore_errors: yes  
+  when: region is not defined
+
+- name: Copy file proxy
+  template:
+    src: roles/rapid7/files/proxy.config
+    dest: /opt/rapid7/ir_agent/components/bootstrap/common/
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Restart rapid7 agent
+  service:
+    name: ir_agent
+    state: restarted
+  
+- name: delete rapid7 installer folder 
+  become: yes
+  file:
+    path: ~/rapid7
+    state: absent

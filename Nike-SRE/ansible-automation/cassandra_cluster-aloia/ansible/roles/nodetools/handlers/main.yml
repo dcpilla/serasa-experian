@@ -1,0 +1,12 @@
+---
+
+- name: Restart cassandra
+  service:
+    name: cassandra.service
+    state: restarted
+    enabled: true
+    daemon_reload: true
+  tags:
+    - nodetools
+    - cassandra 
+    - configuration

@@ -1,0 +1,20 @@
+#****************************************************************************************
+#
+# .gitignore - Especifica arquivos intencionalmente que o Git deve ignorar nos commits
+#
+# Examples:
+# Ignorar os arquivos *.html
+# *.html
+# Ignorar o diretório .idea/
+#.idea/
+#
+# Crie o seu por aqui de acordo com sua tecnologia e evite sugereiras em seus repos :)
+# https://www.gitignore.io/
+#
+# Referencia - https://git-scm.com/docs/gitignore
+#
+#****************************************************************************************
+.terraform
+*.terraform.lock.hcl
+*.log
+*.tfvar

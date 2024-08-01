@@ -1,0 +1,18 @@
+---
+  - name: check Rapid7 Service
+    shell: service ir_agent status
+    register: rapid7_status
+    args:
+      warn: False
+    ignore_errors: yes
+
+  - debug:
+      var: rapid7_status
+
+  - set_fact:
+      service_status: not_running
+    when: service_status.stdout is search('inactive')
+
+  - set_fact:
+      service_status: running
+    when: service_status is not defined

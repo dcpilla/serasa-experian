@@ -1,0 +1,13 @@
+---
+- hosts: localhost
+  tasks:
+    - import_role:
+        name: aws
+        tasks_from: sts_connection.yml
+
+    - import_role:
+        name: aws
+        tasks_from: ec2_ami_get_last_id.yml
+        
+#       ami_name= eec_aws_amzn-lnx*
+#       ami_name= eec_aws_eks_amzn-lnx_2_1.24*

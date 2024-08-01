@@ -1,0 +1,55 @@
+---
+#- name: add tag Name
+#  set_fact:
+#    tags: "{{tags|default([])+[{ 'Name': sg_name }]}}"
+
+- name: create sg {{sg_name}}  by cli
+  shell:  "/usr/local/bin/aws ec2 create-security-group --group-name {{sg_name}} --vpc-id '{{vpc_id}}' --description 'allow all source {{source_cidr}} on port {{port}} protocolo {{protcolo}}' --tag-specifications 'ResourceType=security-group,Tags=[{Key=Environment,Value={{account_environment}}},{Key=CostString,Value={{account_ccosting}}},{Key=AppID,Value={{account_apid}}}]' --region {{account_region}}  --profile=sts_cli"
+  ignore_errors: yes
+
+
+- name: create security group {{sg_name}} rule descriptions vpc {{vpc_id}} proto {{protcolo}} port {{port}} cidr_ip {{source_cidr}}
+  amazon.aws.ec2_security_group:
+    aws_access_key: "{{ assumed_role_ak }}"
+    aws_secret_key: "{{ assumed_role_sk }}"
+    security_token: "{{ assumed_role_token }}"
+    validate_certs: no
+    region: '{{account_region}}'
+
+    name: "{{ sg_name }}"
+    description: "allow all source '{{source_cidr}}'  on port '{{port}}' protocolo '{{protcolo}}'"
+    vpc_id: '{{vpc_id}}'
+    state: present
+    rules:
+      - proto: '{{protcolo}}'
+        from_port: '{{port}}'
+        to_port: '{{port}}'
+        cidr_ip: '{{source_cidr}}'
+#       rule_desc: allow all source '{{source_cidr}}'  on port '{{port}}' protocolo '{{protcolo}}'
+    tags:
+      "{{tag}}"
+    purge_tags: false
+
+  register: sg_out
+
+- debug:
+    msg: 
+      - 'sg_out.group_id:   {{sg_out.group_id}}'
+      - 'sg_out.group_name: {{sg_out.group_name}}'  
+
+
+- name: block when instance_id is defined
+  block:
+     - name: get current security groups in instance {{instance_id}}
+       shell: '/usr/local/bin/aws ec2 describe-instances --instance-ids {{instance_id}} --query "Reservations[].Instances[].SecurityGroups[].GroupId[]" --output text --profile=sts_cli'
+       register: current_sg
+
+     - debug:
+         var: current_sg
+
+     - name: attach sgs in {{instance_id}}
+       shell: "/usr/local/bin/aws ec2 modify-instance-attribute --instance-id {{instance_id}}  --groups {{current_sg.stdout}} {{sg_out.group_id}} --profile=sts_cli"
+  when: instance_id is defined
+
+
+### SDG ###

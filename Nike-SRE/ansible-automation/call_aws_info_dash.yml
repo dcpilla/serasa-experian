@@ -1,0 +1,30 @@
+---
+- hosts: spobrnikeworker
+  gather_facts: no
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    AWS_REGION: sa-east-1
+  become: yes
+  tasks:
+#    - name: guarantees  packages
+#      include_tasks: roles/pip/tasks/install_package.yml
+#      with_items:
+#        - boto3
+#        - argparse
+#        - psycopg2-binary
+#        - re
+#        - csv
+#      loop_control:
+#        loop_var: pack_name
+
+#    - include_tasks: roles/governance/tasks/check_vulnerability_dash.yml
+
+    - name: include task to call aws_eks_tlmp.yml
+      include_tasks: aws_info_dash.yml
+      with_items:
+       - '{{accounts}}'
+      loop_control:
+        loop_var: account
+
+### SDG ###

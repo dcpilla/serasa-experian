@@ -1,0 +1,69 @@
+---
+- name: clean instances_list
+  set_fact:
+    instances_list: !!null
+
+- name: Incluir Assume-Role
+  include_tasks: sts_connection.yml
+
+- name: Gather information about all instances
+  ec2_instance_info:
+    aws_access_key: "{{ assumed_role_ak }}"
+    aws_secret_key: "{{ assumed_role_sk }}"
+    security_token: "{{ assumed_role_token }}"
+    validate_certs: no
+    region: '{{account_region}}'
+#    filters: #https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html
+#      instance-state-name: [ "running" ] #     instance-state-name: [ "shutting-down", "stopping", "stopped","running" ]
+  register:  instances_list
+
+#- name: debug para validação de variavel instances_list
+#  debug:
+#    var: instances_list
+
+#- name: teste apenas id 1
+#  debug:
+#    var: instances_list.instances|map(attribute='instance_id')|list
+#
+#
+#- name: teste apenas id 2
+#  debug:
+#    msg: "{{instances_list|json_query(jmesquery)|list}}"
+#  vars:
+#          jmesquery: "instances[*].{instance_id}"
+#    #network_interfaces[].private_ip_address   tag_sched:tags.Instance-Scheduler
+#  when: instances_list.instances != []
+
+- name: Set instances_fields variable with fields selected
+  set_fact:
+    instances_fields: "{{instances_list|json_query(jmesquery)|list}}"
+  vars:
+          jmesquery: "instances[*].{id:instance_id,key:key_name,type:instance_type,ip:private_ip_address,launch_time:launch_time,tag_name:tags.Name,state:state.name,so:platform_details,tags:tags,iam:iam_instance_profile.arn}"
+    #network_interfaces[].private_ip_address   tag_sched:tags.Instance-Scheduler
+  when: instances_list.instances != []
+
+- debug:
+    var: instances_fields
+
+
+    #- name: show instances from account {{account}}
+    #  debug:
+    #    msg:
+    #      - '###################################'
+    #      - '###################################'
+    #      - "{{instances_list.instances|map(attribute='instance_id  |  instances_list.instances|map(attribute='private_ip_address'|  instances_list.instances|map(attribute='instance_type'}}  |  instances_list.instances|map(attribute='launch_time'  |  instances_list.instances|map(attribute='key_name' |  instances_list.instances|map(attribute='state.name' "
+    #
+    #      - "{{instances_fields| json_query('*.id')}}"
+    #      - "{{instances_fields| json_query('*.ip')}}"
+    #      - "{{instances_fields| json_query('*.key')}}"
+    #      - "{{instances_fields| json_query('*.launch_time')}}"
+    #      - "{{instances_fields| json_query('*.so')}}"
+    #      - "{{instances_fields| json_query('*.state')}}"
+    #      - "{{instances_fields| json_query('*.tag_name')}}"
+    #      - "{{instances_fields| json_query('*.tags')}}"
+    #      - "###################################"
+    #      - "###################################"
+    #        #  with_items: '{{instances_fields}}'
+
+
+### SDG ###      

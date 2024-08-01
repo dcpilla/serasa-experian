@@ -1,0 +1,18 @@
+---
+- hosts: spobrnikeworker
+  gather_facts: no
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    AWS_REGION: sa-east-1
+  become: yes
+  tasks:
+    - name: include task to call aws_eks_tlmp.yml
+      include_tasks: aws_eks_tlmp.yml
+      with_items:
+#        - 'arcsandbox' 
+       - '{{accounts}}'
+      loop_control:
+        loop_var: account
+
+### SDG ###

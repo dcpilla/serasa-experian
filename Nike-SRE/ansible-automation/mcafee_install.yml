@@ -1,0 +1,19 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+      - add_host:
+          name: '{{ item }}'
+          group: to_be_installed
+        with_items:
+            '{{hosts}}'
+
+- hosts: to_be_installed
+  tasks:
+      - meta: end_play
+        when: ansible_architecture != "x86_64"
+
+      - import_role:
+          name: mcafee
+  become: yes

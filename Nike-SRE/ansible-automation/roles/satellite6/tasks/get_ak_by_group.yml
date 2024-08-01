@@ -1,0 +1,43 @@
+---
+- name: Get activation key by group
+  block:
+    - name: set activation key whem DESENVOLVIMENTO_A current is {{group}}
+      set_fact:
+        activationkey: AK_VIRT_RHEL8_DEV_A,AK_VIRT_DC
+      when: group  == 'DESENVOLVIMENTO_A'
+    
+    - name: set activation key whem DESENVOLVIMENTO_B current is {{group}}
+      set_fact:
+        activationkey: AK_VIRT_RHEL8_DEV_B,AK_VIRT_DC
+      when: group  == 'DESENVOLVIMENTO_B'
+    
+    - name: set activation key whem HOMOLOGACAO_A current is {{group}}
+      set_fact:
+        activationkey: AK_VIRT_RHEL8_HOM_A,AK_VIRT_DC
+      when: group  == 'HOMOLOGACAO_A'
+    
+    - name: set activation key whem HOMOLOGACAO_B current is {{group}}
+      set_fact:
+        activationkey: AK_VIRT_RHEL8_HOM_B,AK_VIRT_DC
+      when: group  == 'HOMOLOGACAO_B'
+    
+    - name: set activation key whem PRODUCAO_A current is {{group}}
+      set_fact:
+        activationkey: AK_VIRT_RHEL8_PROD_A,AK_VIRT_DC
+      when: group  == 'PRODUCAO_A'
+    
+    - name: set activation key whem PRODUCAO_B current is {{group}}
+      set_fact:
+        activationkey: AK_VIRT_RHEL8_PROD_B,AK_VIRT_DC
+      when: group  == 'PRODUCAO_B'
+    
+    - name: set activation key whem PRODUCAO_C current is {{group}}
+      set_fact:
+        activationkey: AK_VIRT_RHEL8_PROD_C,AK_VIRT_DC
+      when: group  == 'PRODUCAO_C'
+    
+    - name: set activation key whem PRODUCAO_D current is {{group}}
+      set_fact:
+        activationkey: AK_VIRT_RHEL8_PROD_D,AK_VIRT_DC
+      when: group  == 'PRODUCAO_D'
+  when: group is defined

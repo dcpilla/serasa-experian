@@ -1,0 +1,14 @@
+---
+- name: grep item {{item}} in {{inventory_all_instances_path}} 
+  shell: "grep {{item}} {{inventory_all_instances_path}}| cut -d '|' -f2,4-5"
+  register: unreachable_item
+  ignore_errors: yes
+
+- debug:
+    var: unreachable_item.stdout
+
+- name: create array-list unreachable hosts
+  set_fact:
+    unreachable_list: "{{ unreachable_list|default([]) + [{'UNREACHABLE':unreachable_item.stdout}]}}"
+
+### SDG ###    

@@ -1,0 +1,9 @@
+---
+nodetools_cmds: []
+nodetools_passwd: "cassandra"
+nodetools_user: "cassandra"
+
+cassandra_allocate_tokens_for_local_replication_factor: 3
+cassandra_topology_class: "NetworkTopologyStrategy"
+cassandra_topology_datacenter_name: "datacenter1"
+cassandra_endpoint_snitch: "SimpleSnitch"

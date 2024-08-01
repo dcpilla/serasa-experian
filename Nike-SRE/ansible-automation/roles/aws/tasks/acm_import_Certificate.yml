@@ -1,0 +1,48 @@
+---
+- block:
+    - name: check if exist {{pfx_path}} in the path {{ansible_user_dir}}/automation/roles/aws/files/{{pfx_name}}
+      stat:
+        path: '{{pfx_path}}'
+      register: file_data
+    
+    - name: Report if the file exists
+      block:
+        - debug:
+            msg: "The file or directory exists"
+    
+        - name: convert .pfx to .pem
+          shell: '{{item}}'
+          with_items:
+            - '/usr/bin/openssl pkcs12 -in {{pfx_path}} -nocerts -out /tmp/privatekey.pem'
+            - '/usr/bin/openssl rsa -in /tmp/privatekey.pem -out /tmp/withoutpw-privatekey.pem'
+            - '/usr/bin/openssl pkcs12 -in {{pfx_path}} -clcerts -nokeys -out /tmp/cert-file.pem'
+            - '/usr/bin/openssl pkcs12 -in {{pfx_path}} -cacerts -nokeys -chain -out /tmp/ca-chain.pem'  
+
+    
+        
+        - name: import certificate
+          ignore_errors: yes
+
+          shell: '/usr/local/bin/aws acm import-certificate --certificate file:///tmp/cert-file.pem
+                                                            --certificate-chain file:///tmp/ca-chain.pem
+                                                            --private-key file:///tmp/withoutpw-privatekey.pem
+                  --profile sts_cli --region {{account_region}}'
+          register: acm_imported
+
+        - debug:
+            var: acm_imported
+
+            #        - name: remove pem
+            #          file:
+            #            path: '{{item}}'
+            #            state: absent
+            #          with_items:
+            #            - '/tmp/privatekey.pem'
+            #            - '/tmp/withoutpw-privatekey.pem'
+            #            - '/tmp/cert-file.pem'
+            #            - '/tmp/ca-chain.pem'
+    
+      when: file_data.stat.exists
+  when: pfx_path is defined
+
+

@@ -1,0 +1,23 @@
+---
+- name: call list node groups {{eks_cluster_name}} from {{account}}
+  include_tasks: eks_list_node_groups.yml
+
+- debug:
+    var: noude_group_list.nodegroups
+
+
+- name: delete noude_group_list.nodegroups
+  shell: "/usr/local/bin/aws eks delete-nodegroup  --cluster-name {{eks_cluster_name}}  --nodegroup-name {{node_group_name}}  --profile=sts_cli --region {{account_region}}"
+  ignore_errors: yes
+  with_items: '{{noude_group_list.nodegroups}}'
+  loop_control:
+    loop_var: node_group_name
+
+
+- name: Delete {{eks_cluster_name}} from {{account}}
+  shell: "/usr/local/bin/aws eks delete-cluster --name {{eks_cluster_name}} --profile=sts_cli --region {{account_region}}"
+  ignore_errors: yes
+  register: eks_deleted
+
+- debug:
+    var: eks_deleted

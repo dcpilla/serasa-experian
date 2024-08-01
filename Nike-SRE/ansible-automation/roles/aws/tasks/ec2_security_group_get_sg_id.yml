@@ -1,0 +1,67 @@
+---
+#- name: include get vpc_id
+#  include_tasks:  vpc_list.yml
+
+- name: list vpc
+  import_role:
+    name: aws
+    tasks_from: vpc_list.yml   
+
+- name: block
+  block:
+
+    - name: get sg_id of {{sg_name}}  in vpc {{vpc_id}}
+      shell: "/usr/local/bin/aws ec2 describe-security-groups --filter Name=vpc-id,Values={{vpc_id}} Name=group-name,Values={{sg_name}} --query 'SecurityGroups[*].[GroupId]' --profile=sts_cli --output text"
+      register: sg_id_out
+
+    - debug:
+        var: sg_id_out
+
+    - name: block to set only sg_id
+      block:
+
+        - set_fact:
+            sg_id:  '{{sg_id_out.stdout}}'
+        
+        - debug:
+            var: sg_id
+    
+        - name: print vpc and sg
+          debug:
+            msg:
+              - "##################################"
+              - "##################################"
+              - "## vpc_id: {{vpc_id}}      ##"
+              - "## sg_id : {{sg_id}}       ##"
+              - "##################################"
+              - "##################################"
+      when: sg_id_out.stdout != ''
+
+    - name: print vpc and sg
+      debug:
+        msg:
+          - "##################################"
+          - "##################################"
+          - "##                              ##"
+          - "##    Problem to get sg_id      ##"
+          - "##                              ##"
+          - "##################################"
+          - "##################################"
+
+      when: sg_id_out.stdout != ''
+
+  when: vpc_id is defined
+
+
+- name: print vpc and sg
+  debug:
+    msg:
+      - "##################################"
+      - "##################################"
+      - "##                              ##"
+      - "##    Problem to list VPC       ##"
+      - "##                              ##"
+      - "##################################"
+      - "##################################"
+  when: vpc_id is not defined
+  

@@ -1,0 +1,31 @@
+---
+- name: create new VG {{vg_name}}  with new disk {{volume_device}}
+  lvg:
+    vg: '{{vg_name}}'
+    pvs: '{{volume_device}}'
+#    pesize: '{{sizegb}}'
+
+- name: create new LV {{lv_name}} on VG {{vg_name}}
+  lvol:
+    vg: '{{vg_name}}'
+    lv: '{{lv_name}}'
+    size: 100%FREE
+
+- name: Create directory to mount point {{mount_point}}
+  file:
+    path: '{{mount_point}}'
+    state: directory
+    mode: '0755'
+
+- name: format /dev/mapper/{{vg_name}}-{{lv_name}} xfs filesystem
+  filesystem:
+    fstype: ext4
+    dev:  '/dev/mapper/{{vg_name}}-{{lv_name}}'
+
+- name: Mount LV /dev/mapper/{{vg_name}}-{{lv_name}}  disk  and write on fstab
+  mount:
+    path: '{{mount_point}}'
+    src: '/dev/mapper/{{vg_name}}-{{lv_name}}'
+    fstype: ext4
+    opts: defaults
+    state: mounted

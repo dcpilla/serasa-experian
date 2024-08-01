@@ -1,0 +1,5 @@
+---
+- name create role OpenSearch
+https://opensearch.org/docs/1.2/security-plugin/access-control/api/  
+#  https://opensearch.org/docs/1.2/security-plugin/access-control/users-roles/#rest-api-1
+

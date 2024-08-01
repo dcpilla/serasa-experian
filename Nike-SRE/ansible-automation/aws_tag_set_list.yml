@@ -1,0 +1,34 @@
+---
+- hosts: spobrnikeworker
+  gather_facts: no
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    AWS_REGION: sa-east-1
+  gather_facts: no
+  become: yes
+  tasks:    
+    - import_role:
+        name: aws
+        tasks_from: sts_connection
+
+    - set_fact:
+        item_loop: instance_id
+      when: resources == 'instance'
+
+    - set_fact:
+        item_loop: s3name
+      when: resources == 's3'
+
+    - set_fact:
+        item_loop: eksarn
+      when: resources == 'eks'
+
+    - include_tasks: roles/aws/tasks/tag_set.yml
+      with_items: '{{resource_list}}'
+      loop_control:
+        loop_var: '{{item_loop}}'
+   
+
+
+### SDG ###  

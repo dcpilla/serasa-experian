@@ -1,0 +1,24 @@
+---
+- name: Create a new host or update an existing host's info
+  environment: 
+    PYTHONHTTPSVERIFY: 0
+  local_action:
+    module: zabbix_host
+    server_url: https://spobrzabbix.br.experian.local
+    login_user: '{{ zabbix_user }}' 
+    login_password: '{{ usr_pass }}'
+    host_name: ExampleHost
+    visible_name: ExampleName
+    host_groups:
+      - Linux servers 
+    link_templates:
+      - Template OS Linux
+    interfaces:
+      - type: 1
+        main: 1
+        useip: 1
+        port: 10050
+        ip: '{{ ansible_default_ipv4.address }}'
+        dns: '{{ ansible_fqdn }}'
+    status: enabled
+    state: present

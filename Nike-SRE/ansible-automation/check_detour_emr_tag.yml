@@ -1,0 +1,69 @@
+---
+- name: show current DETOUR
+  debug:
+    msg:
+      - "####################@####################"
+      - "####################@####################"
+      - "#              EMR DETOUR               #"
+      - "#              {{account}}               "
+      - "####################@####################"
+      - "####################@####################"
+
+- name: clean emr_detour
+  set_fact:
+    emr_detour: !!null
+
+- name: get emr_detour of account {{account}} from invetory path {{inventory_emr_path}}
+  shell: grep '{{account_id}}' '{{inventory_emr_path}}' | grep -v wiz_cig  | cut -d '|' -f3,4
+  register: emr_detour
+
+
+- name: show emr_detour of account {{account}}
+  debug:
+    var: emr_detour.stdout_lines
+
+
+- name: block to send emailk when emr_detour is defined
+  block:
+    - name: set fact to send email of emr_detour
+      set_fact:
+        email_title: "Check detour EMR tag"
+        sub_title: 'This is an automatic process from Nike Program'
+        description: 'This job check detour EMR tag from nike aws accounts'
+        report_date: "{{ lookup('pipe', 'date -d \"3 hour ago\" +\"%Y-%m-%d %H:%M:%S\"') }}"
+        body: "Process Name: Check detour EMR tag  <br/>
+               Required Action in {{account_name}} account: <br/>
+               - Include the tags in the Extra field of the dag connections that generate the following EMR cluster list </br>
+                 - tags: </br>
+                 <p>&nbsp;   &emsp;  CostString: Cost String </p>
+                 <p>&nbsp;   &emsp;  AppID: Application ID </p>
+                 <p>&nbsp;   &emsp;  Environment: prd stg uat tst dev sbx </p>
+                 <p>&nbsp;   &emsp;  map-migrated: d-server-02n52mmgua5hr6 </p>
+                 <p>&nbsp;   &emsp;  Service:      latam_nike </p>
+                 <p>&nbsp;   &emsp;  project:      nike </p>
+                 <p>&nbsp;   &emsp;  wiz_cig:      true </p>
+                 <p>&nbsp;   &emsp;  Name:         NOMEDOCLUSTER </p> </br>
+
+               EMR cluster list: </br>
+               {{emr_detour.stdout_lines|regex_replace(',','<br/>')|regex_replace(']',' ')}}"
+               #               {{emr_detour.stdout_lines|regex_replace(',','<br/>')|regex_replace('}]',' ')}}|regex_replace('{','')|regex_replace('}','')"
+
+    - name: send email when emr_detour is defined to {{account_manager}} account {{account_name}}
+      become: false
+      ignore_errors: yes
+      mail:
+        host: '{{mail_host}}'
+        port: '{{mail_port}}'
+        from: '{{mail_from}}'
+        to:
+          - '{{account_manager}}'         
+#           - '{{suport_email}}'
+#           - '{{mail_copy}}'
+#           - '{{mail_operation}}'
+          - 'alessandro.bahia@br.experian.com'
+        subject: 'Detour EMR tag detected from {{account_name}} account'
+        subtype: html
+        body: "{{ lookup('template', '{{mail_template}}') }}"
+
+  when: emr_detour is defined and emr_detour.stdout_lines != []
+

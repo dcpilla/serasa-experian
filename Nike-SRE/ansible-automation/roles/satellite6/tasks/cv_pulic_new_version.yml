@@ -1,0 +1,19 @@
+---
+- set_fact:
+    COD_CV:  '{{item.split("-")[0]}}'
+
+- name: Crete content view version by hammer on CV '{{item}}'
+  delegate_to: spobrsatellite1
+  shell: hammer content-view publish --id '{{COD_CV}}' --organization "Serasa_Experian"
+
+  #- name: Crete a content view version by hub
+  #  redhat.satellite.content_view_version:
+  #    username: '{{api_satellite_username}}'
+  #    password: '{{schedlin_password}}'
+  #    server_url: "https://{{sat6_fqdn}}"
+  #    content_view: "CV_RHEL5"
+  #    organization: "Serasa_Experian"
+  #    lifecycle_environments:
+  #      - Library
+  #      - DESENVOLVIMENTO
+  #      - HOMOLOGACAO

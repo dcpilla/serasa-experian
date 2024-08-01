@@ -1,0 +1,39 @@
+---
+# Use the assumed role above to tag an instance in account 123456789012
+- name: set tag in ec2 instsance id {{instance_id}} of account {{account}}
+  ignore_errors: yes  
+  ec2_tag:
+    aws_access_key: "{{ assumed_role_ak }}"
+    aws_secret_key: "{{ assumed_role_sk }}"
+    security_token: "{{ assumed_role_token }}"
+    validate_certs: no
+    resource: '{{instance_id}}'
+    state: '{{tag_state}}'
+    tags:
+      "{{tag}}"
+  register: tag_instance
+
+#- debug:
+#    var: tag_instance
+
+- name: Notify when chaged
+  block:
+
+    - name: set fact to notify
+      set_fact:
+        notify_type: mail
+        title: "Set Default tags in instance-id {{instance_id}} <br/> account {{account}}"
+        descr: "Set Default tags <br/> instance-id: {{instance_id}} <br/> account: {{account}}"
+        msg: "Defined Tags: <br/> {{tag_instance.tags|replace(',','<br/>')}}"
+        msg_to:
+          - "{{suport_email}}"
+          - "{{account_tl_team}}"
+          - "{{account_manager}}"
+#          - alessandro.bahia@br.experian.com
+
+    - include_role:
+        name: notify
+
+  when: tag_instance.changed
+
+### SDG ###  

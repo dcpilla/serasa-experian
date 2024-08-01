@@ -1,0 +1,44 @@
+---
+- name: Skip if user was added by ks-main on baremetal
+  stat: 
+    path: /home/usr_ansible
+  register: usr_ansible
+
+- block:
+  - name: Ensure '#includedir /etc/sudoers.d' is present in the /etc/sudoers
+    lineinfile:
+      path: /etc/sudoers
+      state: present
+      line: '#includedir /etc/sudoers.d'
+
+  - name: Ensure /etc/sudoers.d/usr_ansible exists
+    copy: src=files/usr_ansible dest=/etc/sudoers.d/usr_ansible owner=root mode=0600
+
+  - name: Check if Centrify is connected
+    command: /usr/bin/adinfo --mode
+    register: centrify_mode
+    ignore_errors: yes
+    changed_when: false
+
+  - block:
+#    - name: Force create usr_ansible dir
+#      shell: sudo su - usr_ansible
+#      args:
+#        warn: false
+      - name: Force create usr_ansible dir
+        file:
+          path: /home/usr_ansible
+          owner: usr_ansible
+          group: usr_ansible
+          mode: 0700
+          state: directory
+
+      - name: Set authorized_key in usr_ansible
+        authorized_key:
+          user: usr_ansible
+          state: present
+          key: http://spobrbastion/pub/id_rsa_usr_ansible.pub
+          validate_certs: False
+
+    when: centrify_mode is defined and centrify_mode.stdout is search('connected')
+  when: usr_ansible.stat.exists == false

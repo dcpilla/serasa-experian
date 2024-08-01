@@ -1,0 +1,35 @@
+pilot:
+  image: "{{ account_id }}.dkr.ecr.sa-east-1.amazonaws.com/chainguard/istio-pilot"
+  tagg: "v1.22.3-r0"
+  nodeSelector:
+    Worker: infra
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  tolerations:
+  - effect: NoSchedule
+    key: dedicated
+    operator: Equal
+    value: infra
+  - effect: NoSchedule
+    key: Disabled
+    operator: Equal
+    value: ForKarpenter
+global:
+  hub: "{{account_id}}.dkr.ecr.sa-east-1.amazonaws.com/chainguard"
+  tag: "v1.22.3-r0"
+  proxy:
+    image: istio-proxy
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 512Mi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+  proxy_init:
+    image: istio-proxy

@@ -1,0 +1,23 @@
+---
+- name: Create a role with description and tags
+  amazon.aws.iam_role:
+    access_key: "{{ assumed_role_ak }}"
+    secret_key: "{{ assumed_role_sk }}"
+    session_token : "{{ assumed_role_token }}"
+    region: '{{account_region}}'
+    validate_certs: no
+    ###
+    state: present
+    name: '{{name_role}}'
+    assume_role_policy_document: "{{ lookup('file','{{name_role}}.json') }}"
+    description: This is Role '{{name_role}}'
+    tags:
+      "{{tag}}"
+  register: role_created
+
+
+- debug:
+    var: role_created    
+
+
+###SDG###

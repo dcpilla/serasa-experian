@@ -1,0 +1,28 @@
+---
+- shell: "df -mlP {{ item }} | tail -1 | awk '{print $4}'"
+  register: avail_space
+  with_items:
+      - /tmp
+      - /var/tmp
+
+- debug:
+    var: avail_space
+
+- set_fact:
+    install_path: '{{ item.item }}'
+  with_items:
+      - '{{ avail_space["results"] }}'
+  when: item.stdout|int > 1000
+
+- fail:
+    msg: Not enough disk space for the installation process (1000 MB at least)
+  when: install_path is not defined
+
+- tempfile:
+    state: directory
+    path:  '{{ install_path }}'
+    prefix: mcafee
+  register: tmp_dir
+
+- set_fact:
+    install_path: '{{ tmp_dir["path"] }}'

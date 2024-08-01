@@ -1,0 +1,45 @@
+---
+- name: list rules
+  shell: '/usr/local/bin/aws ec2 describe-security-group-rules  --filters Name="group-id",Values="{{sg_id}}" --profile=sts_cli --region {{account_region}}'
+  ignore_errors: yes
+  register: rules_list
+
+- name: convert rules_list t json
+  set_fact: 
+    rules_list: '{{rules_list.stdout|from_json}}'
+
+
+- name: show list
+  block:
+    - name: show rules_list  
+      debug:
+        var: rules_list
+
+
+    - name: creat a dictonary  array of rules
+      ignore_errors: yes  # pode dar erro quando estiver com status PROVISIONING e não ter valor o campo emr.Status.Timeline.ReadyDateTime
+      set_fact:
+        rules_fields: "{{rules_fields|default([])+ [{'rule_id':rule.SecurityGroupRuleId, 'rule_outbound':rule.IsEgress }] }}"
+      with_items:
+        - '{{rules_list.SecurityGroupRules}}'
+      loop_control:
+        loop_var: rule
+
+
+    - name: show rules_list  
+      debug:
+        var: rules_fields
+
+
+  when: rules_list.SecurityGroupRules != []
+
+- name: print rules not found
+  debug:
+    msg: 
+      - "########################Rules Not Found########################" 
+      - "##   sg_id   | {{sg_id}}"  
+      - "##   sg_name | {{sg_name}}"  
+      - "###############################################################"
+  when: rules_list.SecurityGroupRules == []
+
+###SDG###

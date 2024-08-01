@@ -1,0 +1,30 @@
+---
+- name: block when command is defined
+  block:
+    - name: task to assumerole in account {{account}}
+      include_role:
+        name: aws
+        tasks_from: sts_connection.yml
+    
+    - name: execute cli comand {{command}}
+      shell: "/usr/local/bin/{{command}} --profile sts_cli"
+      register: executed
+      ignore_errors: yes
+    
+    
+    - name: show executed variable
+      debug:
+        var: executed
+  when: command is defined
+- name: show 
+  debug:
+    msg:
+      - "##################################"
+      - "##################################"
+      - "## command variable not defined ##"
+      - "##################################"
+      - "##################################"
+        
+  when: command is not defined 
+
+### SDG ###

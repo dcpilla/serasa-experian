@@ -1,0 +1,51 @@
+---
+- name: Cleaning proxy
+  shell: '{{item}}'
+  with_items:
+    - 'export https_proxy='
+    - 'export http_proxy='
+
+- block:
+        
+    - name: enable repo
+      shell: subscription-manager repos --enable=Serasa_Experian_Third_party_Third_Party_for_RHEL_5_Server_RPMs_i386
+
+    - name: Install Tanium client 
+      shell: yum -y install TaniumClient
+  when: not inventory_hostname.startswith('awsbr') and  ansible_distribution_major_version|int == 5
+
+- name: Install Tanium client when rhel8
+  yum:
+    name: TaniumClient.x86_64
+    state: present
+    enablerepo: Serasa_Experian_MANDATORY_COLLECTION_RH8_Security_Agents_RH8
+    disable_gpg_check: yes
+  when: not inventory_hostname.startswith('awsbr') and  ansible_distribution_major_version|int == 8
+
+- name: Install Tanium client when rhel7
+  yum:
+    name: TaniumClient.x86_64
+    state: present
+    enablerepo: Serasa_Experian_MANDATORY_COLLECTION_RH7_Security_Agents_RH7 
+    disable_gpg_check: yes
+  when: not inventory_hostname.startswith('awsbr') and  ansible_distribution_major_version|int == 7
+
+- name: Install Tanium client when rhel6
+  yum:
+    name: TaniumClient 
+    state: present
+    enablerepo: Serasa_Experian_MANDATORY_COLLECTION_RH6_Security_Agents_RH6 
+    disable_gpg_check: yes
+  when: not inventory_hostname.startswith('awsbr') and ansible_distribution_major_version|int == 6
+
+- name: Copy TaniumClient.ini file to /opt/Tanium/TaniumClient/TaniumClient.ini
+  template:
+    src: TaniumClient.ini
+    dest: /opt/Tanium/TaniumClient/TaniumClient.ini
+
+- name: Copy tanium.pub file to /opt/Tanium/TaniumClient/tanium.pub
+  copy:
+    src: tanium.pub
+    dest: /opt/Tanium/TaniumClient/tanium.pub
+  notify:
+      - restart taniumclient

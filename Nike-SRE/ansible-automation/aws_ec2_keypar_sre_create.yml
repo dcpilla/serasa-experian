@@ -1,0 +1,20 @@
+---
+- hosts: localhost
+  gather_facts: no
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    AWS_REGION: sa-east-1
+  become: yes
+  tasks:
+    - import_role:
+        name: aws
+        tasks_from: sts_connection.yml
+
+    - set_fact:
+        key_name: sre-suport
+
+    - import_role:
+        name: aws
+        tasks_from: ec2_keys_par_create.yml
+

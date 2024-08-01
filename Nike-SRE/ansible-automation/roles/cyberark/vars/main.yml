@@ -1,0 +1,14 @@
+---
+CCP_URL: "https://ccpcentral.us.experian.local"
+PVWA_URL: "https://pascentral.us.experian.local"
+cyberark_ObjectName: "APPUSER_EITS_SD_ANSIBLE_BR@10.13.26.4"
+username: "APPUSER_EITS_SD_ANSIBLE_BR"
+app_id: "APP_EITS_SD_ANSIBLE_BR"
+account_type: {"linux": "root","windows-sxnk": "sxnk2025","windows-hunt": "hunt3032","windows-ansible": "ansible","RKVM-ILO":"Brkvm8082","RKVM-DRAC":"rkvm8082"}
+safe_name: {"linux": "BR_PUNX_BRA_BUILTIN", "windows-sxnk": "BR_PWIN_BRA_BUILTIN", "windows-hunt": "BR_PWIN_BRA_BUILTIN", "windows-ansible": "BR_PWIN_BRA_BUILTIN","RKVM-ILO":"BR_PKVMS_EITS_BUILTIN","RKVM-DRAC":"BR_PKVMS_EITS_BUILTIN"}
+platform_name: {"linux": "BR_UNX_EX_30D_480M_DPR_PSMR", "windows-sxnk": "USMK_WNL_EX_30D_480M_DPR_PSMR","windows-hunt": "USMK_WNL_EX_30D_480M_DPR_PSMR","windows-ansible": "USMK_WNL_EX_30D_480M_DPR_PSMR","RKVM-ILO":"ALL_ILO_EX_30D_480M_SPR_PSMNR","RKVM-DRAC":"ALL_DRAC_EX_30D_480M_SPR_PSMNR"}
+account_id: ""
+machine_address: '{{ machine_fqdn }}'
+machine_name: '{{ machine_fqdn }}'
+os_name: '{{ type_account }}'
+machine_domain: '{{ domain_machine }}'

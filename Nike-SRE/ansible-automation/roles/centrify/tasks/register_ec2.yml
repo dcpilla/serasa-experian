@@ -1,0 +1,205 @@
+---
+- name: Install centrify and register machine when domain is defined current domain is {{domain}}
+  block:
+#    - name: unset-proxy
+#      shell: unset '{{item}}'
+#      with_items:
+#        - http_proxy
+#        - https_proxy
+
+#    - name: Ensure clean to exclude crypto package
+#      lineinfile:
+#        line: "exclude=crypto-policies*"
+#        dest: /etc/yum.conf
+#        state: absent
+#      when: ansible_distribution_major_version|int > 7
+#
+#    - name: ensures libnsl
+#      yum:
+#        name: libnsl.x86_64
+#        state: present  
+#      when: ansible_distribution_major_version|int == 8
+
+    - stat:
+        path: /usr/share/centrifydc/bin/centrifydc
+      register: stat_centrify
+
+    - block:
+        - name: Exec adleave
+          shell: /usr/sbin/adleave -f
+
+        - name: Remove previous installed Centrify
+          yum:
+            name: 
+              - Centrify*
+            state: absent
+      when: stat_centrify.stat.exists == True
+
+    - name: Using ansible_hostname when hostname is not defined
+      set_fact:
+        hostname: '{{ ansible_hostname }}'
+      when: hostname is not defined or hostname == ''
+
+    - name: Set definitions of Experian domain
+      set_fact:
+        config: '{{ centrify_experian }}'
+      when: domain == 'brexperian'
+
+    - name: Set definitions of Serasa domain
+      set_fact:
+        config: '{{ centrify_serasa }}'
+      when: domain == 'serasacliente'
+
+#    - name: altera gpgcheck todos os repos para 0
+#      shell: "sed -i 's/gpgcheck = 1/gpgcheck = 0/g' /etc/yum.repos.d/redhat.repo"
+#      when: region is not defined or region != 'amazon'
+
+#    - name: Remove crypto-policies-scripts
+#      yum:
+#        name: crypto-policies-scripts*
+#        state: absent
+#      when: group is defined and group == "HADOOP_CORPORATIVO"
+
+    - name: Install Centrify
+      yum:
+        name:
+          - http://spobrsatellite1.br.experian.local/pub/repos/rhel/generic/x86_64/CentrifyDC-openssh-7.4p1-5.4.2-rhel5.x86_64.rpm
+          - http://spobrsatellite1.br.experian.local/pub/repos/rhel/generic/x86_64/CentrifyDC-5.4.2-rhel5.x86_64.rpm
+        state: present
+#        enablerepo: Serasa_Experian_MANDATORY_COLLECTION_GENERIC_RHEL_Generic_RHEL_Servers_RPMs_x86_64
+#      register: instcentrify
+#      ignore_errors: yes
+
+#    - debug:
+#        var: instcentrify
+
+#    - name: altera gpgcheck todos os repos para 1
+#      shell: "sed -i 's/gpgcheck = 0/gpgcheck = 1/g' /etc/yum.repos.d/redhat.repo"
+#      when: region is not defined or region != 'amazon'
+
+    - name: gp disable all
+      lineinfile:
+        path: /etc/centrifydc/centrifydc.conf
+        regexp: '^# gp.disable.all'
+        insertafter: '^# gp.disable.all: false'
+        line: 'gp.disable.all: true'
+
+    - name: Find and remove Kerberos reference
+      command: find /etc/ -iname "krb5*" -exec rm -f {} \;
+      changed_when: no
+
+    - name: Copy Kerberos conf
+      copy:
+        src: files/{{ config.krb5_config }}
+        dest: /etc/krb5.conf
+      when: region is not defined or region != 'amazon'
+
+    - name: Copy Kerberos conf when aws ec2
+      copy:
+        src: files/krb5_aws_ec2.conf
+        dest: /etc/krb5.conf
+      when: region is defined and region == 'amazon'
+
+    - name: Permissions
+      file:
+        path: /etc/krb5.conf
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Create a temporary directory
+      tempfile:
+        state: directory
+        suffix: tmp_centrify
+      register: tmp_directory
+
+    - name: Copy kinit credentials
+      copy:
+        src: files/{{ config.kinit_credential }}
+        dest: '{{ tmp_directory.path }}/join_deploy'
+
+    - name: Execute kinit with credential from {{tmp_directory.path}}
+      command: /usr/share/centrifydc/kerberos/bin/kinit adjoiner -kt {{ tmp_directory.path }}/join_deploy
+      register: exec_kinit
+      ignore_errors: yes
+
+#    - name: active user when exec_kinit is revoked
+#      bllock:
+#        - name: active user when brexperian
+#          when: domain== brexperian
+#
+#        - name: active user when serasacliete
+#          when: domain==serasacliente
+#
+#        - name: Execute Again kinit with credential from {{tmp_directory.path}}
+#          command: /usr/share/centrifydc/kerberos/bin/kinit adjoiner -kt {{ tmp_directory.path }}/join_deploy
+#
+#      when: exec_kinit.search revoked 
+
+    - name: Delete temp folder
+      file:
+        state: absent
+        path: '{{ tmp_directory.path }}'
+
+    - name: Domain register
+      command: /usr/sbin/adjoin -f -z "{{ config.zone }}" -c "{{ config.parms }}" -V {{ config.domain }} --name {{ hostname }}.{{ config.domain }}
+      #     register: domain_register
+      #     ignore_errors: yes
+
+
+#   - debug:
+#       var: domain_register
+
+    - name: Get domain server information
+      command: /usr/bin/adinfo --server
+      register: dns_srv
+
+    - name: Register host on DNS
+      command: /usr/sbin/addns -U -d {{ config.domain }} -s {{ dns_srv.stdout }} -n {{ hostname }} -i {{ ansible_default_ipv4.address }} -V -m -f
+
+    - name: Session destroy
+      command: /usr/share/centrifydc/kerberos/bin/kdestroy
+
+    - name: Setup alternate SSH port
+      lineinfile:
+        dest: "/etc/ssh/sshd_config"
+        regexp: "^Port"
+        line: "Port 2222"
+      when: region is defined and region == 'amazon'
+
+    - name: Download default centrify configuration file
+      get_url:
+        url: http://spobrsatellite1.br.experian.local/pub/centrify_files/centrifydc.conf
+        dest: /etc/centrifydc/centrifydc.conf
+        mode: 0755
+
+
+    - name: Download DNS updater script
+      get_url:
+        url: http://spobrsatellite1.br.experian.local/pub/centrify_files/centrify_network.sh
+        dest: /usr/scripts/centrify_network.sh
+        mode: 0755
+
+    - name: Restart and enable service centrifydc
+      service:
+        state: restarted
+        enabled: yes
+        name: centrifydc
+
+    - name: Enable service centrify-sshd
+      service:
+        state: started
+        enabled: yes
+        name: centrify-sshd
+        
+    - name: Ensure conf to exclude crypto package
+      lineinfile:
+        line: "exclude=crypto-policies*"
+        dest: /etc/yum.conf
+        state: present
+      when: ansible_distribution_major_version|int > 7
+
+  when: domain is defined
+  tags:
+    - setcentrify
+

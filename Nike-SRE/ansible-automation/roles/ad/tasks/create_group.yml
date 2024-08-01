@@ -1,0 +1,125 @@
+---
+- name: Delegate to {{ workerexec }}
+  delegate_to: '{{ workerexec }}'
+  block:
+    - set_fact:
+        type_group: '{{item}}'
+
+    - name: Set Experianbr Domain Variables current domain is {{domain}}
+      set_fact:
+        dcserver: '{{dcserver_experianbr}}'
+        domainname: '{{domains.experianbr}}'
+        dcuser: '{{dcuser_experianbr}}'
+        dcuser_pwd: '{{dcuser_pwd_experianbr}}'
+        dc: spobrexpdc01
+        ou: OU=UnixComputerRoles,OU=UnixGroups,OU=Groups,DC=br,DC=experian,DC=local
+      when: domain == "brexperian"
+
+    - name: Set Serasacliente Domain Variables current domain is {{domain}}
+      set_fact:
+        dcserver: '{{dcserver_serasacliente}}'
+        domainname: '{{domains.serasacliente}}'
+        dcuser: '{{dcuser_serasacliente}}'
+        dcuser_pwd: '{{dcuser_pwd_serasacliente}}'
+        descript: 'Admin ROOT UNIX Server Access for'
+        dc: '{{dcserver_serasacliente}}'
+        ou: OU=UnixComputerRoles,OU=UnixGroups,OU=Groups,DC=serasacliente,DC=com,DC=br
+      when: domain == "serasacliente"
+
+    - name: Block to use only a variable
+      delegate_to: '{{dcserver}}'
+      vars:
+         ansible_connection: winrm
+         ansible_port: 5986
+         ansible_winrm_server_cert_validation: ignore
+         ansible_winrm_transport: certificate
+         ansible_winrm_cert_pem: '{{winrm_cert_pem}}'
+         ansible_winrm_cert_key_pem: '{{winrm_server_key}}'
+         ansible_become: yes
+         ansible_become_method: runas
+         ansible_become_user: dcuser
+         ansible_become_pass: dcuser_pwd
+         ansible_become_flags: logon_type=new_credentials logon_flags=netcredentials_only
+      block:
+        - name: Block when type_group UNX_
+          block:
+            - name: BR Experian - Saving Add group by {{dcserver}}...type_group {{type_group}}...hostname {{hostname}}...domain {{domain}} when type_group UNX_
+              win_domain_group:
+                domain_username: "{{dcuser}}"
+                domain_password: "{{dcuser_pwd}}"
+                name: "{{type_group}}{{hostname}}"
+                description: 'Standard SSH UNIX Server Access for "{{hostname}}" [ {{type_group}}{{hostname}} ]'
+                display_name: "{{type_group}}{{hostname}}"
+                #    domain_server: '{{dc}}'
+                attributes:
+                  info: 'Provides standard login access to a UNIX {{hostname}}'
+                  #extensionAttribute2: 'ADMIN'
+                  extensionAttribute4: '2#LM#{{user_login}}'
+                  extensionAttribute5: 'Requestable:Yes#Certifiable:Yes#Privileged:Yes#ProvideBulkPII:No#ViewPIIData:No#dataOwnerCert:Yes'
+                  extensionAttribute6: 'owner:{{user_login}}#logiplexAppName:Unix Server Standard Access#app_Id:{{geear_app_id}}'
+                scope: universal #domainlocal #domainlocal global universal
+                organizational_unit: '{{ou}}'
+                state: present
+              register: reg_unx
+              ignore_errors: yes
+              when: domain == "brexperian"
+
+            - name: Serasa Cliente - Saving Add group by {{dcserver}}...type_group {{type_group}}...hostname {{hostname}}...domain {{domain}} when type_group UNX_
+              win_domain_group:
+                domain_username: "{{dcuser}}"
+                domain_password: "{{dcuser_pwd}}"
+                name: "{{type_group}}{{hostname}}"
+                description: 'Standard SSH UNIX Server Access for "{{hostname}}" [ {{type_group}}{{hostname}} ]'
+                display_name: "{{type_group}}{{hostname}}"
+                attributes:
+                  info: 'Provides standard login access to a UNIX {{hostname}}'
+                  extensionAttribute2: 'ADMIN'
+                  extensionAttribute4: '2#LM#{{user_login}}'
+                  extensionAttribute5: 'Requestable:Yes#Certifiable:Yes#Privileged:Yes#ProvideBulkPII:No#ViewPIIData:No#dataOwnerCert:Yes'
+                  extensionAttribute6: 'owner:{{user_login}}#logiplexAppName:Unix Server Standard Access#app_Id:{{geear_app_id}}'
+                scope: universal #domainlocal #domainlocal global universal
+                organizational_unit: '{{ou}}'
+                state: present
+              register: reg_unx
+              ignore_errors: yes
+              when: domain == "serasacliente"
+
+            - debug:
+                var: reg_unx
+          when: type_group == 'UNX_'
+
+        - name: Block when type_group UNX_ADM
+          block:
+            - name: Saving Add group by {{dcserver}}...type_group {{type_group}}...hostname {{hostname}}...domain {{domain}} when type_group UNX_ADM_
+              win_domain_group:
+                domain_username: "{{dcuser}}"
+                domain_password: "{{dcuser_pwd}}"
+                name: "{{type_group}}{{hostname}}"
+                description: 'Admin ROOT UNIX Server Access for "{{hostname}}" [ {{type_group}}{{hostname}} ]'
+                display_name: "{{type_group}}{{hostname}}"
+                #    domain_server: '{{dc}}'
+                attributes:
+                  info: 'Provides admin root access to a UNIX {{hostname}}'
+                  extensionAttribute2: 'ADMIN'
+                  extensionAttribute4: '2#LM#{{user_login}}'
+                  extensionAttribute5: 'Requestable:No#Certifiable:Yes#Privileged:Yes#ProvideBulkPII:No#ViewPIIData:No#dataOwnerCert:Yes'
+                  extensionAttribute6: 'owner:{{user_login}}#logiplexAppName:Unix Server Root Access#app_Id:{{geear_app_id}}'
+                scope: universal #domainlocal #domainlocal global universal
+                organizational_unit: '{{ou}}'
+                state: present
+              register: reg_unx_adm
+              ignore_errors: yes
+
+            - debug:
+                var: reg_unx_adm
+          when: type_group == 'UNX-ADM_'
+
+        - name: Add {{type_group}}{{hostname}} to a domain group br_centrify_provisioning
+          win_domain_group_membership:
+            domain_username: "{{dcuser}}"
+            domain_password: "{{dcuser_pwd}}"
+            name: 'br_centrify_provisioning'
+            members:
+              - "{{type_group}}{{hostname}}"
+            state: present
+      when: type_group is defined

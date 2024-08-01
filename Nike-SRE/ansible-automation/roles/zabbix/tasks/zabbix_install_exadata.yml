@@ -1,0 +1,46 @@
+---
+    - name: Get description
+      shell: awk -F ":" '{print $2}' /usr/scripts/descricao.txt
+      register: tag_server
+      ignore_errors: yes
+
+    - name: Define default permission to /var/log
+      file:
+        path: /var/log
+        state: directory
+        mode: 0755
+     
+    - name: Send rpm satellite - server
+#shell: wget -P /tmp/ http://spobrbastion/pub/program/zabbix/zabbix-agent2-5.0.3-1.el7.x86_64.rpm
+      shell: scp -i /usr/share/foreman-proxy/.ssh/id_rsa_foreman_proxy /var/www/html/pub/program/zabbix/zabbix-agent2-5.0.3-1.el7.x86_64.rpm '{{ ansible_default_ipv4.address }}':/tmp/
+      delegate_to: 10.96.170.146
+
+    - name: Install Zabbix Agent
+      shell: yum -y localinstall /tmp/zabbix-agent2-5.0.3-1.el7.x86_64.rpm
+
+    - name: Remove rpm
+      file: 
+        path: /tmp/zabbix-agent2-5.0.3-1.el7.x86_64.rpm
+        state: absent
+
+#    - name: Zabbix_proxy
+#      import_tasks: set_zabbix_proxy.yml
+
+#Default proxy to DATABASE: 10.96.170.70
+    - set_fact:
+        zabbix_proxy: 10.96.170.70
+      
+    
+    - name: Copy Zabbix Agent config
+      template:
+        src: zabbix_agent2.conf
+        dest: /etc/zabbix
+        owner: root
+        group: root
+        mode: 0644
+    
+    - name: Restart Zabbix Agent
+      service:
+        name: zabbix-agent2
+        enabled: yes
+        state: restarted

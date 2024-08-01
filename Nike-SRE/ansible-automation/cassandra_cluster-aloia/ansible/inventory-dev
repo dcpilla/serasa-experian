@@ -1,0 +1,37 @@
+[all:vars]
+env="dev"
+cassandra_cluster_name="cassandra-reports-dev"
+
+#cassandra_endpoint_snitch="GossipingPropertyFileSnitch"
+cassandra_topology_class="NetworkTopologyStrategy"
+cassandra_allocate_tokens_for_local_replication_factor="2"
+cassandra_topology_datacenter_name="DataCenter1"
+
+# USING SSL
+#cassandra_use_ssl=true
+
+# https://docs.datastax.com/en/dse/6.8/dse-admin/datastax_enterprise/config/configRecommendedSettings.html#CheckJavaHugepagessettings
+cassandra_default_check_java_hugepages="never"
+
+
+# NODETOOLS Initial commands
+[cassandra_nodetools]
+10.99.249.14
+
+#ansible_private_key_file="ec2-airflow-dev.pem"
+#cassandra_jvm_xms="4G"
+#cassandra_jvm_xmx="4G"
+#apid7_args: ",Servers EEC AWS, LATAM"
+
+[cassandra_seeds]
+#Zona A
+10.99.249.14
+#Zona B
+10.99.249.177
+
+[cassandra_nodes]
+#Zona A
+10.99.249.19
+
+#Zona B
+10.99.249.173

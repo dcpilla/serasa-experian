@@ -1,0 +1,4 @@
+---
+- name: remove policy arn {{policy_arn}}
+  shell: aws iam delete-policy --policy-arn '{{policy_arn}}'
+

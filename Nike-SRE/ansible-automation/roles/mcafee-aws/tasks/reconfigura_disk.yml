@@ -1,0 +1,191 @@
+---
+- name: get lv opt/isec
+  shell: lvs | grep opt_isec | awk {'print $1'}
+  register: LVOptIsec
+
+#- debug:
+#   var: LVOptIsec
+
+
+- name: remove /opt/isec
+  block:
+    - name: get line of /opt/isec on /etc/fstab
+      shell: cat /etc/fstab | grep /opt/isec
+      register: LineFstabe
+
+    - name: get VG of  {{ LVOptIsec.stdout }} lv
+      shell : lvs | grep opt_isec | awk {'print $2'}
+      register: VGISEC
+
+    - name: Unmount a mounted volume /opt/isec
+      mount:
+        path: /opt/isec
+        state: unmounted
+
+    - name: remove line of /etc/fstab
+      lineinfile:
+        path: /etc/fstab
+        line: '{{ LineFstabe.stdout }}'
+        state: absent
+
+    - name: remove file /opt/isec
+      file:
+        path: /opt/isec
+        state: absent
+
+    - name: remove lv {{ LVOptIsec.stdout }}
+      lvol:
+        vg: '{{ VGISEC.stdout }}'
+        lv: '{{ LVOptIsec.stdout }}'
+        state: absent
+        force: yes
+      register: rm_lv
+  when: LVOptIsec is defined and LVOptIsec.stdout == 'opt_isec'
+
+# Descomentar apenas quando utilizado o paly como tareda unica
+#- name: get LV /opt/McAfee
+#  shell: "lvs | grep opt_McAfee  | awk {'print $1'}"
+#  register: LVoptMcAfee
+#  ignore_errors: yes
+
+#- debug:
+#    var: LVoptMcAfee
+
+- name: Create Mount Point Mcafee
+  block:
+    - name: Create a directory if it does not exist
+      file:
+        path: /opt/McAfee
+        state: directory
+        mode: '0700'      
+
+    - name: Get VG of /
+      shell: df -h /opt/McAfee/ | awk {'print $1'} | cut -d '/' -f4| cut -d '-' -f1| grep -v Filesystem
+      register: VGBARRA
+
+    - name: check if free Vg-Rehl is GiB
+      shell: vgdisplay '{{VGBARRA.stdout}}' | grep Free | awk {'print $8'}
+      register: VgRhelSizeFree
+
+#    - debug:
+#        var: VgRhelSizeFree
+
+    - name: Set itens to create LVMcAfee form VG-rhel
+      block:
+        - name: Set Vol rhel LVMcafee
+          set_fact:
+            NewVolMcafee: '{{VGBARRA.stdout}}'
+
+        - name: Set sizeLvMcAfee
+          set_fact:
+            sizeLvMcAfee: 1024
+
+      when: VgRhelSizeFree is defined and VgRhelSizeFree.stdout == 'GiB'  and LVoptMcAfee.stdout == ''
+
+    - name: Set itens to create LVMcAfee from a new Disk  
+      block:
+        - name: Set Vol VGMCAFEE LVMcafee
+          set_fact:
+            NewVolMcafee: VGMCAFEE
+
+        - name: Set Size Disk
+          set_fact:
+            extra_disk: 1
+
+        - import_role:
+            name: vsphere
+            tasks_from: vsphere_add_disk_vmware.yml
+
+        - name: Get Last disk add
+          shell: fdisk -l |grep -v identifier|grep Disk | tail -1 | awk {'print $2'}| cut -d ':' -f1
+          register: LastDiskADD
+
+        - name: Create VG McAfee on Disk {{LastDiskADD.stdout}}
+          lvg:
+            vg: VGMCAFEE
+            pvs: '{{ LastDiskADD.stdout }}'
+        
+        - name: Set sizeLvMcAfee
+          set_fact:
+            sizeLvMcAfee: +100%FREE
+
+      when: (VgRhelSizeFree is defined and VgRhelSizeFree.stdout != 'GiB'  and LVoptMcAfee.stdout == '') or (VgRhelSizeFree is not defined  and LVoptMcAfee.stdout == '')
+
+#    - debug:
+#        var: '{{item}}'
+#      with_items:
+#        - NewVolMcafee
+#        - sizeLvMcAfee        
+
+    - name: Create LV Mcafee on VG= {{NewVolMcafee}}
+      lvol:
+        vg: '{{ NewVolMcafee }}'
+        lv: opt_McAfee
+        size: '{{ sizeLvMcAfee }}'
+#        resizefs: true
+      register: lv
+
+#    - debug:
+#        var: lv
+    - set_fact:
+        FsType: xfs  
+
+    - name: set ext4 when rhel < 7
+      set_fact:
+        FsType: ext4 
+      when: ansible_distribution_major_version|int < 7
+     
+    - debug:
+        var: FsType
+
+    - name: Fomat {{FsType}} type LV Mcafee /dev/mapper/{{NewVolMcafee}}-opt_McAfee
+      filesystem:
+        fstype: '{{FsType}}'
+        dev: /dev/{{NewVolMcafee}}/opt_McAfee
+
+
+    - name: Mount LV McAfee=/dev/mapper/{{NewVolMcafee}}-opt_McAfee  disk  and write on fstab
+      mount:
+        path: /opt/McAfee
+        src: /dev/{{NewVolMcafee}}/opt_McAfee
+        fstype: '{{FsType}}'
+        opts: defaults
+        state: mounted
+
+
+  when: LVoptMcAfee is defined and LVoptMcAfee.stdout == ''
+
+- debug:
+    var: LVoptMcAfee.stdout
+
+- name: Check Pre-Rec VG Mcafee
+  block:
+    - name: get VG /opt/McAfee
+      shell: lvs | grep opt_McAfee  | awk {'print $2'}
+      register: VgMcAfee
+
+    - name: check if free Vg is GiB
+      shell: vgdisplay {{ VgMcAfee.stdout }} | grep Free | awk {'print $8'}
+      register: VgSizeFree
+
+    - debug:
+        var: VgSizeFree
+
+    - name: Ensure 1GB on /opt/McAfee
+      block:
+        - name: Ensure 1GB on /opt/McAfee
+          lvol:
+            vg: '{{ VgMcAfee.stdout }}'
+            lv: '{{ LVoptMcAfee.stdout }}'
+            size: 1024
+            resizefs: true
+          register: lvextend
+
+#        - debug:
+#            var: lvextend
+      when: VgSizeFree is defined and '{{ VgSizeFree.stdout }}' == 'GiB'
+
+#    - name:
+#  montar 
+
+  when: LVoptMcAfee is defined and LVoptMcAfee.stdout == 'opt_McAfee'

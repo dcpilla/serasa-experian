@@ -1,0 +1,62 @@
+---
+- hosts: spobrnikeworker
+  #  gather_facts: no
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    AWS_REGION: sa-east-1
+  tasks:
+    - name: include task aws_emr_terminate_all_no_prod.yml
+      include_tasks: aws_emr_terminate_all_no_prod.yml
+      with_items:
+        - '{{accounts_no_prod}}'
+      loop_control:
+        loop_var: account
+  become: yes
+
+
+#    - name: block to send emailk when unreachable_list or emrfields_list is defined      
+#      block:
+#        - name: set fact all checks
+#          set_fact:
+#            email_title: "Check unreachable hosts and EMR more a daybr/>"
+#            sub_title: 'This is an automatic process from Nike Program'
+#            description: 'This job check hosts running from nike aws accounts to test unreachable connection'
+#            report_date: "{{ lookup('pipe', 'date -d \"3 hour ago\" +\"%Y-%m-%d %H:%M:%S\"') }}"
+#            virgula: ','
+#
+#
+#        - name: set fact to send email when emr_running_more_than_a_day is defined
+#          set_fact:
+#            body: "{{body}}<br/>
+#                   ############################################## <br/>
+#                   ############################################## <br/>
+#                   #            EMR RUNNING MORE A DAY          # <br/>
+#                   ############################################## <br/>
+#                   ############################################## <br/>
+#                   {{emr_running_more_than_a_day.stdout_lines| regex_replace('virgula','<br/>') }}    <br/>"
+#
+#                   # {{unreachable_list|regex_replace(',','<br/>')|regex_replace('}]',' ')}}|regex_replace('{','')|regex_replace('}','')"
+#                   # {{unreachable_list|regex_replace('}, {','<br/>')|regex_replace('[{','')|regex_replace('}]','')}}"
+#                   #
+#          when: emr_running_more_than_a_day is defined
+#
+#    
+#        - name: send email when unreachable_list is defined
+#          become: false
+#          ignore_errors: yes
+#          mail:
+#            host: '{{mail_host}}'
+#            port: '{{mail_port}}'
+#            from: '{{mail_from}}'
+#            to:
+#              - '{{suport_email}}'
+##              - '{{mail_copy}}'
+##              - '{{mail_operation}}'
+##              - 'alessandro.bahia@br.experian.com'
+#            subject: 'unreachable hosts detected'
+#            subtype: html
+#            body: "{{ lookup('template', '{{mail_template}}') }}"
+#      when: emr_running_more_than_a_day is defined
+
+### SDG ###

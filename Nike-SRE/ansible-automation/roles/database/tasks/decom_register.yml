@@ -1,0 +1,9 @@
+- name: Create register on Decom_Register Table
+  shell: /opt/mssql-tools/bin/sqlcmd -S spobrsqlprd14,1433 -U '{{sqluser}}'  -P '{{sqlpasswd}}' -Q "use linux_reports ; insert dbo.Decom_Register (Server,Date) values ('{{item}}',(SELECT GETDATE ( )))"
+  delegate_to: "spobrbastion"
+  register: insert
+  ignore_errors: yes
+  when: item.startswith('spobr') 
+
+- debug:
+    var: insert

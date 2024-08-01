@@ -1,0 +1,25 @@
+---
+- name: Tanium stopped on rhel >= 7
+  service:
+    name: taniumclient
+    state: stopped
+  ignore_errors: yes
+  when: ansible_distribution_major_version|int >= 7
+
+- name: Tanium stopped on rhel <=6
+  service:
+    name: TaniumClient
+    state: stopped
+  ignore_errors: yes
+  when: ansible_distribution_major_version|int <= 6
+
+- name: Remove package Tanium
+  yum:
+    name: Tanium*
+    state: absent
+  ignore_errors: yes
+
+
+- name: Remove files /opt/Tanium/*
+  shell: rm -rf /opt/Tanium/*
+  ignore_errors: yes

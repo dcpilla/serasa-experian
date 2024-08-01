@@ -1,0 +1,9 @@
+---
+- name: Default config images 
+  import_tasks: config_basic.yml
+
+- name: Default config key
+  import_tasks: remove_pem.yml
+
+#- name: Default config network 
+#  import_tasks: network_basic.yml

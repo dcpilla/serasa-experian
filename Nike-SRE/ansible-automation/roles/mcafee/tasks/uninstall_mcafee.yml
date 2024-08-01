@@ -1,0 +1,43 @@
+---
+# name: check erron on messages
+# command: grep AAC_ERROR /var/log/messages
+# register: messages
+
+#- name: check installed packeg Mcafee
+#  shell: 'rpm -qa | grep -i mcafee'
+#  register: mcafee
+
+#- debug:
+#    var: mcafee
+
+- name: stop service
+  service:
+    name: ma
+    state: stopped
+  ignore_errors: yes
+# when: mcafee is defined
+
+- name: Remove packeg MFE
+  yum:
+    name: MFE*
+    state: absent
+  ignore_errors: yes
+
+- name: Remove packeg Mcafee
+  yum:
+    name: McAfee*
+    state: absent
+  ignore_errors: yes
+#  when: mcafee is defined
+
+- name: checking if exist Path isec 
+  check_mode: no
+  stat:
+    path: /opt/isec/ens/threatprevention/bin/uninstall-isectp.sh
+  register: isec
+  ignore_errors: yes
+
+- name: running uninstall-isectp.sh
+  shell: "echo yes|`/opt/isec/ens/threatprevention/bin/uninstall-isectp.sh`"
+  ignore_errors: yes
+  when: isec.stat.exists == true

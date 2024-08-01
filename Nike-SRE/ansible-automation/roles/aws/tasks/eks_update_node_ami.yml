@@ -1,0 +1,70 @@
+---
+- name: show itens to apply patch in eks nodegroup
+  debug:
+    msg:
+      - "#######################################################################################"
+      - "##                            Values to upda eks node ami                            ##"
+      - "#######################################################################################"
+      - "## ami_id............: {{ami_id}}                                             ##"
+      - "## account...........: {{account}}                                             "
+      - "## eks_cluster_name..: {{eks_cluster_name}}                                    "
+      - "## aws_region........: {{aws_region}}                                                     ##"
+      - "## bu................: {{bu}}                                                            ##"
+      - "## eks_nodegroup_name: {{eks_nodegroup_name}} ##"
+      - "## chg_environment.: {{chg_environment}}"
+      - "#######################################################################################"
+      - "#######################################################################################"
+
+- name: set variable py_file to execute {{eks_cluster_name}}.py
+  set_fact:
+    py_file: "/home/Check/aws-eks-update-node-ami/{{account}}-{{eks_cluster_name}}.py"
+
+- name: Copy python template {{py_file}} to execute fix in ami account {{account}}      
+  become: yes
+  template:
+    src: roles/aws/templates/fixami_ansible.py
+    dest: '{{py_file}}'
+    owner: root
+    group: root
+    mode: 0644
+
+
+- name: recreate aws session
+  include_tasks: sts_connection.yml
+
+- name: execute '{{py_file}}' python fix ami eks_nodegroup_name {{eks_nodegroup_name}} desiredSize {{eks_nodegroup_describe.nodegroup.scalingConfig.desiredSize}} cluster {{eks_cluster_name}} from account {{account}}
+  shell: python3 '{{py_file}}'
+  ignore_errors: yes
+  register: update_node
+  become: yes
+
+- name: show update_node
+  block:
+    - name: show update_node
+      debug:
+        var: update_node.stdout_lines
+
+    - name: set fact to notify
+      set_fact:
+        notify_type: mail
+        title: 'Error in update eks nodegroup ami {{eks_cluster_name}} from {{account}}'
+        descr: "nodegroup name: {{eks_nodegroup_name}} | cluster name: {{eks_cluster_name}} |Account: {{account}}"
+        msg: '{{update_node.stdout_lines}}'
+        msg_to:
+          - "{{suport_email}}"
+            #              - alessandro.bahia@br.experian.com
+
+    - name: call notify when failed
+      include_role:
+        name: notify
+
+
+  when:  update_node.failed
+
+- name: remove python file '{{py_file}}'
+  become: yes
+  file:
+    state: absent
+    path: '{{py_file}}'
+
+  ###SDG###  

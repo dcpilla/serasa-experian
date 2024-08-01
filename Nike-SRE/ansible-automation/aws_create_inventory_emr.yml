@@ -1,0 +1,20 @@
+---
+- name: clean emrfields_list dictonary
+  set_fact:
+    emrfields_list: []
+
+- import_role:
+    name: aws
+    tasks_from: emr_list 
+
+- name: ADD emr invetory in {{inventory_emr_path}} from group {{account_name}}
+  become: yes
+  lineinfile:
+    path: '{{inventory_emr_path}}'
+    line: "{{account_id}}|{{account_name}}|{{item.emr_id}}|{{item.emr_name}}|{{item.emr_creationdatetime}}|{{item.emr_readydatetime}}|{{item.emr_tags}}|{{item.emr_arn}}"
+    state: present
+    create: true
+  with_items: '{{emrfields_list}}'
+  when:  emrfields_list != []
+
+### SDG ###  

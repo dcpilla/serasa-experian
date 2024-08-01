@@ -1,0 +1,17 @@
+---
+- hosts: localhost
+  gather_facts: yes
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    AWS_REGION: sa-east-1  
+  tasks:
+    - include_role:
+        name: aws
+        tasks_from: sts_connection
+
+    - include_role:
+        name: aws
+        tasks_from: acm_import_Certificate.yml
+  become: yes
+ ### SDG ###

@@ -1,0 +1,55 @@
+---
+- hosts: localhost
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    AWS_REGION: sa-east-1
+  become: yes
+  tasks:
+    - name: check variable not defined
+      debug:
+        msg: 
+              - "####################################"
+              - "## Vrable defined"  
+              - "####################################"
+              - "##  account"
+              - "##  so"
+              - "##  name"
+              - "####################################"
+
+      when: account is not defined or so is not defined or name is not defined
+
+    - import_role:
+        name: aws
+        tasks_from: sts_connection
+
+
+
+    - name: Create ec2 when subnetid is definet
+      import_role:
+        name: aws
+        tasks_from: ec2_create
+      when: subnetid is defined
+
+    - block:
+        - import_role:
+            name: aws
+            tasks_from: vpc_list
+                
+        - debug:
+            msg:
+              - "##################################################################" 
+              - '##                         Run Again                            ##'
+              - '##       choise a subneid and declare  subnetid variable        ##'
+              - "##################################################################" 
+              - ""
+              - "{{teste_subnet_id}}"
+              - ""
+              - "##################################################################" 
+              - '##                         Run Again                            ##'
+              - '##       choise a subnetid and declare subnetid variable        ##'
+              - "##################################################################" 
+      when: subnetid is not defined
+  become: yes
+
+        ### SDG ###        

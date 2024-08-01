@@ -1,0 +1,27 @@
+---
+- hosts: localhost
+  gather_facts: no
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    AWS_REGION: sa-east-1
+  tasks:
+    - name: remove existent inventory
+      become: yes
+      file:
+        state: absent
+        path: '{{item}}'
+      with_items:
+        - '{{inventory_s3_path}}'
+
+    - name: include task to call set ak sk role-task
+      include_tasks: aws_create_inventory_s3.yml
+      with_items:
+       - '{{accounts}}'
+#        - reportsdev
+#        - sredev
+      loop_control:
+        loop_var: account
+
+### SDG ######
+                  

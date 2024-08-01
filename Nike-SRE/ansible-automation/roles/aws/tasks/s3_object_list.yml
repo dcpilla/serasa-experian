@@ -1,0 +1,14 @@
+---
+- name: Retrieve a list of objects in S3 bucket 
+  amazon.aws.s3_object_info:
+    aws_access_key: "{{ assumed_role_ak }}"
+    aws_secret_key: "{{ assumed_role_sk }}"
+    security_token: "{{ assumed_role_token }}"
+    validate_certs: no
+
+    bucket_name: '{{bucket_name}}'
+  register: result    
+
+- debug:
+    var: result  
+

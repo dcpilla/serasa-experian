@@ -1,0 +1,76 @@
+---
+- name: Bootstrap Legacy for baremetal
+  block:
+    # Set basics configurations
+    - include_role:
+        name: config_machine
+
+    # Set legacy configurations 
+    - include_role:
+        name: config_machine
+        tasks_from: baremetal
+    
+    # Set network basic configurations
+    - include_role:
+        name: config_machine
+        tasks_from: network_basic
+
+    # Set definitions on sudoers
+    - include_role:
+        name: sudoers
+
+    # When is prod, register on Satellite 6
+    - include_role:
+        name: satellite6 
+
+    # Set basics packages 
+    - include_role:
+        name: yum
+
+    # Install and configure DNS
+    - include_role:
+        name: dns_config 
+      vars:
+          region: onpremise
+    
+    # Install NTP and configure
+    - include_role:
+        name: ntp
+
+    # Install centrify, register in AD ad update hostname in DNS
+    - include_role:
+        name: centrify
+   
+    # Set definitions of users 
+    - include_role:
+        name: users_definitions
+
+    # Install Rapid7
+    - include_role:
+        name: rapid7
+      when: drop_rapid7 is not defined or drop_rapid7 == 'no'
+    
+    # Install Tanium Agent
+    - include_role:
+        name: tanium
+
+    # Subscribe RedHat Insights
+    - include_role:
+        name: insights
+   
+    # Encase Agent
+    - include_role:
+        name: encase
+    
+    # McAfee Agent and Antivirus
+    - include_role:
+        name: mcafee
+
+    # SCCM Client
+    #- include_role:
+    #    name: sccm_client
+
+    # Set sshd configs
+    - include_role:
+        name: config_machine
+        tasks_from: config_sshd

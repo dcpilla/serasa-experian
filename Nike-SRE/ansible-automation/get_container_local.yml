@@ -1,0 +1,16 @@
+---
+- hosts: localhost
+  gather_facts: no
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    AWS_REGION: sa-east-1
+  become: yes
+  tasks:
+    - name:
+      include_tasks: check_token_time.yml
+
+    - name: 
+      include_tasks: search_container_vulnerability.yml
+
+###SDG###

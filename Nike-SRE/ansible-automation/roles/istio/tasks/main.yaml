@@ -1,0 +1,38 @@
+---
+- name: AWSautentication
+  include_role:
+    name: aws
+    tasks_from: sts_connection
+
+- name: include role with task kubectl_config_cluster.yml
+  include_role:
+    name: k8s
+    tasks_from: kubectl_config_cluster.yml
+ 
+
+- name: Verificando se o Helm esta Instalado
+  command: helm version
+  register: helm_version
+  failed_when: helm_version.rc != 0
+  changed_when: false
+
+- name: Update dos repositórios Helms 
+  command: helm repo update
+  register: helm_repo_update
+  failed_when: helm_repo_update.rc != 0
+
+- name: Upgrade Istio Helm chart
+  community.kubernetes.helm:
+    name: "{{ item.name }}"
+    chart_ref: "{{ item.chart }}"
+    namespace: "{{ item.namespace }}"
+    values_file: 
+      - "{{ item.values_file }}"
+  loop: "{{ helm_charts }}"
+  register: helm_upgrade
+  failed_when: helm_upgrade.rc != 0
+  
+- name: Helm Upgrade Result
+  debug:
+    msg: "{{ helm_upgrade }}"
+

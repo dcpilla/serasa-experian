@@ -1,0 +1,81 @@
+
+#roles/bootstrap/templates/saml2aws
+---
+
+
+- set_fact:
+    current_user: "{{user.split(':')|first}}"
+    prefix_mail: "{{user|split(':')|last}}"
+
+
+- name: config files of user {{current_user}} email {{prefix_mail}}
+  ignore_errors: yes
+  become: yes         
+  shell: '{{item}}'
+  #      no_log: yes
+  with_items:
+    - 'cp -r /home/svi4808-a/.tmux.conf /home/{{current_user}}'
+    - 'cp -r /home/svi4808-a/repo_kp/ /home/{{current_user}}'
+    - 'cp /home/svi4808-a/key_cod_nike_automation /home/{{current_user}}/'
+    - 'cp /home/svi4808-a/McAfee.pem /home/{{current_user}}/'
+    - 'cp /home/svi4808-a/set_eks.sh /home/{{current_user}}/'
+    - 'cp /home/svi4808-a/sre-suport.pem /home/{{current_user}}/'
+    - 'chown -R {{current_user}}. /home/{{current_user}}/'
+
+
+
+- name: line in file  /etc/sudoers.d/{{current_user}}
+  become: yes         
+  lineinfile:
+    path: '/etc/sudoers.d/{{current_user}}'
+    line: '{{current_user}} ALL=(ALL) NOPASSWD: ALL'
+    state: present
+    create: true
+
+- name: line in file  /home/{{current_user}}/.bash_profile
+  become: yes         
+  lineinfile:
+    path: '/home/{{current_user}}/.bash_profile'
+    line: '{{item}}' 
+    state: present
+    create: true
+  with_items:
+    - 'export https_proxy=http://spobrproxy.serasa.intranet:3128'
+    - 'export http_proxy=http://spobrproxy.serasa.intranet:3128'
+
+- name: line in file  /home/{{current_user}}/.bashrc
+  become: yes         
+  lineinfile:
+    path: '/home/{{current_user}}/.bashrc'
+    line: '{{item}}'
+    state: present
+    create: true
+  with_items:
+    - "alias vai='ssh -q -i ~/sre-suport.pem -o ConnectTimeout=3 -o StrictHostKeyChecking=no'"
+    - "source <(kubectl completion bash)"
+    - "alias k=kubectl"
+    - "alias kc=kubectl"
+    - "complete -o default -F __start_kubectl k"
+    - "complete -o default -F __start_kubectl kc"
+
+- name: running commands to execute ansible
+  become: yes
+  become_user: '{{current_user}}'
+  environment:
+      https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+      http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+  shell: '{{item}}'
+  with_items:
+    - 'git config --global http.sslVerify false' 
+    - 'python3.12 -m ensurepip --default-pip'
+    - 'python3.12 -m pip install awscli --upgrade'
+    - 'python3.12 -m pip install jmespath'
+    - 'python3.12 -m pip install boto3'
+    - 'python3.12 -m pip install botocore'
+    - 'ansible-galaxy collection install community.general --force'
+    - 'ansible-galaxy collection install community.aws --force'
+    - 'ansible-galaxy collection install ansible.posix --force'
+    - 'ansible-galaxy collection install kubernetes.core --force'
+    - 'python3.12 -m pip install xlsx2csv'
+
+      ###SDG###      

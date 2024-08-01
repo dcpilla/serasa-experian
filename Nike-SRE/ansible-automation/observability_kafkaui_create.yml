@@ -1,0 +1,22 @@
+---
+- hosts: localhost
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    AWS_REGION: sa-east-1
+  become: yes
+  tasks:
+    - name:
+      include_tasks: check_token_time.yml
+
+    - import_role:
+        name: aws
+        tasks_from: sts_connection.yml
+
+    - name: set new namespace {{kafka_ui_name}}
+      set_fact:
+        name_spaces: '{{kafka_ui_name}}'
+
+    - import_role:
+        name: observability
+        tasks_from: kafkaui_create.yml

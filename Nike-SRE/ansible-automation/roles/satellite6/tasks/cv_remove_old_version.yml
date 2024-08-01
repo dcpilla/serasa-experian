@@ -1,0 +1,16 @@
+---
+- set_fact:
+    COD_CV:  '{{item.split("-")[0]}}'
+
+- name: get the old-versions CV {{COD_CV}} {{item}}
+  delegate_to: spobrsatellite1
+  shell: hammer content-view version list --content-view-id '{{COD_CV}}'  | cut -d '|' -f1 | egrep -v "ID|----" |tail -n +4
+  register: cv_old_versions
+
+
+- name: remove old-versions CV {{COD_CV}}  {{item}}
+  delegate_to: spobrsatellite1
+  shell: hammer content-view  version delete --content-view-id '{{COD_CV}}' --id '{{item}}'
+  with_items:
+    - '{{cv_old_versions.stdout_lines}}'
+  when: cv_old_versions.stdout != ''

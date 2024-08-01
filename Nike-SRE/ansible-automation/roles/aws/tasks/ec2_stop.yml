@@ -1,0 +1,12 @@
+---
+- name: get instance
+  include_tasks: ec2_describe.yml
+  when: instance_id is not defined
+
+- name: stop instance
+  shell: "/usr/local/bin/aws ec2 stop-instances --instance-ids={{instance_id}} --region {{account_region}}  --profile=sts_cli"
+  ignore_errors: yes
+  register: instance_status
+
+- debug:
+    var: instance_status

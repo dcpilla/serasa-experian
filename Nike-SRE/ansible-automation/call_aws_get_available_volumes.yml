@@ -1,0 +1,58 @@
+---
+- hosts: spobrnikeworker
+  environment:
+    https_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    http_proxy: 'http://spobrproxy.serasa.intranet:3128'
+    AWS_REGION: sa-east-1  
+  become: yes
+  tasks:
+    - name: remove file {{voume_available_path}}
+      file:
+        state: absent
+        path: '{{voume_available_path}}'
+
+    - name: include task aws_get_available_volumes.yml
+      include_tasks: aws_get_available_volumes.yml
+      with_items:
+        - '{{accounts}}'
+      loop_control:
+        loop_var: account
+
+    - name: get number volumes vailable
+      shell: "wc {{voume_available_path}} | awk {'print $1'}"
+      register: available_number
+
+    - debug:
+        msg:
+          - "######################################"
+          - "## number of available  volumes: {{available_number.stdout}}##"
+          - "######################################"
+
+    - name: block when available_number.stdout|int > 0
+      block:
+        - name: get results
+          shell: cat '{{voume_available_path}}'
+          register: volumes_account
+
+#        - debug:
+#            var: volumes_account
+
+        - name: set fact to notify
+          set_fact:
+            notify_type: mail
+            title: 'Identified {{available_number.stdout}} available volumes'
+            descr: "available volumes: {{available_number.stdout}}"
+            msg: "{{volumes_account.stdout|replace('|','  ')|replace('\n','<br/>')}}"
+            msg_to:
+              - "{{suport_email}}"
+#             - alessandro.bahia@br.experian.com
+
+        - include_role:
+            name: notify
+
+
+      when: available_number.stdout|int > 0
+        
+
+        
+###SDG###

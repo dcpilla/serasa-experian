@@ -1,0 +1,17 @@
+---
+# Use shell/rpm command instead of yum module because of RHEL5
+- name: Check if MFEcma is installed
+  shell: rpm -qi MFEcma | grep ^Version | awk '{print $3}'
+  register: check_agent_version
+
+- name: Check if ISecESP is installed 
+  shell: rpm -qi ISecESP | grep ^Version | awk '{print $3}'
+  register: check_antivirus_version
+
+- fail:
+    msg: An higher or same version of the agent is already installed
+  when: check_agent_version.stdout == agent_version
+
+- fail:
+    msg: An higher or same version of the antivirus is already installed
+  when: check_antivirus_version.stdout == antivirus_version

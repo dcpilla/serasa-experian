@@ -1,0 +1,62 @@
+---
+- name: book and get ip by infoblox from fqdn {{fqdn}}...network {{network}}
+  delegate_to: '{{workerexec}}'
+  block:
+    - name: reserve ip of {{fqdn}} to {{network}} on infoblox server  {{server_api}}
+      uri:
+        url: https://{{server_api}}record:host?_return_fields=ipv4addrs
+        user: usr_ansible
+        password: '{{usr_ansible_pass}}'
+        status_code: 201    
+        method: POST
+        force_basic_auth: yes
+        validate_certs: no
+        body_format: json
+        body:
+          configure_for_dns: false
+          name: "{{fqdn}}"
+          ipv4addrs:
+            - ipv4addr: 'func:nextavailableip:{{network}}'
+              #            _function: 'next_available_ip'
+              #            _object_field: 'value'
+              #            _object: '10.50.2.0/24'
+              #          _parameters:
+              #            num: 1
+              #            exclude: [ '45.0.1.1' , '45.0.1.2' ],
+    
+      ignore_errors: yes
+      register: ip_reservation
+    
+    - name: Set the ip in variable host_ip
+      set_fact:
+        host_ip_infoblox: '{{ip_reservation.json.ipv4addrs.0.ipv4addr}}'
+    
+    - debug:
+        msg: 
+          - '############################################################'
+          - '#        Informations about Infoblox IP Reservation         '
+          - '#-----------------------------+-----------------------------'
+          - '# Network:                    | {{network}}'
+          - '# Reserved ip:                | {{host_ip_infoblox}}'
+          - '# Reservation was for server: | {{fqdn}}'
+          - '############################################################'
+
+    - name: Double check if {{host_ip_infoblox}} is available
+      shell: "ping -c1 -W3 '{{host_ip_infoblox}}' | head -n2 | awk '{print $6}'"
+      register: ping_ip
+
+    - set_fact:
+        precheck: false
+        result: 'O IP {{host_ip_infoblox}} já está sendo utilizado. Por favor, validar com sistemasdistribuidos@br.experian.com'
+      when: ping_ip.stdout_lines[1] is defined and ping_ip.stdout_lines[1].startswith('ttl')
+
+  when: fqdn is defined and network is defined
+
+    ## to running this playbook you need this variables
+    ###Variables name####values definition##
+    # fqdn       # load from roles/vsphere/tasks/load_rec_fact.yml
+    # network    # load from roles/vsphere/tasks/load_rec_fact.yml
+    #
+    # Returns
+    #   host_ip_infoblox
+

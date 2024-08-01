@@ -1,0 +1,22 @@
+---
+- include_role:
+   name: aws
+   tasks_from: acm_list.yml
+
+- name:  block when have certificate
+  block:
+    - name: delete acm account {{account}}
+      no_log: true
+      shell: export PGPASSWORD='{{pgs_pw}}';/usr/bin/psql  -h '{{pgs_host}}' -p 5432 -U '{{pgs_login}}' -d inventario -c "delete from certificate where account_id='{{account_id}}' ";unset PGPASSWORD
+      register: acm_clean
+
+    - debug:
+        var: acm_clean
+    
+    - name: register acm account {{account}}
+      no_log: true
+      shell: export PGPASSWORD='{{pgs_pw}}';/usr/bin/psql  -h '{{pgs_host}}' -p 5432 -U '{{pgs_login}}' -d inventario -c "insert into certificate (domain,account_id,acm,validate,created) values ('{{item.DomainName}}','{{account_id}}','{{item.CertificateArn}}','{{item.NotAfter}}','{{item.ImportedAt}}')";unset PGPASSWORD
+      loop: "{{acms_list.CertificateSummaryList}}"
+
+  when: acms_list.CertificateSummaryList != []
+###SDG### 

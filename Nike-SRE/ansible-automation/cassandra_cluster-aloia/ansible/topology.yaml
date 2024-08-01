@@ -1,0 +1,7 @@
+---
+
+cassandra_topology:
+  - "10.99.249.14={{cassandra_topology_datacenter_name}}:rack1" 
+  - "10.99.249.177={{cassandra_topology_datacenter_name}}:rack1"
+  - "10.99.249.19={{cassandra_topology_datacenter_name}}:rack1"
+  - "10.99.249.173={{cassandra_topology_datacenter_name}}:rack1"

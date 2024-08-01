@@ -1,0 +1,114 @@
+---
+- name: get lv opt/Tanium
+  shell: lvs | grep opt_Tanium | awk {'print $1'}
+  register: LVOptTanium
+
+- debug:
+    var: LVOptTanium
+
+- name: Create Mount Point Tanium
+  block:
+    - name: Create a directory /opt/Tanium if it does not exist 
+      file:
+        path: /opt/Tanium
+        state: directory
+        mode: 0700
+
+    - name: Get VG of /opt/Tanium directory
+      shell: df -h /opt/Tanium | awk {'print $1'} | cut -d '/' -f4| cut -d '-' -f1| grep -v Filesystem
+      register: VGBARRA
+      ignore_errors: yes
+
+#    - debug:
+#        var: VGBARRA
+
+    - name: check if  VG {{VGBARRA.stdout}} is GiB FREE
+      shell: vgdisplay '{{VGBARRA.stdout}}' | grep Free | awk {'print $8'}
+      register: VgRhelSizeFree
+
+#    - debug:
+#        var: VgRhelSizeFree
+
+    - name: Set config to create LVTanium form VG-rhel
+      block:
+        - name: Set Vol rhel LVTanium
+          set_fact:
+            NewVolName: '{{VGBARRA.stdout}}'
+
+        - name: Set SizeNewLV
+          set_fact:
+            SizeNewLV: 1024
+
+      when: VgRhelSizeFree is defined and VgRhelSizeFree.stdout == 'GiB'  and LVOptTanium.stdout == ''
+
+    - name: Set itens to create LV opt_Tanium  from a new Disk  
+      block:
+        - name: Set Vol VGTANIUM of  LV opt_Tanium
+          set_fact:
+            NewVolName: VGTANIUM
+
+        - name: Set Size Disk
+          set_fact:
+            extra_disk: 1
+
+        - import_role:
+            name: vsphere
+            tasks_from: vsphere_add_disk_vmware.yml
+
+        - name: Get Last disk add
+          shell: fdisk -l |grep -v identifier|grep Disk | tail -1 | awk {'print $2'}| cut -d ':' -f1
+          register: LastDiskADD
+
+        - name: Create VGTANIUM  on Disk {{LastDiskADD.stdout}}
+          lvg:
+            vg: VGTANIUM
+            pvs: '{{ LastDiskADD.stdout }}'
+        
+        - name: Set SizeNewLV
+          set_fact:
+            SizeNewLV: +100%FREE
+
+      when: (VgRhelSizeFree is defined and VgRhelSizeFree.stdout != 'GiB'  and LVOptTanium.stdout  == '') or (VgRhelSizeFree is not defined  and LVOptTanium.stdout == '')
+
+#    - debug:
+#        var: '{{item}}'
+#      with_items:
+#        - NewVolName
+#        - SizeNewLV        
+
+    - name: Create LV Tanium on VG= {{NewVolName}}
+      lvol:
+        vg: '{{ NewVolName }}'
+        lv: opt_Tanium
+        size: '{{ SizeNewLV }}'
+      register: lv
+
+#    - debug:
+#        var: lv
+
+    - set_fact:
+        FsType: xfs  
+
+    - name: set ext4 when rhel < 7
+      set_fact:
+        FsType: ext4 
+      when: ansible_distribution_major_version|int < 7
+     
+#    - debug:
+#        var: FsType
+
+    - name: Fomat {{FsType}} type LV Tanium /dev/mapper/{{NewVolName}}-opt_Tanium
+      filesystem:
+        fstype: '{{FsType}}'
+        dev: /dev/{{NewVolName}}/opt_Tanium
+
+
+    - name: Mount LV Tanium=/dev/mapper/{{NewVolName}}-opt_Tanium  disk  and write on fstab
+      mount:
+        path: /opt/Tanium
+        src: /dev/{{NewVolName}}/opt_Tanium
+        fstype: '{{FsType}}'
+        opts: defaults
+        state: mounted
+
+  when: LVOptTanium is defined and LVOptTanium.stdout == ''

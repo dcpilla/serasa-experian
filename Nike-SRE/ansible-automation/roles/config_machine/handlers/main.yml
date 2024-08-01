@@ -1,0 +1,9 @@
+- name: Restart centrify-sshd when not EID
+  service: name=centrify-sshd state=reloaded
+  listen: restart ssh service
+  when: centrify_sshd_config.stat.exists == True
+
+- name: Restart sshd when EID
+  service: name=sshd state=reloaded
+  listen: restart ssh service
+  when: centrify_sshd_config.stat.exists == false

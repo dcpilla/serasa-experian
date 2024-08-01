@@ -1,0 +1,103 @@
+---
+- set_fact:
+    states:
+      - "Assess and Plan"
+      - "Authorize"
+      #- "Scheduled"
+    state_review: "Review"
+
+- name: get sys_id to {{chg_num}}
+  environment:
+    https_proxy: https_proxy=https://spobrproxy:3128
+  uri:
+   url: "https://{{instance}}.service-now.com/api/now/table/change_request?sysparm_query=number={{chg_num}}"
+   method: GET
+   return_content: yes
+   headers:
+    Accept: "application/json"
+   user: "{{ snow_login }}"
+   password: "{{ snow_pass }}"
+   body_format: json
+   validate_certs: no
+  register: change_info
+
+- name: Extrair sys_id da CHG
+  set_fact:
+   change_sys_id: "{{ change_info.json.result[0].sys_id }}"
+
+- name: Alterar estado da mudanca para cada estado intermediario_de_AssecAndPlan_ate_Scheduled
+  environment:
+    https_proxy: https_proxy=https://spobrproxy:3128
+  uri:
+    url: "https://{{instance}}.service-now.com/api/now/table/change_request/{{change_sys_id}}"
+    #url: "https://experianworker.service-now.com/api/eplc/exp/table/change_request/{{chg_num}}"
+    #url: "https://experianworker.service-now.com/api/eplc/exp/getStandardChangeStatus/c719bacfdb9f97402511fa910f96192e/getStandardChangeStatus?searchVal={{chg_num}} "
+    method: PATCH
+    return_content: yes
+    headers:
+      Accept: "application/json"
+      Content-Type: "application/json"
+    user: "{{ snow_login }}"
+    password: "{{ snow_pass }}"
+    body_format: json
+    body: 
+      #state: "{{state_Authorize}}"
+      state: "{{ item }}"
+    validate_certs: no
+  loop: "{{ states }}"
+
+- name: Aguardar ate que a CHG esteja no estado 'Implement'
+  environment:
+    https_proxy: https_proxy=https://spobrproxy:3128
+  uri:
+    url: "https://{{instance}}.service-now.com/api/now/table/change_request/{{change_sys_id}}"
+    method: GET
+    return_content: yes
+    headers:
+      Accept: "application/json"
+      Content-Type: "application/json"
+    user: "{{ snow_login }}"
+    password: "{{ snow_pass }}"
+    validate_certs: no
+    body_format: json
+  register: change_details
+  until: change_details.json.result.state == "-1"  # 0 REVIEW / -1 IMPLEMENT / -2 SCHEDULED / -3 Assess and Plan / -4 Authorize / -5 NEW
+  retries: 10 # REPETIR 8 VEZES
+  delay: 10  # 10 SEGUNDOS
+
+- debug:
+    var: change_details.json.result.state
+  
+
+
+- name: Alterar estado da CHG para review
+  environment:
+    https_proxy: https_proxy=https://spobrproxy:3128
+  uri:
+    url: "https://{{instance}}.service-now.com/api/now/table/change_request/{{change_sys_id}}"
+    #url: "https://experianworker.service-now.com/api/eplc/exp/table/change_request/{{chg_num}}"
+    #url: "https://experianworker.service-now.com/api/eplc/exp/getStandardChangeStatus/c719bacfdb9f97402511fa910f96192e/getStandardChangeStatus?searchVal={{chg_num}} "
+    method: PATCH
+    return_content: yes
+    headers:
+      Accept: "application/json"
+      Content-Type: "application/json"
+    user: "{{ snow_login }}"
+    password: "{{ snow_pass }}"
+    body_format: json
+    body: 
+      state: "{{ state_review }}"
+    validate_certs: no
+  register: change_details
+  
+- debug:
+    var: change_details.json.result.state
+
+
+  #register: state_change
+   
+#state change number
+#- debug:
+ #   var: state_change
+
+#

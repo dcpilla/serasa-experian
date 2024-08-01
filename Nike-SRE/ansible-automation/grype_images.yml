@@ -1,0 +1,54 @@
+---
+- name: set files
+  set_fact:
+    grype_fyle: '/home/Check/{{cluster_name}}.txt'
+
+- name: remove grype_fyle
+  become: yes
+  file:
+    state: absent
+    path: '{{grype_fyle}}'
+
+- name: include role with task kubectl_config_cluster.yml
+  include_role:
+    name: k8s
+    tasks_from: kubectl_config_cluster.yml
+
+
+
+    #- set_fact:
+    #    exec_command: /usr/local/bin/kubectl get pods --all-namespaces -o json | jq -r '.items[] | .metadata.namespace + "/" + .metadata.name + ": " + (.spec.containers[].image)' | cut -d ' ' -f2    
+
+    #- debug:
+    #    var: exec_command    
+
+- name: exec json get pods
+  ignore_errors: yes
+  shell: "/usr/local/bin/kubectl get pods --all-namespaces -o jsonpath="{.items[*].spec['initContainers', 'containers'][*].image}" |tr -s '[[:space:]]' '\n' |sort |uniq -c | awk {'print $2'}| grep -v {{account_id}}.dkr."
+  
+  #  shell: '{{exec_command}}'
+  #shell: /usr/local/bin/kubectl get pods --all-namespaces -o json | jq -r '.items[] | .metadata.namespace + "/" + .metadata.name + ": " + (.spec.containers[].image)' 
+  #  shell: '/usr/local/bin/kubens'
+  # shell: /usr/local/bin/kubectl get pods --all-namespaces 
+  #-o json
+  register: imaglist
+
+  #- set_fact:
+  #    jq: '{{jq.stdout|from_json}}'
+
+- debug:
+    var: imaglist.stdout_lines
+
+
+- name: exec grype {{grype_fyle}}
+  become: yes
+  shell:  "echo '{{{{account}}}}|{{cluster_name}}|{{item}}|`/usr/local/bin/trivy image {{item}}| grep Total: >>{{grype_fyle}}` "  
+  with_items: '{{imaglist.stdout_lines}}'
+
+
+
+#- name:
+#  shell:
+# images=$(kubectl get pods --all-namespaces -o json | jq -r '.items[] | .metadata.namespace + "/" + .metadata.name + ": " + (.spec.containers[].image)' | cut -d ' ' -f2)
+# 'for V in $images ; do echo "##### grype of $V ####" >> /tmp/grype-out.txt ; grype $V >> /tmp/grype-out.txt; done'
+

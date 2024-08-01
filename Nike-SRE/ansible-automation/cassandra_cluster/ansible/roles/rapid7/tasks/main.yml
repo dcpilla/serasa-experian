@@ -1,0 +1,62 @@
+---
+- name: Install Unzip
+  yum:
+    name: "{{ item }}"
+    state: latest
+  loop:
+    - "unzip"
+  tags:
+    - rapid7
+    - packages
+    - repository
+
+- name: Create rapid7 temporary directory
+  file:
+    path: "/tmp/rapid7"
+    state: directory
+    recurse: true
+  tags:
+    - rapid7
+    - configuration
+
+- name: Download Rapid7
+  get_url:
+    url: "{{rapid7_url}}"
+    validate_certs: no
+    dest: /tmp/rapid7/rapid7.zip
+  environment: "{{proxy_env}}"
+  tags:
+    - rapid7
+    - configuration
+
+- name: Extract Rapid7
+  unarchive:
+    src: /tmp/rapid7/rapid7.zip
+    dest: /tmp/rapid7
+  tags:
+    - rapid7
+    - configuration
+
+- name: Permission for rapid7
+  file:
+    path: /tmp/rapid7/agent_installer.sh
+    mode: '0750'
+
+- name: Install Rapid7
+  shell: /tmp/rapid7/agent_installer.sh reinstall_start --attributes "{{rapid7_args}}"
+  environment: "{{proxy_env}}"
+  tags:
+    - rapid7
+    - configuration
+
+- meta: flush_handlers
+
+- name: Ensure rapid7 service is enabled and started
+  systemd:
+    name: ir_agent
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  tags:
+    - rapid7
+    - configuration

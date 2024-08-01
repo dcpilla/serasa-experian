@@ -1,0 +1,5 @@
+dc="{{cassandra_topology_datacenter_name}}"
+rack=rack1
+{% if cassandra_endpoint_snitch in ["GossipingPropertyFileSnitch", "Ec2MultiRegionSnitch"] %}
+prefer_local=true
+{% endif %}

@@ -1,0 +1,38 @@
+---
+- name: Include role to install Rapid7
+  include_role:
+    name: rapid7
+  when: not hostname.startswith('lab') 
+
+- name: Include role to install Tanium Agent
+  include_role:
+    name: tanium
+
+- name: Include role to install McAfee Agent and Antivirus
+  include_role:
+    name: mcafee
+
+# nimsoft nimbus
+#- include_role:
+#    name: nimsoft
+
+- name: Include role to install IBM  BESAgent ILMT
+  include_role:
+    name: besagent
+  when: not hostname.startswith('lab')
+
+- name: Include role to install Red Hat Insights when region not is amazon - currentent {{region}}
+  include_role:
+    name: insights
+    tasks_from: register
+  when: region is not defined or region != 'amazon'
+                
+- name: Include role to install Encase Agent when region not is amazon - currentent {{region}}
+  include_role:
+    name: encase
+  when: region is not defined or region != 'amazon'
+
+- name: Include role to install Zabbix Agent
+  include_role:
+    name: zabbix
+  when: not hostname.startswith('lab')

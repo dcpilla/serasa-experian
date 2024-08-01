@@ -1,0 +1,236 @@
+AUTOMATION_AK: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          35616233616134616237343436356631383765323238386639313333633262313437313764386261
+          6339623461336431376635313137663733666263343736620a376138663232653932303939343265
+          33633133396233616133623562666133396534613033366661326338383765653130323833353638
+          3839303664383363310a353764626135346632336262303836376233633731333334303736346465
+          33346638636631376264366263633863613837343065306135326132343866356631
+
+
+
+
+AUTOMATION_SK: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          34353163623030646433623362663764386636653533626533613638316432633962613035303561
+          3861663232623938333862316238343938383238363662350a353136373937393036393436393661
+          66623463663565303366323832343861613832376661373630623431323565646631356237343136
+          6664353934363734360a323539333236653262636262643838613933393334343666333630383266
+          37333664656230353066383437663662313761303934626632353533353439353130636630633962
+          3434366430313532366661613964393632323137333639336632
+
+pgs_host: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          64376530346164393864653466336135663537653035386539663431636236323233613762373236
+          3366623561663164333738313561396561373933343566320a333130663132373362653738626633
+          37643836356633643933383565626666346339363239393332326234656330326332656332373762
+          3432636461356630360a313261363533663839633565623932643566326463333566303433323166
+          30306262343535346639303534616661343330353735313532333334323138616137326665393339
+          36613161313134383661663232646431396164343532333732313264666436663062323533343861
+          306334666530343265306563316361396364
+
+pgs_login: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          62333233396163346436623163666631313433613031303362366666323730353937363334363663
+          3437346531383636646663363563326637363136313531380a666431653566613232366331303166
+          61356262643133643532646539343364663866323339346130633233613338393530656133376637
+          6136326633346339650a333939306665333936356130306362313732343262643737323430336638
+          6535
+
+pgs_pw: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          66363136623135623931396565643766323561626239383833366338643333323233623564656234
+          3163366462393235373366343236366532653564663863320a666164313736376636343962346632
+          35646232313339346139336338363634303131656439383865376537363561663239353535623131
+          3866386238343862340a393132636463306561303638393535303439336166633762316332333531
+          6639
+
+
+#AUTOMATION_AK: !vault |
+#          $ANSIBLE_VAULT;1.1;AES256
+#          31306662363031316662666334376130626364393864386639613235653535336339383562646634
+#          3232613866636533376261306164636666383031386139370a303730353465346139346532373566
+#          39323030623235336266303031363761643164663134366434636136396434376533633138336330
+#          3832393266643431640a386466393333613234616233653231663039326632356366373433633332
+#          62636331623163663263653738363538336664323865396337393265656430626364
+#
+#AUTOMATION_SK: !vault |
+#          $ANSIBLE_VAULT;1.1;AES256
+#          64346664313439663461323539376661643039636639353835346662313337323066313137646432
+#          3466623865316431323333633639323430306638363634330a663635313164333466383739316438
+#          36396265653931363831333463633766666432663030646136656262383862656130316263326437
+#          6364666231316436300a656433316232626235623866363938393737356133303566363361376462
+#          66646534393635356235343636316664306233363430323339663763343932643832323035373433
+#          6164373462356139376566633134363732313135303834393839
+#AUTOMATION_AK: !vault |
+#          $ANSIBLE_VAULT;1.1;AES256
+#          66666335333536633564626434363265313936383337373639393338386263643837663235656130
+#          6137356461636165396430353230376564613233653439650a333766646136326435366461656664
+#          65626532386231626530323865653461336130326436633363363462613236386165623163663930
+#          3431356432343436390a633136313437363230313133393133393237353437653661316530623336
+#          63353738353135363333623536646130663164323030333162383435656638353465
+
+
+#AUTOMATION_SK: !vault |
+#          $ANSIBLE_VAULT;1.1;AES256
+#          62643337343661383030306339393264396136316535643136343464616464356238643762393561
+#          6163643536373136653264616132303738393738653938620a653338663337386264326634373965
+#          61633137333233393235626163653461383736653765313336646562656365363664656537643763
+#          3635353232386362350a306264323532343863643737373730333138356263353663663635336236
+#          61393338383734666264613363363964623530316561303232633432313933353463666232636261
+#          6266313838376661333633613064623230363837666231323033
+
+
+profile:
+  arcsandbox:
+    id: 187739130313
+    appid: 21231
+    enviroment: sbx
+    ccosting: 1800.BR.100.404506
+    email_team: nikesre@br.experian.com
+    sm_team: nikesre@br.experian.com
+    tl_team: nikesre@br.experian.com
+    manager: reinaldo.veloso@br.experian.com
+    region: sa-east-1
+    domain: nikeeksdev.br.experian.eeca
+  corporatedev: 
+    id: 153056696998
+    appid: 21231
+    enviroment: dev
+    ccosting: 1800.BR.100.404506
+    email_team: nikesre@br.experian.com
+    sm_team: nikesre@br.experian.com
+    tl_team: nikesre@br.experian.com
+    manager: reinaldo.veloso@br.experian.com
+    region: sa-east-1
+    domain: 
+  corporateprod: 
+    id: 564593125549
+    appid: 21231
+    enviroment: prd
+    email_team: nikesre@br.experian.com
+    ccosting: 1800.BR.100.404506
+    sm_team: nikesre@br.experian.com
+    tl_team: nikesre@br.experian.com
+    manager: reinaldo.veloso@br.experian.com
+    region: sa-east-1
+    domain: nike-corporate-prod.br.experian.eeca
+  dsdev:
+    id: 530914589075
+    appid: 19558
+    enviroment: dev    
+    ccosting: 1800.BR.100.404506
+    email_team: nikesre@br.experian.com
+    sm_team: rodrigo.bernardo@br.experian.com
+    tl_team: robson.coutinho@br.experian.com
+    manager: fernando.ito@br.experian.com
+    region: sa-east-1
+    domain: dev-ds.br.experian.eeca
+  dsprod:
+    id: 662860092544
+    appid: 19558
+    enviroment: prd
+    ccosting: 1800.BR.100.404506
+    email_team: nikesre@br.experian.com
+    sm_team: rodrigo.bernardo@br.experian.com
+    tl_team: robson.coutinho@br.experian.com
+    manager: fernando.ito@br.experian.com
+    region: sa-east-1
+    domain: prod-ds.br.experian.eeca
+  dsstage:
+    id: 146737708860
+    appid: 19558
+    enviroment: stg
+    ccosting: 1800.BR.100.404506
+    email_team: nikesre@br.experian.com
+    sm_team: rodrigo.bernardo@br.experian.com
+    tl_team: robson.coutinho@br.experian.com
+    manager: fernando.ito@br.experian.com
+    region: sa-east-1
+    domain: uat-ds.br.experian.eeca
+  sredev:
+    id: 504195663072
+    appid: 21231
+    enviroment: dev
+    ccosting: 1800.BR.124.602000
+    email_team: nikesre@br.experian.com
+    sm_team: nikesre@br.experian.com
+    tl_team: nikesre@br.experian.com
+    manager: reinaldo.veloso@br.experian.com
+    region: sa-east-1
+    domain: nike-sre.br.experian.eeca
+  ssrmdev:
+    id: 306716481758
+    appid: 12019
+    enviroment: dev
+    ccosting: 1800.BR.124.602000    
+    email_team: nikesre@br.experian.com
+    sm_team: vanessa.kis@br.experian.com
+    tl_team: cristovao.costa@br.experian.com
+    manager: Thiago.Trigo@br.experian.com
+    region: sa-east-1
+    domain: 
+  ssrmprod: 
+    id: 877001948254
+    appid: 12019
+    enviroment: prd
+    ccosting: 1800.BR.124.602000    
+    email_team: nikesre@br.experian.com
+    sm_team: vanessa.kis@br.experian.com
+    tl_team: cristovao.costa@br.experian.com
+    manager: Thiago.Trigo@br.experian.com
+    region: sa-east-1
+    domain: nikessrmprod.br.experian.eeca|nikessrmuat.br.experian.eeca
+  ssrmsandbox:
+    id: 087086536124
+    appid: 12019
+    enviroment: sbx
+    ccosting: 1800.BR.124.602000    
+    email_team: nikesre@br.experian.com
+    sm_team: vanessa.kis@br.experian.com
+    tl_team: cristovao.costa@br.experian.com    
+    manager: Thiago.Trigo@br.experian.com
+    region: sa-east-1
+    domain: nikessrmsandbox.br.experian.eeca
+  datahubdev:
+    id: 730335661246
+    appid: 23008
+    enviroment: dev
+    ccosting: 1800.BR.100.502500
+    email_team: nikesre@br.experian.com
+    sm_team: andre.silva@br.experian.com
+    tl_team: cezar.godinho@br.experian.com    
+    manager: fernando.ito@br.experian.com
+    region: sa-east-1
+    domain: datahub-dev.br.experian.eeca
+  datahubprod:
+    id: 415071355886
+    appid: 23008
+    enviroment: prd
+    ccosting: 1800.BR.100.502535
+    email_team: nikesre@br.experian.com
+    sm_team: andre.silva@br.experian.com
+    tl_team: cezar.godinho@br.experian.com
+    manager: fernando.ito@br.experian.com
+    region: sa-east-1
+    domain: datahub-prod.br.experian.eeca
+    #  consentdev:
+    #    id: 992382670558
+    #    appid: 17553
+    #    enviroment: dev
+    #    ccosting: 1800.BR.685.501000
+    #    email_team: nikesre@br.experian.com
+    #    sm_team: Gabriela.Barboza@br.experian.com
+    #    tl_team: andre.silva@br.experian.com
+    #    manager: lais.altube@br.experian.com
+    #    region: us-east-1
+    #  consentprod:
+    #    id: 975050357449
+    #    appid: 17553 
+    #    enviroment: prd
+    #    ccosting: 1800.BR.685.501000
+    #    email_team: nikesre@br.experian.com
+    #    sm_team: Gabriela.Barboza@br.experian.com
+    #    tl_team: andre.silva@br.experian.com
+    #    manager: lais.altube@br.experian.com
+    #    region: us-east-1
+    #

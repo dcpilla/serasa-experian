@@ -1,0 +1,115 @@
+---
+- name: set fqdn
+  set_fact:
+    machine_fqdn: "{{ machine_fqdn_list | join }}"
+
+- name: Get CyberArk credentials for "{{ username }}"
+  uri:
+    url: "{{ CCP_URL }}/AIMWebService/api/Accounts?AppID={{ app_id }}&Object={{cyberark_ObjectName}}"
+    method: GET
+    validate_certs: no
+  register: cyberark_password
+
+- name: "Get API Token"
+  uri:
+    url: "{{ PVWA_URL }}/PasswordVault/API/Auth/CyberArk/Logon"
+    method: POST
+    body_format: json
+    body: {"Username": "{{ username }}", "Password": "{{ cyberark_password.json.Content }}" }
+    return_content: no
+    validate_certs: no
+  register: api_token_output
+  run_once: true
+
+- name: "get token fact"
+  set_fact:
+    api_token: "{{ api_token_output.json  }}"
+  run_once: true
+
+- name: Set {{ account_type[os_name] }} object name to create cyberark account
+  set_fact:
+    object_name_onboard_user: "{{ account_type[os_name] }}@{{ machine_address }}"
+
+
+- name: Set object name to search if {{ account_type[os_name] }} account exists before deleting it
+  set_fact:
+    search_name_onboard_user: "{{ account_type[os_name] }}%20{{ machine_address }}"
+
+- name: get accounts to verify if {{ account_type[os_name] }} object already exists
+  uri:
+    url: "{{ PVWA_URL }}/PasswordVault/WebServices/PIMServices.svc/Accounts?safe={{ previous_safe[os_name] }}&Keywords={{ search_name_onboard_user }}"
+    method: GET
+    validate_certs: no
+    headers:
+      Authorization: "{{ api_token }}"
+  register: accounts_onboard_user
+
+- debug:
+    msg: "Starting exclusion of {{ machine_fqdn }}"
+  when: accounts_onboard_user.json.Count != 0
+
+- name: Move {{ account_type[os_name] }}@{{ machine_address }} account to Recycle bin - CyberArk
+  uri:
+    url: "{{ PVWA_URL }}/PasswordVault/api/Accounts"
+    method: POST
+    body_format: json
+    body: {"name": "{{ object_name_onboard_user }}", "address": "{{ machine_address }}", "userName": "{{ account_type[os_name] }}", "platformId": "{{ static_platform_name }}", "safeName": "{{ recycle_safe_name }}", "secretType":"password" ,"secret": "Dummy" }
+    validate_certs: no
+    status_code: 201
+    headers:
+      Authorization: "{{ api_token }}"
+  ignore_errors: yes
+  when: 
+    - accounts_onboard_user.json.Count > 0
+    - "'linux' in os_name"
+
+- name: Move {{ account_type[os_name] }}@{{ machine_address }} account to Recycle bin - CyberArk
+  uri:
+    url: "{{ PVWA_URL }}/PasswordVault/api/Accounts"
+    method: POST
+    body_format: json
+    body: {"name": "{{ object_name_onboard_user }}", "address": "{{ machine_address }}", "userName": "{{ account_type[os_name] }}", "platformId": "{{ static_platform_name }}", "safeName": "{{ recycle_safe_name }}", "secretType":"password" ,"secret": "Dummy" }
+    validate_certs: no
+    status_code: 201
+    headers:
+      Authorization: "{{ api_token }}"
+  ignore_errors: yes
+  when: 
+    - accounts_onboard_user.json.Count > 0
+    - "'windows' in os_name"
+
+- name: Get {{ account_type[os_name] }} cyberark account once moved
+  uri:
+    url: "{{ PVWA_URL }}/PasswordVault/WebServices/PIMServices.svc/Accounts?safe={{ recycle_safe_name }}&Keywords={{ search_name_onboard_user }}"
+    method: GET
+    validate_certs: no
+    headers:
+      Authorization: "{{ api_token }}"
+  register: account_moved_onboard_user
+
+- name: Delete {{ account_type[os_name] }} account in CyberArk from previous safe
+  uri:
+    url: "{{ PVWA_URL  }}/PasswordVault/WebServices/PIMServices.svc/Accounts/{{ accounts_onboard_user.json.accounts[0].AccountID }}"
+    method: DELETE
+    body_format: json
+    validate_certs: no
+    headers:
+      Authorization: "{{ api_token }}"
+  ignore_errors: yes
+  when:
+    - account_moved_onboard_user.json.Count > 0
+    - accounts_onboard_user.json.Count > 0
+
+- name: logoff from cyberark
+  uri:
+    url: "{{ PVWA_URL }}/PasswordVault/API/Auth/Logoff"
+    method: POST
+    body_format: json
+    validate_certs: no
+    headers:
+      Authorization: "{{ api_token }}"
+
+- debug:
+    msg: "{{ machine_fqdn }} does not exists in safe"
+  when: accounts_onboard_user.json.Count == 0
+

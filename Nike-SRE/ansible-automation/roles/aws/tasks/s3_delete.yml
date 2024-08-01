@@ -1,0 +1,19 @@
+---
+- name: delete s3 name {{s3name}} from account {{account}} 
+  s3_bucket:   # https://docs.ansible.com/ansible/2.9/modules/s3_bucket_module.html#s3-bucket-module
+    aws_access_key: "{{ assumed_role_ak }}"
+    aws_secret_key: "{{ assumed_role_sk }}"
+    security_token: "{{ assumed_role_token }}"
+    validate_certs: no
+    state: absent
+    force: true
+
+    name: '{{s3name}}'
+#   policy: "{{ lookup('file','policy.json') }}"
+#   requester_pays: yes
+#   versioning: yes
+#   purge_tags: no
+#    tags:
+#      "{{tag}}"
+
+### SDG ###  

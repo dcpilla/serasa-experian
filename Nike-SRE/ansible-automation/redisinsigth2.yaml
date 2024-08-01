@@ -1,0 +1,107 @@
+---
+#https://fahadahammed.medium.com/how-to-deploy-redisinsight-in-eks-and-access-via-ingress-nginx-3e4daf5008e0
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: redisinsight
+  labels:
+    name: redisinsight
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: redisinsight-cert
+  namespace: redisinsight
+spec:
+  secretName: redisinsight-cert
+  dnsNames:
+  - redisinsight.nikereportsdev.br.experian.eeca
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redisinsight
+  namespace: redisinsight
+  labels:
+    app: redisinsight
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "redisinsight"
+  template:
+    metadata:
+      labels:
+        app: redisinsight
+    spec:
+      containers:
+      - name:  redisinsight
+        image: redislabs/redisinsight:latest
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: RILOGLEVEL
+            value: "DEBUG"
+          - name: RITRUSTEDORIGINS
+            value: "https://redisinsight.nikereportsdev.br.experian.eeca"
+        volumeMounts:
+        - name: db
+          mountPath: /db
+        ports:
+        - containerPort: 8001
+          name: http-port
+      volumes:
+      - name: db
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redisinsight-service
+  namespace: redisinsight
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      name: http-port
+      protocol: TCP
+      targetPort: 8001
+  selector:
+    app: redisinsight
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: redisinsight
+  name: redisinsight-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    nginx.org/server-snippets: "gzip on;"
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-passthrough: 'true'
+    # type of authentication
+    nginx.ingress.kubernetes.io/auth-type: basic
+    # name of the secret that contains the user/password definitions
+    nginx.ingress.kubernetes.io/auth-secret: basic-auth-for-redisinsight
+    # message to display with an appropriate context why the authentication is required
+    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required !'
+spec:
+  tls:
+  - hosts:
+    - redisinsight.nikereportsdev.br.experian.eeca
+    secretName: redisinsight-cert
+  rules:
+  - host: redisinsight.nikereportsdev.br.experian.eeca
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: redisinsight-service
+            port:
+              number: 80

@@ -1,0 +1,4 @@
+---
+rapid7_version: "v3.1.6.42"
+rapid7_args: "Servers EEC AWS, LATAM"
+rapid7_url: "https://code.experian.local/projects/CYTHMA/repos/rapid7-agent-packages/raw/archive/linux__Insight_Agent.{{rapid7_version}}.zip?at=refs%2Fheads%2Fmaster"

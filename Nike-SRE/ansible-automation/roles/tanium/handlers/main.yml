@@ -1,0 +1,7 @@
+---
+- name: restart taniumclient
+  service:
+      name: taniumclient
+      state: restarted
+      enabled: yes
+  listen: restart taniumclient

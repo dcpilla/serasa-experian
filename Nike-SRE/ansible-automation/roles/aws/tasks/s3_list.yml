@@ -1,0 +1,46 @@
+---
+- name: clean s3_list
+  set_fact:
+    s3_list: !!null
+
+- name: Incluir Assume-Role
+  include_tasks: sts_connection.yml
+
+- name: list s3 account {{account}}
+  aws_s3_bucket_info:
+    aws_access_key: "{{ assumed_role_ak }}"
+    aws_secret_key: "{{ assumed_role_sk }}"
+    security_token: "{{ assumed_role_token }}"
+    region: '{{account_region}}'
+    validate_certs: no  
+    #     bucket_facts: true
+  register: s3_list
+
+- name: debug s3_list variable
+  debug:
+    var: s3_list
+
+- name: List s3 test1
+  debug:
+    msg: "{{ s3_list.buckets|map(attribute='name')|list}}"
+
+
+- name: Set s3_fields variable with fields selected
+  set_fact:
+    s3_fields: "{{s3_list|json_query(jmesquery)|list}}"
+  vars:
+    jmesquery: "buckets[*].{names:name}"
+    #network_interfaces[].private_ip_address   tag_sched:tags.Instance-Scheduler    
+  when: s3_list.buckets != []
+
+- name: show s3_fields from {{account}}
+  debug:
+    var: s3_fields|map(attribute='name'|list)
+
+#- name: describe s3 fields
+#  include_tasks: s3_list_describe.yml
+#  with_items: '{{s3_fields}}'  
+#  loop_control:
+#    loop_var: bucket_name
+
+### SDG ###    

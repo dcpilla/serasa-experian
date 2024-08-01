@@ -1,0 +1,58 @@
+---
+- name: Configure Network Time Protocol(NTP)
+  block:
+      - name: Instal and Configure Client NTP when rhel less than 8 
+        block:
+          - name: Install NTP when rhel 7 or  less
+            yum:
+              name: ntp
+              state: present
+
+          - name: Define template NTP
+            template:
+              src: ntp.conf
+              dest: /etc/ntp.conf
+              owner: root
+              group: root
+              mode: 0644
+
+          - name: Force sync NTP
+            shell: /usr/sbin/ntpd -gq
+            ignore_errors: yes
+
+          - name: Restart NTP service
+            service:
+              name: ntpd
+              enabled: yes
+              state: restarted
+
+        when: ansible_distribution_major_version|int < 8
+
+      - name: Instal and Configure Client NTB By Chrony  when rhel bigger then 7 
+        block:
+          - name: Install chrony when rhel8 or bigger
+            yum:
+              name: chrony
+              state: present
+
+          - name: Define template chrony.conf when rhel8 or bigger
+            template:
+              src: chrony.conf
+              dest: /etc/chrony.conf
+              owner: root
+              group: root
+              mode: 0644
+
+          - name: Force sync chrony when rhel8 or bigger
+            shell: /usr/sbin/chronyd -q
+            ignore_errors: yes
+
+          - name: Restart chronyd service when rhel8 or bigger
+            service:
+              name: chronyd
+              enabled: yes
+              state: restarted
+
+        when: ansible_distribution_major_version|int >= 8
+  tags:
+    - setntp 

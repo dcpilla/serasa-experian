@@ -1,0 +1,25 @@
+---
+- name: Remove host Satellite API
+  block:
+    - name: Delete host on Satellite
+      uri:
+        url: https://spobrsatellite1.br.experian.local/api/v2/hosts/{{ fqdn }}
+        validate_certs: False
+        user: '{{ api_satellite_username }}'
+        password: '{{ schedlin_password }}'
+        method: DELETE
+        status_code: 200
+        force_basic_auth: yes
+        body_format: json
+        headers:
+          Content-Type: 'application/json'
+      register: uri_output
+      ignore_errors: yes
+
+    - debug: 
+        msg: "Host {{fqdn}} not found"
+      when: uri_output.status == 404
+
+  when: fqdn is defined and fqdn != ''
+  tags:
+    - removesatellite6

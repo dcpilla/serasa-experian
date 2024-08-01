@@ -1,0 +1,52 @@
+---
+- debug:
+    msg: "{{ item | regex_search('([^$].*.br.experian.local)', ignorecase=True)}}"
+  with_items: "{{ list }}"
+
+- debug:
+    msg: "{{ item | regex_search('([^$].*).br.experian.local', '\\1', ignorecase=True) }}"
+  with_items: "{{ list }}"
+
+- name: CyberArk decom Br Experian
+  include_role:
+    name: cyberark
+    tasks_from: cyberark_remove
+  vars:
+    machine_fqdn_list: "{{ item | regex_search('(.*.br.experian.local)', '\\1', ignorecase=True)}}"
+    type_account: "windows-sxnk"
+  with_items: "{{ list }}"
+  when: operational_system == 'windows' and
+        machine_fqdn_list != ''
+
+- name: CyberArk decom Serasa Intranet
+  include_role:
+    name: cyberark
+    tasks_from: cyberark_remove
+  vars:
+    machine_fqdn_list: "{{ item | regex_search('(.*.serasa.intranet)', '\\1', ignorecase=True)}}"
+    type_account: "windows-sxnk"
+  with_items: "{{ list }}"
+  when: operational_system == 'windows' and
+        machine_fqdn_list != ''
+        
+- name: CyberArk decom Serasa Cliente
+  include_role:
+    name: cyberark
+    tasks_from: cyberark_remove
+  vars:
+    machine_fqdn_list: "{{ item | regex_search('(.*.serasacliente.com.br)', '\\1', ignorecase=True)}}"
+    type_account: "windows-hunt"
+  with_items: "{{ list }}"
+  when: operational_system == 'windows' and
+        machine_fqdn_list != ''
+
+- name: CyberArk decom Linux
+  include_role:
+    name: cyberark
+    tasks_from: cyberark_remove
+  vars:
+    machine_fqdn_list: "{{ item }}"
+    type_account: "linux"
+  with_items: "{{ list }}"
+  when: operational_system == 'linux' and
+        machine_fqdn_list != ''

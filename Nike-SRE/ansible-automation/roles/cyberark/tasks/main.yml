@@ -1,0 +1,3 @@
+---
+- name: Default Task
+  import_tasks: Cyberark_Onboarding_Automation_BR.yml

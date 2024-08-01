@@ -1,0 +1,66 @@
+---
+- set_fact:
+    pong_file: /home/Check/Inv/pong_result.txt
+
+- name: remove existent inventory
+  become: yes
+  file:
+    state: absent
+    path: '{{pong_file}}'
+
+- name: execute ping module
+  become: yes
+  shell: ansible -e "ansible_ssh_extra_args='-o StrictHostKeyChecking=no'" all  -i '{{inventory_our_instance_path_linux}}'  -m ping > '{{pong_file}}'  --ssh-common-args='-o StrictHostKeyChecking=no'
+#  shell: ansible -e "ansible_debug=1  ansible_ssh_extra_args='-o StrictHostKeyChecking=no' accelerate_connect_timeout =1.0" --timeout 4 --private-key  ~/sre-suport.pem -i '{{inventory_our_instance_path}}' -m ping -f10 -o > '{{pong_file}}'
+  ignore_errors: yes
+
+- name: get UNREACHABLE and FAILED hosts from {{pong_file}}
+#  delegate_to: '{{workerexec}}'
+  shell: egrep " UNREACHABLE| FAILED" '{{pong_file}}' | cut -d '!' -f1 | egrep "UNREACHABLE|FAILED|" |cut -d '|' -f1
+  register:  unreachable_hosts
+
+- name: debug variable unreachable_hosts
+  debug:
+    var: unreachable_hosts
+
+- name: loop to create unreachable_list variable
+  include_tasks: check_unreachable_hosts_create_list.yml
+  with_items: '{{ unreachable_hosts.stdout_lines}}'
+
+
+- name: debug unreachable_list
+  debug:
+    var: unreachable_list
+
+
+#- name: block to send emailk when unreachable_list is defined 
+#  block:
+#    - name: set fact to send email when unreachable_list is defined
+#      set_fact:
+#        email_title: "Check unreachable hosts<br/>"
+#        sub_title: 'This is an automatic process from Nike Program'
+#        description: 'This job check hosts running from nike aws accounts to test unreachable connection'
+#        report_date: "{{ lookup('pipe', 'date -d \"3 hour ago\" +\"%Y-%m-%d %H:%M:%S\"') }}"
+#        body: "<br>Process Name: Check unreachable hosts <br/>
+#               Server List: <br/>
+#               {{unreachable_list|regex_replace(',','<br/>')|regex_replace('}]',' ')}}|regex_replace('{','')|regex_replace('}','')"
+#               #               {{unreachable_list|regex_replace('}, {','<br/>')|regex_replace('[{','')|regex_replace('}]','')}}"
+#    
+#    - name: send email when unreachable_list is defined
+#      become: false
+#      ignore_errors: yes
+#      mail:
+#        host: '{{mail_host}}'
+#        port: '{{mail_port}}'
+#        from: '{{mail_from}}'
+#        to:
+#          - '{{suport_email}}'
+##          - '{{mail_copy}}'
+##          - '{{mail_operation}}'
+##          - 'alessandro.bahia@br.experian.com'
+#        subject: 'unreachable hosts detected'
+#        subtype: html
+#        body: "{{ lookup('template', '{{mail_template}}') }}"
+#  when: unreachable_list is defined
+
+### SDG ###  

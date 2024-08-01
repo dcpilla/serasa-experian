@@ -1,0 +1,59 @@
+---
+- name: Define extra disk
+  block:
+    - name: Define extra partion
+      parted:
+        device: /dev/sdb
+        number: 1
+        flags: [ lvm ]
+        state: present
+
+    - name: Define extra VG
+      lvg:
+        vg: VG001
+        pvs: /dev/sdb1
+
+    - name: Define extra LV 
+      lvol:
+        vg: VG001
+        lv: LV001 
+        size: +100%FREE
+      register: lv
+
+    - name: Format extra partion
+      filesystem:
+        fstype: xfs 
+        dev: /dev/VG001/LV001
+
+    - name: Create mount directory
+      file:
+        path: '{{ path_extra_disk }}'
+        state: directory
+      ignore_errors: yes
+      when: path_extra_disk is defined and
+            path_extra_disk is search("^/[a-zA-Z0-9]*[a-zA-Z0-9/]*[a-zA-Z0-9]$")
+
+    - set_fact:
+        path_extra_disk: /mnt
+      when: path_extra_disk is defined and
+            not path_extra_disk is search("^/[a-zA-Z0-9]*[a-zA-Z0-9/]*[a-zA-Z0-9]$")
+
+    - set_fact:
+        path_extra_disk: /mnt
+      when: path_extra_disk is not defined and extra_disk is defined and extra_disk|int > 0
+
+    - name: Mount extra disk 
+      mount:
+        path: "{{ path_extra_disk | default('/mnt') }}"
+        src: /dev/VG001/LV001 
+        fstype: xfs 
+        opts: defaults
+        state: mounted
+    
+    - debug: msg="Formato incorreto de path. Disco extra montado em /mnt" 
+      when: path_extra_disk is defined and
+            not path_extra_disk is search("^/[a-zA-Z0-9]*[a-zA-Z0-9/]*[a-zA-Z0-9]$")
+
+  when: extra_disk is defined and extra_disk|int > 0
+  tags:
+    - setextradisk

@@ -1,0 +1,11 @@
+---
+- hosts: spobrbastion
+  gather_facts: false
+  tasks:
+    - name: include role 
+      import_role:
+        name: tower
+        tasks_from: schedule_create.yml
+      become: false
+
+### SDG ###      

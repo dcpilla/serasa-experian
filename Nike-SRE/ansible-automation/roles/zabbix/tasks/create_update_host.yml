@@ -1,0 +1,31 @@
+---
+  - name: Set proxy hostname
+    delegate_to: '{{ zabbix_proxy }}'
+    shell: cat /etc/hostname
+    register: proxy_name
+  
+  - name: Create a new host or update an existing on Zabbix Server
+    environment:
+      PYTHONHTTPSVERIFY: 0
+    become: no
+    local_action:
+      module: zabbix_host
+      server_url: https://spobrzabbix.br.experian.local
+      login_user: '{{ zabbix_user }}'
+      login_password: '{{ usr_pass }}'
+      host_name: '{{ ansible_nodename }}'
+      visible_name: '{{ ansible_nodename }}'
+      host_groups:
+        - Linux Servers
+      link_templates:
+        - Template OS Linux
+      interfaces:
+        - type: 1
+          main: 1
+          useip: 0
+          port: 10050
+          ip: ''
+          dns: '{{ ansible_nodename }}'
+      proxy: '{{ proxy_name.stdout }}'
+      status: enabled
+      state: present

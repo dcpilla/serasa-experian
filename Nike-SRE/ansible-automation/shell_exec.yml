@@ -1,0 +1,10 @@
+---
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: exec shell
+      shell: '{{command}}'
+      register: sysout_command
+
+    - debug:
+        var: sysout_command

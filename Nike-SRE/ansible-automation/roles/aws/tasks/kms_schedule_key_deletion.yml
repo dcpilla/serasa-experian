@@ -1,0 +1,3 @@
+---
+- name: schedule-key-deletion of kms_customer_disable_list variable list from {{account}} account ... {{km_key_id}} km_key_id
+  shell: "/usr/local/bin/aws kms schedule-key-deletion --key-id {{km_key_id}}  --profile sts_cli" 

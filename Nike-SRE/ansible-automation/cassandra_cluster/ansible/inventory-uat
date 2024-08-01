@@ -1,0 +1,37 @@
+[all:vars]
+env="uat"
+cassandra_cluster_name="cassandra-bi-uat"
+cassandra_jvm_xms="4G"
+cassandra_jvm_xmx="4G"
+
+cassandra_endpoint_snitch="GossipingPropertyFileSnitch"
+#cassandra_endpoint_snitch="Ec2Snitch"
+cassandra_topology_class="NetworkTopologyStrategy"
+cassandra_allocate_tokens_for_local_replication_factor="3"
+cassandra_topology_datacenter_name="sa-east-1"
+#cassandra_topology_datacenter_name="datacenter1"
+
+
+[cassandra_nodetools]
+# Zone A
+10.99.224.23
+
+[cassandra_seeds]
+# Zone A
+10.99.224.23
+
+# Zone B
+10.99.224.141
+
+# Zone C
+10.99.20.228
+
+[cassandra_nodes]
+# Zone A
+10.99.224.61
+
+# Zone B
+10.99.224.202
+
+# Zone C
+10.99.20.148

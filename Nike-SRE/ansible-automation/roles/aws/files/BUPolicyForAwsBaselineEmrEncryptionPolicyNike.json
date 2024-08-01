@@ -1,0 +1,29 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "kms:GenerateDataKey",
+                "kms:GenerateDataKeyWithoutPlaintext",
+                "kms:GenerateRandom",
+                "kms:Encrypt",
+                "kms:ReEncrypt*",
+                "kms:Decrypt",
+                "kms:Put*",
+                "kms:ScheduleKeyDeletion",
+                "kms:CancelKeyDeletion",
+                "kms:Describe*",
+                "kms:Revoke*",
+                "kms:Disable*",
+                "kms:Enable*",
+                "kms:Delete*",
+                "kms:List*",
+                "kms:Update*",
+                "kms:Create*"
+            ],
+            "Resource": "*",
+            "Effect": "Allow",
+            "Sid": "KMSActions"
+        }
+    ]
+}

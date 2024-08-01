@@ -1,0 +1,25 @@
+---
+  - name: check Tanium Service on rh5
+    shell: service TaniumClient status
+    register: tanium_status
+    when: ansible_distribution_major_version|int == 5
+    ignore_errors: yes
+
+  - name: check Tanium Service on rh-6-7
+    shell: service taniumclient status
+    register: tanium_status
+    args:
+      warn: False
+    when: ansible_distribution_major_version|int >= 6
+    ignore_errors: yes
+
+  - debug:
+      var: tanium_status
+
+  - set_fact:
+      service_status: not_running
+    when: tanium_status.stdout is search('inactive')
+
+  - set_fact:
+      service_status: running
+    when: service_status is not defined
