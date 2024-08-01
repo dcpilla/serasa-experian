@@ -1,0 +1,24 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Principal": {
+          "AWS": [
+            "arn:aws:iam::662860092544:role/BURoleForOdinAccess",
+            "arn:aws:iam::662860092544:role/BURoleForEmrEc2Nike",
+            "arn:aws:iam::662860092544:user/BUUserForBatimentodeFraude",
+            "arn:aws:iam::662860092544:role/BURoleForOpenBanking"
+        ]
+        },
+        "Effect": "Allow",
+        "Action": [
+          "s3:ListBucket",
+          "s3:GetObject"
+        ],
+        "Resource": [
+          "arn:aws:s3:::experian-sre-emr-bootstrap-662860092544",
+          "arn:aws:s3:::experian-sre-emr-bootstrap-662860092544/*"
+        ]
+      }
+    ]
+  }

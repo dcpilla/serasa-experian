@@ -1,0 +1,40 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "VisualEditor0",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:DescribeJob",
+        "s3:ListBucket",
+        "glue:GetTable",
+        "glue:GetDatabase",
+        "glue:GetDatabases",
+        "glue:GetTables",
+        "glue:GetPartition",
+        "glue:GetPartitions"
+      ],
+      "Resource": [
+        "arn:aws:glue:sa-east-1:662860092544:database/pep_ingestion",
+        "arn:aws:glue:sa-east-1:662860092544:catalog",
+        "arn:aws:glue:sa-east-1:662860092544:table/*",
+        "arn:aws:s3:::experian-datahub-gold-reports-prod/warehouse/reports/depara_hash/*",
+        "arn:aws:s3:::experian-datahub-silver-prod/warehouse/qsa/bt_qsa/*",
+        "arn:aws:s3:::datahub-pep-prod/*"
+      ]
+    },
+    {
+      "Sid": "VisualEditor1",
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::datahub-pep-prod",
+        "arn:aws:s3:::experian-datahub-silver-prod",
+        "arn:aws:s3:::experian-datahub-gold-reports-prod"
+      ]
+    }
+  ]
+}
