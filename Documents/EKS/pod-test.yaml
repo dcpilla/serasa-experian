@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-test-kyverno
+  namespace: app-test
+  labels:
+    app: myapp
+spec:
+  containers:
+  - name: nginx
+    image: nginx

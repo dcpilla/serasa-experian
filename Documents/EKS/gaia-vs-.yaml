@@ -1,0 +1,44 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: gaia-virtual-service
+  namespace: gaia
+spec:
+  gateways:
+  - gaia-gateway
+  hosts:
+  - gaia.sandbox-cs-tribe-sre.br.experian.eeca
+  http:
+  - route:
+    - destination:
+        host: gaia
+        port:
+          number: 80
+      headers:
+        request:
+          set:
+            X-Forwarded-Proto: https
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: gaia-gateway
+  namespace: gaia
+spec:
+  selector:
+    istio: ingress
+  servers:
+  - hosts:
+    - gaia.sandbox-cs-tribe-sre.br.experian.eeca
+    port:
+      name: http
+      number: 80
+      protocol: HTTP
+    tls:
+      httpsRedirect: true
+  - hosts:
+    - gaia.sandbox-cs-tribe-sre.br.experian.eeca
+    port:
+      name: https
+      number: 8080
+      protocol: HTTP

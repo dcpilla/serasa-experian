@@ -1,0 +1,36 @@
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: argocd-gateway
+  namespace: argocd-gitops
+spec:
+  selector:
+    istio: ingress
+  servers:
+  - hosts:
+    - argocd.sre-cs-cross.br.experian.eeca
+    port:
+      name: http
+      number: 8080
+      protocol: HTTP
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: argocd-virtualservice
+  namespace: argocd-gitops
+spec:
+  gateways:
+  - argocd-gateway
+  hosts:
+  - argocd.sre-cs-cross.br.experian.eeca
+  http:
+  - route:
+    - destination:
+        host: argocd-server
+        port: 
+          number: 80
+      headers:
+        request:
+          set:
+            X-Forwarded-Proto: https

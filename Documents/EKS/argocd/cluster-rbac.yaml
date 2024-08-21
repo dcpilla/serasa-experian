@@ -1,0 +1,53 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cluster-admin
+  uid: 441a35c0-9c6f-445f-982e-517e3d0e4569
+  resourceVersion: '597449'
+  creationTimestamp: '2024-04-10T13:13:30Z'
+  labels:
+    k8slens-edit-resource-version: v1
+    kubernetes.io/bootstrapping: rbac-defaults
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: 'true'
+  managedFields:
+    - manager: kube-apiserver
+      operation: Update
+      apiVersion: rbac.authorization.k8s.io/v1
+      time: '2024-04-10T13:13:30Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:annotations:
+            .: {}
+            f:rbac.authorization.kubernetes.io/autoupdate: {}
+          f:labels:
+            .: {}
+            f:kubernetes.io/bootstrapping: {}
+        f:roleRef: {}
+    - manager: node-fetch
+      operation: Update
+      apiVersion: rbac.authorization.k8s.io/v1
+      time: '2024-04-11T20:03:41Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:labels:
+            f:k8slens-edit-resource-version: {}
+        f:subjects: {}
+  selfLink: /apis/rbac.authorization.k8s.io/v1/clusterrolebindings/cluster-admin
+subjects:
+  - kind: Group
+    apiGroup: rbac.authorization.k8s.io
+    name: system:masters
+  - kind: ServiceAccount
+    name: argocd-application-controller
+    namespace: gitops
+  - kind: ServiceAccount
+    name: argocd-server
+    namespace: argocd
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+

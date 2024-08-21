@@ -1,0 +1,57 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: oauth2-proxy
+#  namespace: kubernetes-dashboard
+spec:
+  project: default
+  destination:
+    server: "https://F22B024026B89EAF57E8D4840797513E.yl4.sa-east-1.eks.amazonaws.com"
+    namespace: kubernetes-dashboard
+  sources:
+    - chart: oauth2-proxy
+      repoURL: https://oauth2-proxy.github.io/manifests/
+      targetRevision: 7.4.1
+#      path: kubernetes-dashboard/kubernetes-dashboard
+      helm:
+        values: | 
+          resources: 
+              limits:
+                cpu: 256m 
+                memory: 512Mi
+              requests:
+                cpu: 256m
+                memory: 512Mi
+          livenessProbe:
+            enabled: true
+            initialDelaySeconds: 30
+            timeoutSeconds: 60
+          readinessProbe: 
+            enabled: true
+            initialDelaySeconds: 30
+            timeoutSeconds: 60
+          config:
+            clientID: "0oa1vbl0jboY0Wp230h8"
+            clientSecret: "EIQmNbMJDoybofEnzTKWM5ZwCmwl-eQXoaIKPu1g_BS44un9OJJaHMQAdERAC_qA"
+            cookieSecret: "iU6w1RNbf33ZbtzdNL4-WD9KkDxohEqdrvuA9F3S9uA="
+          extraEnv: 
+            - name: "OAUTH2_PROXY_PROVIDER"
+              value: "oidc"
+            - name: "OAUTH2_PROXY_UPSTREAMS"
+              value: "https://kubernetes-dashboard-web.kubernetes-dashboard.svc.cluster.local"
+            - name: "OAUTH2_PROXY_UPSTREAM_TIMEOUT"
+              value: "120s"
+            - name: "OAUTH2_PROXY_SSL_UPSTREAM_INSECURE_SKIP_VERIFY"
+              value: "true"
+            - name: "OAUTH2_PROXY_REDIRECT_URL"
+              value: "https://kubernetes.sandbox-cs-tribe-sre.br.experian.eeca/oauth2/callback"
+            - name: "OAUTH2_PROXY_OIDC_ISSUER_URL"
+              value: "https://experian.oktapreview.com/oauth2/auslkzh1op2UXTy0Y0h7"
+            - name: "OAUTH2_PROXY_PASS_AUTHORIZATION_HEADER"
+              value: "true"
+            - name: "OAUTH2_PROXY_SKIP_PROVIDER_BUTTON"
+              value: "true"
+            - name: "OAUTH2_PROXY_SILENCE_PING_LOGGING"
+              value: "true"
+            - name: "OAUTH2_PROXY_COOKIE_EXPIRE"
+              value: "1h0m0s"

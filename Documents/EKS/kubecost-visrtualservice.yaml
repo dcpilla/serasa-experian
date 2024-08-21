@@ -1,0 +1,17 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  annotations:
+  name: kubecost-system-cost-analyzer-vs
+  namespace: kubecost-system
+spec:
+  gateways:
+  - kubecost-system/kubecost-system-cost-analyzer-gateway
+  hosts:
+  - kubecost.scoreci-prod.br.experian.eeca
+  http:
+  - route:
+    - destination:
+        host: kubecost-system-cost-analyzer
+        port:
+          number: 9090

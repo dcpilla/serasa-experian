@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"networking.k8s.io/v1","kind":"NetworkPolicy","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"notifications-controller","app.kubernetes.io/name":"argocd-notifications-controller","app.kubernetes.io/part-of":"argocd"},"name":"argocd-notifications-controller-network-policy","namespace":"gitops"},"spec":{"ingress":[{"from":[{"namespaceSelector":{}}],"ports":[{"port":9001,"protocol":"TCP"}]}],"podSelector":{"matchLabels":{"app.kubernetes.io/name":"argocd-notifications-controller"}},"policyTypes":["Ingress"]}}
+  creationTimestamp: "2024-04-11T19:36:10Z"
+  generation: 1
+  labels:
+    app.kubernetes.io/component: notifications-controller
+    app.kubernetes.io/name: argocd-notifications-controller
+    app.kubernetes.io/part-of: argocd
+  name: argocd-notifications-controller-network-policy
+  namespace: gitops
+  resourceVersion: "588573"
+  uid: 58914e9a-830a-41e8-90a2-3f410e44da67
+spec:
+  ingress:
+  - from:
+    - namespaceSelector: {}
+    ports:
+    - port: 9001
+      protocol: TCP
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-notifications-controller
+  policyTypes:
+  - Ingress

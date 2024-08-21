@@ -1,0 +1,47 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: kubernetes-dashboard-gateway
+  namespace: kubernetes-dashboard
+spec:
+  selector:
+    istio: ingress
+  servers:
+    - hosts:
+        - kubernetes.sandbox-cs-tribe-sre.br.experian.eeca
+      port:
+        name: http
+        number: 80
+        protocol: HTTP
+      tls:
+        httpsRedirect: true
+    - hosts:
+        - kubernetes.sandbox-cs-tribe-sre.br.experian.eeca
+      port:
+        name: https
+        number: 8080
+        protocol: HTTP
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: kubernetes-dashboard-virtual-service
+  namespace: kubernetes-dashboard
+spec:
+  gateways:
+    - kubernetes-dashboard-gateway
+  hosts:
+    - kubernetes.sandbox-cs-tribe-sre.br.experian.eeca
+  http:
+    - route:
+        - destination:
+            host: oauth2-proxy
+            port:
+              number: 80
+          headers:
+            request:
+              set:
+                X-Forwarded-Proto: https
+
+

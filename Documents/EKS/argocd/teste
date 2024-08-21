@@ -1,0 +1,34 @@
+useFips = true
+hostNetwork = true
+image: repository = "602401143452.dkr.ecr.sa-east-1.amazonaws.com/eks/aws-efs-csi-driver"
+sidecars: 
+  livenessProbe:
+    repository: "${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/aws-public/eks-distro/kubernetes-csi/livenessprobe"
+  csiProvisioner:
+    repository: "${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/aws-public/eks-distro/kubernetes-csi/external-provisioner"
+
+  nodeDriverRegistrar:
+    repository: "${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/aws-public/eks-distro/kubernetes-csi/node-driver-registrar"
+
+controller:
+  nodeSelector:
+    Worker: "infra"
+
+  tolerations:
+    key: "dedicated"
+    operator: "Equal"
+    value: "infra"
+    effect: "NoSchedule"
+
+storageClasses:
+    name = "efs"
+    parameters:
+      provisioningMode: "efs-ap"
+      fileSystemId: resource.aws_efs_file_system.eks_file_system[count.index].id
+      directoryPerms: "700"
+      gidRangeStart: "1000"
+      gidRangeEnd: "2000"
+      basePath: "/dynamic_provisioning"
+
+    reclaimPolicy: "Delete"
+    volumeBindingMode: "Immediate"

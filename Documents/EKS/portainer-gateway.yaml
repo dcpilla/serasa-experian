@@ -1,0 +1,33 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: portainer-gateway
+  namespace: portainer
+spec:
+  selector:
+    istio: ingress
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP     
+    hosts:
+    - dashboard-eks.scoreci-uat.br.experian.eeca
+ 
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: portainer
+  namespace: portainer
+spec:
+  hosts:
+  - dashboard-eks.scoreci-uat.br.experian.eeca
+  gateways:
+  - portainer-gateway
+  http:
+  - route:
+    - destination:
+        host: portainer
+        port:
+          number: 9000

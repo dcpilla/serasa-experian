@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"networking.k8s.io/v1","kind":"NetworkPolicy","metadata":{"annotations":{},"name":"argocd-server-network-policy","namespace":"gitops"},"spec":{"ingress":[{}],"podSelector":{"matchLabels":{"app.kubernetes.io/name":"argocd-server"}},"policyTypes":["Ingress"]}}
+  creationTimestamp: "2024-04-11T19:36:11Z"
+  generation: 1
+  name: argocd-server-network-policy
+  namespace: gitops
+  resourceVersion: "588583"
+  uid: 33478fa0-f23a-4d8b-9341-7acd47f99894
+spec:
+  ingress:
+  - {}
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-server
+  policyTypes:
+  - Ingress

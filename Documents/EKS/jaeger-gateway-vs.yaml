@@ -1,0 +1,48 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: frontend-virtualservice
+  namespace: istio-system
+spec:
+  gateways:
+  - jaeger-gateway
+  hosts:
+  - jaeger.scoreci-dev.br.experian.eeca
+  http:
+  - route:
+    - destination:
+        host: tracing
+        port: 
+          number: 80
+      headers:
+        request:
+          set:
+            X-Forwarded-Proto: https
+
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: jaeger-gateway
+  namespace: istio-system
+spec:
+  selector:
+    istio: ingress
+  servers:
+  - hosts:
+    - jaeger.scoreci-dev.br.experian.eeca
+    port:
+      name: http
+      number: 80
+      protocol: HTTP
+    tls:
+      httpsRedirect: true
+  - hosts:
+    - jaeger.scoreci-dev.br.experian.eeca
+    port:
+      name: https
+      number: 8080
+      protocol: HTTP
+
+
+

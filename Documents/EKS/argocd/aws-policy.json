@@ -1,0 +1,29 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "VisualEditor0",
+			"Effect": "Allow",
+			"Action": "ds:*",
+			"Resource": "arn:aws:ds:*:595875577682:directory/*"
+		},
+		{
+			"Sid": "VisualEditor1",
+			"Effect": "Allow",
+			"Action": [
+				"ds:CreateDirectory",
+				"ds:CreateMicrosoftAD",
+				"ds:CreateIdentityPoolDirectory",
+				"ds:ListLogSubscriptions",
+				"ds:DescribeTrusts",
+				"ds:ConnectDirectory",
+				"ds:DescribeSnapshots",
+				"quicksight:*",
+				"ds:DescribeDirectories",
+				"ds:GetDirectoryLimits",
+				"ds:CheckAlias"
+			],
+			"Resource": "*"
+		}
+	]
+}

@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  annotations:
+  name: kubecost-system-cost-analyzer-gateway
+  namespace: kubecost-system
+spec:
+  selector:
+    istio: ingress
+  servers:
+  - hosts:
+    - kubecost.scoreci-prod.br.experian.eeca
+    port:
+      name: http
+      number: 8080
+      protocol: HTTP

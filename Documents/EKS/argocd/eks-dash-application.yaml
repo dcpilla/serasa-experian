@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kubernetes-dashboard
+spec:
+  project: default
+  destination:
+    server: "https://F22B024026B89EAF57E8D4840797513E.yl4.sa-east-1.eks.amazonaws.com"
+    namespace: kubernetes-dashboard
+  sources:
+    - chart: kubernetes-dashboard
+      repoURL: https://kubernetes.github.io/dashboard
+      targetRevision: 7.3.2
+      helm:
+        releaseName: kubernetes-dashboard
+        values: | 
+          resources: 
+              limits:
+                cpu: 256m 
+                memory: 512Mi
+              requests:
+                cpu: 256m
+                memory: 512Mi
+          livenessProbe:
+            timeoutSeconds: 120
+          metricsScraper: 
+            enabled: true
+
+
