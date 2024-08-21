@@ -1,0 +1,30 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: developers
+subjects:
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Franklin.Roza@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Guilherme.Araujo@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Matheus.Vilar@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Lucas.Passos@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Richard.Catanosse@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Rafael.Melo0@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Thiago.DeSouza@br.experian.com
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: view

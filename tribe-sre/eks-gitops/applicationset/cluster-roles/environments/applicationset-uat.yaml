@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cluster-role-uat
+spec:
+  generators:
+  - list:
+      # Lista de clusters que irá deployar
+      elements:
+      # Cluster ArgoCD
+      - cluster: reports-eks-01-uat
+        url: https://CE8B6382B2610F6BB45AC24158EB9BD9.yl4.sa-east-1.eks.amazonaws.com
+        tribe: reports
+      - cluster: psm-eks-01-uat
+        url: https://AE366B28474EC7C43B18F89326B57892.sk1.sa-east-1.eks.amazonaws.com
+        tribe: psm
+      - cluster: mdc-eks-01-uat
+        url: https://0190B224E671275CD9B01008FE247AE3.gr7.sa-east-1.eks.amazonaws.com
+        tribe: monitoring
+
+  template:
+    metadata:
+      name: 'cluster-role-{{cluster}}'
+      labels: 
+        tribe: '{{tribe}}'
+    spec:
+      project: '{{cluster}}'
+      source:
+        repoURL: ssh://git@code.experian.local/trsrecs/eks-gitops.git
+        targetRevision: qa
+        path: applicationset/cluster-roles/{{cluster}}
+      destination:
+        server: '{{url}}'
+#        namespace: app-test
+      syncPolicy:
+        automated:
+          allowEmpty: true
+          prune: true
+          selfHeal: true

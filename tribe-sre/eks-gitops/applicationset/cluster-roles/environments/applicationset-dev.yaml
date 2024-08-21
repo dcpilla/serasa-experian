@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cluster-roles-dev
+spec:
+  generators:
+  - list:
+      # Lista de clusters que irá deployar
+      elements:
+      # Cluster ArgoCD
+      - cluster: in-cluster
+        url: https://kubernetes.default.svc
+        tribe: sre-cross
+      # - cluster: sre-cs-eks-01-sandbox
+      #   url: https://F22B024026B89EAF57E8D4840797513E.yl4.sa-east-1.eks.amazonaws.com
+      #   tribe: sre-cross
+      - cluster: reports-eks-01-dev
+        url: https://71B3F73DE93545A8EB513D39A0697901.sk1.sa-east-1.eks.amazonaws.com
+        tribe: reports
+      - cluster: mdc-eks-01-dev
+        url: https://45897D8C78A692D13A6E31D31D1A9513.gr7.sa-east-1.eks.amazonaws.com
+        tribe: monitoring
+
+  template:
+    metadata:
+      name: 'cluster-role-{{cluster}}'
+      labels: 
+        tribe: '{{tribe}}'
+    spec:
+      project: '{{cluster}}'
+      source:
+        repoURL: ssh://git@code.experian.local/trsrecs/eks-gitops.git
+        targetRevision: develop
+        path: applicationset/cluster-roles/{{cluster}}
+      destination:
+        server: '{{url}}'
+#        namespace: app-test
+      syncPolicy:
+        automated:
+          allowEmpty: true
+          prune: true
+          selfHeal: true

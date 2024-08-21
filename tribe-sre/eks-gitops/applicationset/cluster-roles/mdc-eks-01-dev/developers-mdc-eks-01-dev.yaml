@@ -1,0 +1,141 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: developers
+subjects:
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Vitor.Monteiro@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Marcos.Andreo@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Rafael.Santos@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Nascimento.Daniel@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: gft.levi.candido@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: alan.cardoso2@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: bruna.nyulas@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Douglas.Oliveira@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Matheus.Bertazzo@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Daniel.Nascimento@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Ric.Souza@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: andre.fonseca2@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Ric.Souza@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Marcelo.Kaufmann@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Renato.Santos@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Ronaldo.Gimenes@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: guilherme.santanna@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Camila.HSouza@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Gustavo.Lopes@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Murilo.Nascimento@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Eudo.Primo@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: jose.ferreirajunior@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: diego.schneider@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: felipe.msantos@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Jose.FerreiraJunior@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Pedro.Marques@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: enos.gomes@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: AntonioCesar.DeLima@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Douglas.Trigo@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Pedro.Marques@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Jose.Moraes@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Yuri.Mota@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Leandro.Bura@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Felipe.DosSantos@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Michelle.Rodrigues@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: bruna.nyulas@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Thiago.Levin@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Isabel.Pereira@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Yure.Mota@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Vitor.Mancinelli@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Wellington.Yoshida@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Julio.DeJesus@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Lucas.Sampaio@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Victor.MSantos@br.experian.com
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: view

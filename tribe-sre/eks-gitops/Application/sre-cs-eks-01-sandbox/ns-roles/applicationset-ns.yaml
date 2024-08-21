@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: ns-role
+spec:
+  generators:
+  - list:
+      elements:
+      - namespace: teste-1
+        url: https://kubernetes.default.svc
+      - namespace: teste-2
+        url: https://kubernetes.default.svc
+
+  template:
+    metadata:
+      name: '{{namespace}}-ns-role'
+    spec:
+      project: teste
+      source:
+        path: Application/sre-cs-eks-01-sandbox/ns-roles
+        repoURL: ssh://git@code.experian.local/trsrecs/eks-gitops.git
+        targetRevision: develop
+ #       helm:
+ #         releaseName: ns-role
+ #         valueFiles:
+ #           - values.yaml
+ #           - values-{{"{{"}}namespace{{"}}"}}.yaml
+      destination:
+        server: '{{url}}'
+        namespace: '{{namespace}}'
