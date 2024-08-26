@@ -1,0 +1,75 @@
+---
+# Documentação do Desenvolvedor JoaquinX: https://code.experian.local/projects/SCIB/repos/joaquin-x/browse/doc/user_guide_developer.md
+running_in: aws
+itil: 
+  request: false
+  changeorder: false
+definition: Launch para importar (Criar ou Atualizar) certificado (acm)
+team_owner: Tribe SRE CS - Cross/Credit Services
+manual_time: 30
+notification:
+  onfailure:
+    email:
+      recipients: srecscross@br.experian.com
+      subject: 'JoaquinX falha automação - aws-certificate-import '
+  onsuccess:
+    email:
+      recipients: srecscross@br.experian.com
+      subject: 'JoaquinX sucesso automação - aws-certificate-import '
+  disable_in_qa: true
+
+global:
+  aws_account_id:
+    type: text 
+    pattern : ^(\d{1,12}|\d{1,12})$
+    description : Qual o ID da conta AWS?
+    required: true
+    answer: null
+    validationEndpoint: '/catalog-jenkins/v1/validate/aws_account'
+  aws_region:
+    type: options
+    options: sa-east-1;us-east-1
+    description: Região onde o cluster está implantado
+    required: true
+    answer: null
+  bu:
+    type: options 
+    options: Decision_Analytics;Marketing_Services;EITS_Enterprise;Credit_Services;Experian_Consumer_Services;Automotive_Services
+    description: Defina a unidade de negócio
+    required: true
+    answer: null
+  env:
+    type: options
+    options: dev;uat;sandbox;prod
+    description: Environment
+    required: true
+    answer: null
+  action:
+    type: options
+    options: create;update
+    description: Escolha entre criar ou atualizar o certificado.
+    required: true
+    answer: null
+  certificate_body:
+    type: text
+    pattern: ^-----BEGIN CERTIFICATE-----([\s\S]*)-----END CERTIFICATE-----\s?$
+    description: Insira aqui o certificado que inicia com -----BEGIN CERTIFICATE----- e termina com -----END CERTIFICATE-----
+    required: false
+    answer: null
+  private_key:
+    type: text
+    pattern: ^-----BEGIN PRIVATE KEY-----([\s\S]*)-----END PRIVATE KEY-----\s?$
+    description: Insira aqui a chave privada do certificado que inicia com -----BEGIN PRIVATE KEY----- e termina com -----END PRIVATE KEY-----
+    required: false
+    answer: null
+  certificate_chain:
+    type: text
+    pattern: ^-----BEGIN CERTIFICATE-----([\s\S]*)-----END CERTIFICATE-----\s?$
+    description: Caso tenha uma cadeia de certificado insira aqui.
+    required: false
+    answer: null
+
+before_plan:
+  - replace acm_manager.py
+plan:
+  - python3 acm_manager.py
