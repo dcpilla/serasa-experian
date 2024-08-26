@@ -1,0 +1,55 @@
+# Documentação do Desenvolvedor JoaquinX: https://code.experian.local/projects/SCIB/repos/joaquin-x/browse/doc/user_guide_developer.md
+running_in: aws
+itil: 
+  request: false
+  changeorder: false
+definition: Este é um lançador para criar ou atualizar o life cycle policy do ecr
+team_owner: Tribe SRE CS - Cross/Credit Services
+manual_time: 20
+notification:
+  onfailure:
+    email:
+      recipients: SRECSCross@br.experian.com
+      subject: 'JoaquinX falha automação - aws-ecr-create-lifecycle-policy '
+  onsuccess:
+    email:
+      recipients: SRECSCross@br.experian.com
+      subject: 'JoaquinX sucesso automação - aws-ecr-create-lifecycle-policy '
+  disable_in_qa: true
+
+global:
+  aws_account_id:
+    type: text 
+    pattern : ^(\d{1,12}|\d{1,12})$
+    description : Qual o ID da conta AWS?
+    required: true
+    answer: null
+    validationEndpoint: '/catalog-jenkins/v1/validate/aws_account'
+  aws_region:
+    type: options
+    options: sa-east-1;us-east-1
+    description: Região onde o repositório está implantado
+    required: true
+    answer: null
+  bu:
+    type: options 
+    options: Decision_Analytics;Marketing_Services;EITS_Enterprise;Credit_Services;Experian_Consumer_Services;Automotive_Services
+    description: Defina a unidade de negócio
+    required: true
+    answer: null
+  repositorio:
+    type: text
+    pattern: \w{4,100}
+    description: Opcional, deixe vazio para pegar TODOS os repositórios
+    required: false
+    answer: null
+  images_to_maintan:
+    type: text 
+    pattern: ^\d{1,2}$
+    description: Insira a quantidade de imagens para manter as mais recentes
+    required: true
+    answer: null
+before_plan:
+  - replace main.py
+plan:
+  - python3 ./main.py
