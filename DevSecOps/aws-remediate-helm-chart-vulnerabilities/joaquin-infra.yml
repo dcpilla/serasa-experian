@@ -1,0 +1,71 @@
+---
+running_in: aws
+itil: 
+  request: false
+  changeorder: false
+definition: aws-remediate-helm-chart-vulnerabilities
+team_owner: DevSecOps PaaS Brazil
+manual_time: 90
+bu: EITS
+notification:
+  onfailure:
+    email:
+      recipients: felipe.olivotto@br.experian.com
+      subject: 'JoaquinX falha automacao - aws-remediate-helm-chart-vulnerabilities'
+#  onsuccess:
+#    email:
+#      recipients: felipe.olivotto@br.experian.com
+#      subject: 'JoaquinX sucesso automacao - aws-remediate-helm-chart-vulnerabilities'
+#  onsuccess:
+#    teams:
+#      team_id: <INSERT YOUR TEAM ID>
+#      channel_id: <INSERT YOUR CHANNEL ID>
+#  onfailure:
+#    teams:
+#      team_id: <INSERT YOUR TEAM ID>
+#      channel_id: <INSERT YOUR CHANNEL ID>
+  disable_in_qa: false
+global:
+  change_order:
+    type: text
+    description: Informe o número da change order
+    pattern : ^CHG[0-9]+$
+    required: true
+    answer: null
+  aws_account_id:
+    type: text 
+    pattern : ^(\d{1,12}|\d{1,12})$
+    description : Informe o ID da sua conta AWS
+    required: true
+    answer: null
+    validationEndpoint: '/catalog-jenkins/v1/validate/aws_account'
+  eks_cluster_name:
+    type: text 
+    description : Informe o nome do seu cluster EKS
+    required: true
+    answer: null
+  aws_region:
+    type: options
+    options: sa-east-1 
+    description : Informe a região da sua conta AWS
+    required: true
+    answer: null
+  charts:
+    type: checkbox 
+    description: Escolha quais vulnerabilidades deseja mitigar
+    options : vpa-recommender;metrics-server;kubecost
+    required: true
+    answer: null
+  snowconsultasprd:
+    type: cyberark
+    description: Cyberark integration
+    required: false 
+    answer: static
+    safe: BR_PAPP_EITS_DSECOPS_STATIC
+    account: snow_statuschange_prd
+before_plan:
+  - replace bin/itil.sh
+  - replace main.sh
+plan:
+  - ./bin/itil.sh
+  - ./main.sh
