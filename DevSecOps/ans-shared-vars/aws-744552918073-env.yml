@@ -1,0 +1,16 @@
+domain: .serasa.intranet
+prefix_hostname: "{{ prefix_stack_hostname }}"
+stack_name: "{{ prefix_stack_name }}"
+aws_region: sa-east-1
+env: prod
+tribe: SRECSCross
+vpi_id: vpc-0eb3dd02beb98a644
+subnet:
+    a: subnet-0318aaa0d6fe9f1ff
+    b: subnet-0f9d2649a48a99bc8
+    c: 
+    d: 
+kms_id: b0be7650-fad4-4274-b5ee-fafe0d7416f1
+aws_account_id: 744552918073
+##Identity_ssh
+ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible

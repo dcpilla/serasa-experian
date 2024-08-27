@@ -1,0 +1,16 @@
+domain: .serasa.intranet
+prefix_hostname: "{{ prefix_stack_hostname }}"
+stack_name: "{{ prefix_stack_name }}"
+aws_region: sa-east-1
+env: snd
+tribe: Datalab
+vpi_id: vpc-04ed78db74ed3af4e
+subnet:
+    a: subnet-0ab6bbef616fb372a
+    b: subnet-082cd73c444cae1fc
+    c: subnet-07964389e12e7c6c8
+    d: 
+kms_id: cfa14424-82cd-4ad2-a173-e2ea852dbae4
+aws_account_id: 838714014709
+##Identity_ssh
+ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible

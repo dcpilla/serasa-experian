@@ -1,0 +1,20 @@
+domain: .serasa.intranet
+prefix_hostname: "{{ prefix_stack_hostname }}"
+stack_name: "{{ prefix_stack_name }}"
+aws_region: sa-east-1
+env: prd
+tribe: trci
+vpi_id: vpc-09dae43cc9f221e0c
+subnet:
+  a: subnet-047e25004acb3f2fb
+  b: subnet-07b4e8c807bfd20bf
+kms_id: b96638cc-aabf-4f9e-8359-b4a1e551f3ce
+aws_account_id: 853525473431
+ami_id: "{{ ami_id_rhel7 }}"
+ami_id_rhel7: ami-0079d0f7320c240ae
+ami_id_rhel8:
+##Identity_ssh
+ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible
+ami_id: "{{ ami_id_rhel7 }}"
+ami_id_rhel7: ami-0079d0f7320c240ae
+ami_id_rhel8:

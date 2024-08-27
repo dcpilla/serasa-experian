@@ -1,0 +1,5 @@
+solicitante: "@@SOLICITANTE@@"
+project_key: "@@PROJECT_KEY@@"
+repo_name: "@@REPO_NAME@@"
+project_language: "@@PROJECT_LANGUAGE@@"
+devhub_owner: "@@DEVHUB_OWNER@@"

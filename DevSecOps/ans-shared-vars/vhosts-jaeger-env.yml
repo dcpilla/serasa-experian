@@ -1,0 +1,8 @@
+---
+app_host_name: jaeger_elastic
+app_host_ip: K8S_URL
+app_host_port: 31967
+app_host_vhost: "spobr{{bu_name}}jaeger{{ env_stack }}{{ domain }}"
+ldap_system_user: "{{ ldap_user_serasa }}"
+ldap_system_password: "{{ ldap_password_serasa }}"
+ldap: false

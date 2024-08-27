@@ -1,0 +1,12 @@
+lvm_volumes:
+    - vg_name: vgapp
+      lv_name: app01
+      disk: nvme1n1
+      filesystem: xfs
+      ### Mount
+      mount: /var/lib/cassandra/data
+cassandra_cluster_name: "@@CLUSTER_NAME@@"
+cassandra_seeds:
+  - seed01.cassandra.hosts
+app_name: cassandra
+hostname: "{{ prefix_stack_hostname }}{{ app_name }}{{ prefix_stack_name }}{{(groups.cassandra.index(inventory_hostname) + 1)}}"

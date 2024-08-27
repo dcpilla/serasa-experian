@@ -1,0 +1,16 @@
+domain: .experian.local
+prefix_hostname: "{{ prefix_stack_hostname }}"
+stack_name: "{{ prefix_stack_name }}"
+aws_region: us-east-1
+env: prod
+tribe: Agro
+vpi_id: vpc-0de482725295d24cb
+subnet:
+    a: subnet-0d03133de4c530756
+    b: subnet-0423390f36d466313
+    c: subnet-05ceeb4e71e2db197
+    d: 
+kms_id: 7649117f-cffd-4154-b2c3-febbf4e02588
+aws_account_id: 476950844217
+##Identity_ssh
+ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible

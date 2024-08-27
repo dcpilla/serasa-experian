@@ -1,0 +1,16 @@
+domain: .br.expeian.local
+prefix_hostname: "{{ prefix_stack_hostname }}"
+stack_name: "{{ prefix_stack_name }}"
+aws_region: sa-east-1
+env: prod
+tribe: DOB
+vpi_id: vpc-07a64d30e9d2cf134
+subnet:
+    a: subnet-044f057618c992f77
+    b: subnet-0949a602c0834b655
+    c: subnet-067d7575e0302a2a7
+    d: 
+kms_id: ef7c974d-9b28-405d-9f04-be0fda3de769
+aws_account_id: 822130695371
+##Identity_ssh
+ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible

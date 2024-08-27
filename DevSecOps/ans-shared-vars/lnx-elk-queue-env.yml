@@ -1,0 +1,26 @@
+
+#Roles variables
+zookeeper_lb: "{{ zookeeper_lb_@@TRIBE@@_@@ENV@@ }}"
+elasticsearch_host: "{{ elasticsearch_host_@@TRIBE@@_@@ENV@@ }}"
+kafka_servers: "{{ kafka_servers_@@TRIBE@@_@@ENV@@ }}"
+elasticsearch_port: 443
+zookeeper_port : 2181
+kafka_topic: @@KAFKA_TOPIC@@-logs
+kafka_metric: @@KAFKA_TOPIC@@-metrics
+
+#nike_sandbox
+zookeeper_lb_nike_snd: EKZLGC-zookeeper-nlb-430270682605e4ca.elb.sa-east-1.amazonaws.com
+elasticsearch_host_nike_snd: vpc-spobresnikesnd-yuefgojx5rrbcn2luf7y4w7mri.sa-east-1.es.amazonaws.com
+kafka_servers_nike_snd: 10.99.145.147:9092,10.99.145.21:9092,10.99.145.123:9092
+#nike_prod
+zookeeper_lb_nike_prd: ELKZKG-zookeeper-nlb-aeb241c7e2c83e25.elb.sa-east-1.amazonaws.com
+elasticsearch_host_nike_prd: vpc-nike-log-tiixws6zcpidvytawnyetnifiy.sa-east-1.es.amazonaws.com
+kafka_servers_nike_prd: 10.99.151.6:9092,10.99.151.137:9092,10.99.151.69:9092
+#datastrategy_prod
+zookeeper_lb_dtst_prd: ELKZKG-zookeeper-nlb-6cbf264f2fcc161d.elb.sa-east-1.amazonaws.com
+elasticsearch_host_dtst_prd: vpc-dtst-dl-j75cjovwyzsdsknwf3jdwno2cq.sa-east-1.es.amazonaws.com
+kafka_servers_dtst_prd: 10.99.204.121:9092,10.99.204.47:9092,10.99.204.7:9092,10.99.204.110:9092
+
+
+##Identity_ssh
+ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible

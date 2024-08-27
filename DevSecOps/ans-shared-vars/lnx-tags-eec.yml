@@ -1,0 +1,6 @@
+tags: @@TAGS_SCHEDULE@@
+
+tag_value:
+  desligamento_20h: br-saopaulo-stop-only
+  utilizar_horario_comercial: br-saopaulo-office-hours
+  nao: schedule-off

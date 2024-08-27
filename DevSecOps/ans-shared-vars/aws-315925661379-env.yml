@@ -1,0 +1,15 @@
+domain: .serasa.intranet
+prefix_hostname: "{{ prefix_stack_hostname }}"
+stack_name: "{{ prefix_stack_name }}"
+aws_region: sa-east-1
+env: uat
+tribe: Credit3D
+vpi_id: vpc-0cb0e29c51230ffcd
+subnet:
+    a: subnet-0ee82fe6fdd6d7e81
+    b: subnet-0f67d7d272be56b23
+    c: subnet-0c955cb8203a98514
+kms_id: 8c6959af-b018-4853-ba49-57562bc3fd3a
+aws_account_id: 315925661379
+##Identity_ssh
+ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible

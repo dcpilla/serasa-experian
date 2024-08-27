@@ -1,0 +1,16 @@
+domain: .serasa.intranet
+prefix_hostname: "{{ prefix_stack_hostname }}"
+stack_name: "{{ prefix_stack_name }}"
+aws_region: sa-east-1
+env: prod
+tribe: Devhub
+vpi_id: vpc-0b4a9286d9288da07
+subnet:
+    a: subnet-0a43f7aad6d89c36e
+    b: subnet-06e3666066b1396d8
+    c: subnet-00eb36983a957fcc3
+    d: 
+kms_id: d6992d31-1b6c-4ab7-8013-03362f367cc9
+aws_account_id: 306298826605
+##Identity_ssh
+ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible

@@ -1,0 +1,14 @@
+ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible
+aws_account_id: 013626294458
+aws_region: sa-east-1
+domain: .br.experian.local
+env: prod
+kms_id: b3b4ac6a-29f6-412e-92b2-7407eccb3c6e
+prefix_hostname: '{{ prefix_stack_hostname }}'
+stack_name: '{{ prefix_stack_name }}'
+subnet:
+  a: subnet-08db2c424d044ba09
+  b: subnet-00870dd086d4fe371
+  c: subnet-07121474358590b5d
+tribe: brdasre
+vpi_id: vpc-0950c2537a2003ffe

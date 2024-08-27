@@ -1,0 +1,16 @@
+domain: .br.experian.local
+prefix_hostname: "{{ prefix_stack_hostname }}"
+stack_name: "{{ prefix_stack_name }}"
+aws_region: sa-east-1
+env: dev
+tribe: EITS
+vpi_id: vpc-0d8b5b19301b9d9b7
+subnet:
+    a: subnet-061dd89d95aab0416
+    b: subnet-035046932ba551711
+    c: subnet-0135a1fb5c847ab0f
+    d: 
+kms_id: fa28b622-7500-4217-8b2c-9a9834226692
+aws_account_id: 575206002933
+##Identity_ssh
+ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible

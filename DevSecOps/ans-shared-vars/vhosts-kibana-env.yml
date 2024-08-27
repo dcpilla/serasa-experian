@@ -1,0 +1,8 @@
+---
+app_host_name: kibana_elastic
+app_host_ip: K8S_URL
+app_host_port: 32141
+app_host_vhost: "spobr{{bu_name}}kibana{{ env_stack }}{{ domain }}"
+ldap_system_user: "{{ ldap_user_serasa }}"
+ldap_system_password: "{{ ldap_password_serasa }}"
+ldap: true

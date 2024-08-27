@@ -1,0 +1,6 @@
+project_key: "@@PROJECT_KEY@@"
+repo_name: "@@REPO_NAME@@"
+brench: "@@BRENCH@@"
+commit: "@@COMMIT@@"
+opcao: "@@OPCAO@@"
+file_local: "@@FILE_LOCAL@@"

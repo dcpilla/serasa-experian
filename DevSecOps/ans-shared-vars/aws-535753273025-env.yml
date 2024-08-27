@@ -1,0 +1,17 @@
+domain: .serasa.intranet
+prefix_hostname: "{{ prefix_stack_hostname }}"
+stack_name: "{{ prefix_stack_name }}"
+aws_region: sa-east-1
+env: prd
+tribe: pmetr
+vpi_id: vpc-0b4530eabf3b0d599
+subnet:
+    a: subnet-0f5be25a2ffc4e589
+    b: subnet-07b93a1a8e95e9e49
+    c: subnet-071dcdef950e6c9de
+    d: subnet-01991a451ca67cc9d
+    e: subnet-0e33f08535b6b1870
+kms_id: b7b0c1b0-54b8-4c4c-bc22-4025e65f45e5
+aws_account_id: 535753273025
+##Identity_ssh
+ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible

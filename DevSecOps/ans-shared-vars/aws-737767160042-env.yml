@@ -1,0 +1,14 @@
+domain: .serasa.intranet
+prefix_hostname: "{{ prefix_stack_hostname }}"
+stack_name: "{{ prefix_stack_name }}"
+aws_region: sa-east-1
+env: prd
+tribe: DECISION-ANALYTICS-PROD
+vpi_id: vpc-023d55f71fb69df85
+subnet:
+    a: subnet-0b18326364ecd9a4a
+    b: subnet-0b18326364ecd9a4a
+kms_id: acb631f5-dd5f-44f0-92b6-21ac391d1595
+aws_account_id: 737767160042 
+##Identity_ssh
+ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible

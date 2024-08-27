@@ -1,0 +1,16 @@
+domain: .br.expeian.local
+prefix_hostname: "{{ prefix_stack_hostname }}"
+stack_name: "{{ prefix_stack_name }}"
+aws_region: sa-east-1
+env: dev
+tribe: trdo
+vpi_id: vpc-0676613b8560883f5
+subnet:
+    a: subnet-00e5fadac1ea1996c
+    b: subnet-028508f0b47d65739
+    c: subnet-06e357f2372ece22f
+    d: 
+kms_id: b4dab486-c4f2-4a67-bb01-60c02148c940
+aws_account_id: 916546429908
+##Identity_ssh
+ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible

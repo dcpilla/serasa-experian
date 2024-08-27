@@ -1,0 +1,15 @@
+domain: .serasa.intranet
+prefix_hostname: "{{ prefix_stack_hostname }}"
+stack_name: "{{ prefix_stack_name }}"
+aws_region: sa-east-1
+env: prd
+tribe: nike
+vpi_id: vpc-0a72c80a7b0b6e7d3
+subnet:
+    a: subnet-046bfb32ca2c90b0e
+    b: subnet-0dd7d678195327c5d
+    c: subnet-00840a4ea265c37e2
+kms_id: 1b31dc26-3894-4fbd-b342-0047673fbf05
+aws_account_id: 707064604759
+##Identity_ssh
+ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible

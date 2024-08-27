@@ -1,0 +1,10 @@
+ca_path_debian: /usr/local/share/ca-certificates
+ca_path:
+  RedHat:
+    6: /usr/local/share/ca-certificates
+    7: /etc/pki/ca-trust/source/anchors
+    8: /etc/pki/ca-trust/source/anchors
+    2: /etc/pki/ca-trust/source/anchors
+    9: /etc/pki/ca-trust/source/anchors
+##Identity_ssh
+ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible

@@ -1,0 +1,25 @@
+domain: .serasa.intranet
+ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible
+#sprefix_hostname: "{{ prefix_stack_hostname }}"
+#stack_name: "{{ prefix_stack_name }}"
+aws_region: sa-east-1
+elasticsearch_port: 443
+zookeeper_port : 2181
+env: prd
+tribe: nike
+backend: secdevops-terraform-prd-tfstates
+vpi_id: vpc-0a9d3b72fba388442
+subnet:
+  a: subnet-06588e5b9be554263
+  b: subnet-0b502f71eace9c5b5
+kms_id: 2864875b-686b-42a5-bb36-5a2b89b55965
+aws_account_id: 564593125549
+elasticsearch_host: vpc-nike-log-tiixws6zcpidvytawnyetnifiy.sa-east-1.es.amazonaws.com
+kafka_servers: 10.99.151.6:9092,10.99.151.137:9092,10.99.151.69:9092
+zookeeper_lb: ELKZKG-zookeeper-nlb-aeb241c7e2c83e25.elb.sa-east-1.amazonaws.com
+k8s_efs_dns_name: fs-541db759.efs.sa-east-1.amazonaws.com
+ami_id: "{{ ami_id_rhel7 }}"
+ami_id_rhel7: ami-02513a3e45fb49995
+ami_id_rhel8:
+##Identity_ssh
+ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible

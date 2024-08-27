@@ -1,0 +1,6 @@
+aws_account_id          : "@@AWS_ACCOUNT_ID@@"
+aws_region              : "@@AWS_REGION@@"
+aws_bu                  : "@@AWS_BU@@"
+eks_cluster_name        : "@@EKS_CLUSTER_NAME@@"
+aws_eks_api             : "@@AWS_EKS_API@@"
+

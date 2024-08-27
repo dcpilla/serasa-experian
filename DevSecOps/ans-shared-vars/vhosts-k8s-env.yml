@@ -1,0 +1,8 @@
+---
+app_host_name: k8s_elastic
+app_host_ip: K8S_URL
+app_host_port: 6443
+app_host_vhost: "{{ prefix_stack_hostname }}{{ app_name }}{{ prefix_stack_name }}{{(groups.k8s.index(inventory_hostname) + 1)}}{{ domain }}"
+ldap_system_user: "{{ ldap_user_serasa }}"
+ldap_system_password: "{{ ldap_password_serasa }}"
+ldap: false

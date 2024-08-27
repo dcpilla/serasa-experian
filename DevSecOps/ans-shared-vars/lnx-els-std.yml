@@ -1,0 +1,13 @@
+domain_name: @@DOMAIN_NAME@@
+deployment_type: @@DEPLOYMENT_TYPE@@
+instance_type: @@INSTANCE_TYPE@@
+number_nodes: @@NUMBER_NODES@@
+master_username: @@MASTER_USERNAME@@
+master_username_key: @@MASTER_USERNAME_KEY@@
+els_master_key_arn: @@ELS_MASTER_KEY_ARN@@
+EBS_storage_size_node: @@EBS_STORAGE_SIZE_NODE@@
+country: @@COUNTRY@@
+bu: @@BU@@
+Asset_Category: @@ASSET_CATEGORY@@
+Data_Type: @@DATA_TYPE@@
+Data_Category: @@DATA_CATEGORY@@

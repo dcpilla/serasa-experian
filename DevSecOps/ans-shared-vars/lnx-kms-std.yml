@@ -1,0 +1,4 @@
+aws_account_id: @@AWS_ACCOUNT_ID@@
+key_usage: @@KEY_USAGE@@
+kms_name_alias: @@KMS_NAME_ALIAS@@
+kms_description: @@KMS_DESCRIPTION@@

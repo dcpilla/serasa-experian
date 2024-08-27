@@ -1,0 +1,14 @@
+ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible
+aws_account_id: 246255858577
+aws_region: sa-east-1
+domain: .serasa.intranet
+env: snd
+kms_id: 67f88dad-40e6-43b8-b687-17df85127846
+prefix_hostname: '{{ prefix_stack_hostname }}'
+stack_name: '{{ prefix_stack_name }}'
+subnet:
+  a: subnet-0cd07e221f5ed90a0
+  b: subnet-05cee0add11ad1339
+  c: subnet-069b2283c819facfb
+tribe: DevHub
+vpi_id: vpc-0b01586e3caa532bb
