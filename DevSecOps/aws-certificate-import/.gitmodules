@@ -1,0 +1,6 @@
+[submodule "cockpit_common"]
+        path = cockpit_common
+        url = https://code.br.experian.local/scm/scib/cockpit-common.git
+[submodule "helpers"]
+	path = helpers
+	url = https://code.experian.local/scm/trsrecs/helpers.git

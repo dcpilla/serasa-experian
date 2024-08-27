@@ -1,0 +1,12 @@
+[submodule "playbooks/roles/bitbucket/templates/aws/ans-shared-roles"]
+	path = playbooks/roles/bitbucket/templates/aws/ans-shared-roles
+	url = ssh://git@code.experian.local/scib/ans-shared-roles.git
+[submodule "playbooks/roles/bitbucket/templates/aws/ans-shared-vars"]
+	path = playbooks/roles/bitbucket/templates/aws/ans-shared-vars
+	url = ssh://git@code.experian.local/scib/ans-shared-vars.git
+[submodule "ans-shared-vars"]
+	path = ans-shared-vars
+	url = ssh://git@code.br.experian.local/scib/ans-shared-vars.git
+[submodule "ans-shared-roles"]
+	path = ans-shared-roles
+	url = ssh://git@code.br.experian.local/scib/ans-shared-roles.git

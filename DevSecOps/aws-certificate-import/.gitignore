@@ -1,0 +1,58 @@
+#****************************************************************************************
+#
+# .gitignore - Especifica arquivos intencionalmente que o Git deve ignorar nos commits
+#
+# Examples:
+# Ignorar os arquivos *.html
+# *.html
+# Ignorar o diretório .idea/
+#.idea/
+#
+# Crie o seu por aqui de acordo com sua tecnologia e evite sugereiras em seus repos :)
+# https://www.gitignore.io/
+#
+# Referencia - https://git-scm.com/docs/gitignore
+#
+#****************************************************************************************
+### Terraform ###
+# Local .terraform directories
+**/.terraform/*
+terraform-resources/*
+*.tfstate
+*.tfstate.*
+*tfplan*
+*.plan
+.terraform.lock.hcl
+
+#  log files
+*.log
+
+# Package
+*.DS_Store
+.DS_Store
+*.zip
+*.tar.gz
+
+### Intellij ###
+/.idea/
+*/.idea
+**/.idea/*
+.idea/
+*.iml
+
+### Eclipse ###
+.project
+.settings
+
+### VS Code ###
+.vscode/
+
+### Temp Local ###
+temp/
+
+### Sublime ###
+*.sublime-workspace
+*.sublime-project
+*.sublime-workspace
+
+replace_for_test.sh

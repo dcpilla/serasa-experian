@@ -1,0 +1,41 @@
+#### Tags ####
+variable "env" {
+  description = "Tag Envirolment"
+  default = "{{ env }}"
+}
+variable "bu"{
+  description = "Tag BU"
+  default = "{{ tribe }}"
+}
+variable "namespace" {
+  type          = string
+  description   = "Namespace (e.g. `eg` or `cp`)"
+  default       = "{{ tribe }}"
+}
+variable "stage" {
+  type          = string
+  description   = "Stage (e.g. `prod`, `dev`, `staging`, `infra`)"
+  default       = "{{ env }}"
+}
+
+#### Account Variable ####
+variable "aws_account_id" {
+  description   = "AWS Id Account"
+  default       = "{{ aws_account_id }}"
+}
+variable "region" {
+  description   = "Region that will be used in AWS"
+  default       = "{{ aws_region }}"
+}
+
+#### Universal ####
+variable "country" {
+  default       = "{{ country }}"
+}
+variable "bu_name" {
+  default       = "{{ bu_name[bu] }}"
+}
+variable "assume_role_arn" {
+  description   = "Assume Role ARN"
+  default       = "arn:aws:iam::{{ aws_account_id }}:role/BURoleForDevSecOpsServiceCatalog"
+}
