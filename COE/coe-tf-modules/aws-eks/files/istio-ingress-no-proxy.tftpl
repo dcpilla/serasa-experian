@@ -1,0 +1,23 @@
+service:
+  annotations:
+    "service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags": ${annotations_tag}
+
+podAnnotations: {}
+
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+    - labelSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - istio-ingress
+      topologyKey: kubernetes.io/hostname
+    - labelSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - istio-ingress
+      topologyKey: topology.kubernetes.io/zone

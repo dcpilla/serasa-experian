@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  namespace: ns-teste-secret-store-csi
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.14.2
+          ports:
+            - containerPort: 80
+          command: ["/bin/sh", "-c", "cat /mnt/k8s-secret"]
+          volumeMounts:
+            - name: k8s-secret
+              mountPath: "/mnt/k8s-secret"
+      volumes:
+        - name: k8s-secret
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "k8s-secret"

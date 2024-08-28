@@ -1,0 +1,214 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Service Catalog: EMR Reference Architecture.'
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: EMR Network Configuration
+      Parameters:
+      - SubnetId
+    - Label:
+        default: EMR Cluster Configuration
+      Parameters:
+      - ClusterName
+      - CoreInstanceType
+      - CoreNodeCount
+      - ReleaseLabel
+
+    ParameterLabels:
+      SubnetId:
+        default: Subnet
+      ClusterName:
+        default: EMR Cluster Name
+      CoreInstanceType:
+        default: Core Instance Type
+      CoreNodeCount:
+        default: Core Node Count
+      ReleaseLabel:
+        default: Release Configuration
+      BootstrapScriptPath:
+        default: Bootstrap Script Path Configuration
+
+Parameters:
+  ClusterName:
+    Description: Enter a name for your EMR cluster.
+    Type: String
+  CoreInstanceType:
+    Description: Select the core node instance type.
+    Type: String
+    Default: m5.xlarge
+    AllowedValues:
+%{ for element in jsondecode(allowed_instance_types) ~}
+    - ${element}
+%{ endfor ~}
+   
+  CoreNodeCount:
+    Description: Enter the number of Core Nodes. Minimum is 1.
+    Type: Number
+    Default: 2
+    AllowedValues:
+    - 1
+    - 2
+  ClusterSize:
+    Description: Select the cluster size. Default is P. 
+    Type: String
+    Default: P
+    AllowedValues:
+    - P
+    - M
+    - G
+  ReleaseLabel:
+    Description: Select the EMR Cluster release configuration. Selected emr-6.15.0 to Delta and Iceberg works.
+    Type: String
+    Default: emr-6.15.0
+    AllowedValues:
+    - emr-6.15.0
+    - emr-5.36.1
+  SubnetId:
+    Description: Select target subnet for EMR Cluster.
+    Type: AWS::EC2::Subnet::Id
+  UserLanId:
+    Description: Enter your lan id (Typically, c12345a).
+    Type: String
+  BootstrapScriptPath:
+    Description: Enter your bootstrap script s3 path. If there are no particularities, kepp the default s3 path.
+    Type: String
+    Default: "${bootstrap_script_path}"
+Conditions: 
+  IsP:
+    !Equals [!Ref  ClusterSize, "P"]
+  IsM:
+    !Equals [!Ref  ClusterSize, "M"]
+  IsG:
+    !Equals [!Ref  ClusterSize, "G"]
+  
+Resources:
+  Cluster:
+    Type: AWS::EMR::Cluster
+    Properties:
+%{ if team != "" ~}
+      Name: !Sub "emr-cluster-${fmt_team}-$${UserLanId}-$${ClusterName}"
+%{ else ~}
+      Name: !Sub "emr-cluster-$${UserLanId}-$${ClusterName}"
+%{ endif ~}
+      Applications:
+%{ for application in jsondecode(allowed_applications) ~}
+        - Name: ${application}
+%{ endfor ~}
+      BootstrapActions:
+        - Name: RunBootstrapScript
+          ScriptBootstrapAction:
+            Path: !Sub "$${BootstrapScriptPath}"
+      EbsRootVolumeSize: 32
+      ManagedScalingPolicy:
+        ComputeLimits:
+            MaximumCapacityUnits: !If [ IsP, 8, !If [ IsM, 12, !If [ IsG, 16, 16]]]
+            MaximumCoreCapacityUnits:  !If [ IsP, 8, !If [ IsM, 12, !If [ IsG, 16, 16]]]
+            MaximumOnDemandCapacityUnits:  !If [ IsP, 8, !If [ IsM, 12, !If [ IsG, 16, 16]]]
+            MinimumCapacityUnits:  1
+            UnitType: Instances
+      Instances:
+        MasterInstanceGroup:
+          InstanceCount: 1
+          InstanceType: m5.xlarge
+          Market: ON_DEMAND
+          Name: Master
+        CoreInstanceGroup:
+          InstanceCount:
+            Ref: CoreNodeCount
+          InstanceType:
+            Ref: CoreInstanceType
+          Market: ON_DEMAND
+          Name: Core
+          EbsConfiguration:
+            EbsBlockDeviceConfigs:
+                - VolumeSpecification:
+                    SizeInGB: !If [ IsP, 32, !If [ IsM, 64, !If [ IsG, 128, 128]]]
+                    VolumeType: "gp2"
+                  VolumesPerInstance: 2
+
+        TerminationProtected: false
+        Ec2SubnetId:
+          Ref: SubnetId
+      JobFlowRole: 'arn:aws:iam::${account_id}:instance-profile/${emr_job_flow_role_name}'
+      ServiceRole: 'arn:aws:iam::${account_id}:role/eec-aws-standard-emr-defaultrole'
+      ReleaseLabel:
+        Ref: ReleaseLabel
+      LogUri: s3://${s3_emr_cluster_logs}/emr-cluster-logs/
+      VisibleToAllUsers: true
+      AutoTerminationPolicy:
+        IdleTimeout: 3600
+%{if length(jsondecode(emr_cluster_configurations)) > 0 ~}
+      Configurations:
+%{ endif ~}
+%{ for configuration in jsondecode(emr_cluster_configurations) ~}
+%{ if configuration == "Delta" ~}
+      - Classification: 'delta-defaults'
+        ConfigurationProperties:
+          'delta.enabled': 'true'
+%{ endif ~}
+%{ if configuration == "Iceberg" ~}
+      - Classification: 'iceberg-defaults'
+        ConfigurationProperties:
+          'iceberg.enabled': 'true'
+%{ endif ~} 
+%{ if configuration == "Glue" ~}
+      - Classification: 'spark-hive-site'
+        ConfigurationProperties:
+          'hive.metastore.client.factory.class': 'com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory'
+%{ endif ~} 
+%{ if configuration == "Hive" ~}
+      - Classification: 'hive-site'
+        ConfigurationProperties:
+          'hive.metastore.client.factory.class': 'com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory'
+%{ endif ~} 
+%{ if configuration == "Presto" ~}
+      - Classification: 'presto-connector-hive'
+        ConfigurationProperties:
+          'hive.metastore.glue.datacatalog.enabled': 'true'
+%{ endif ~} 
+%{ endfor ~}
+      Tags:
+%{ if team != "" ~}
+      - Key : Name
+        Value: !Sub "emr-cluster-${fmt_team}-$${UserLanId}-$${ClusterName}"
+%{ else ~}
+      - Key : Name
+        Value: !Sub "emr-cluster-$${UserLanId}-$${ClusterName}"
+%{ endif ~}
+      - Key: UserLanId
+        Value: !Sub "$${UserLanId}"
+      - Key: Environment
+        Value: ${env}
+      - Key: AppID
+        Value: ${app_id}
+      - Key: CostString
+        Value: '${cost_string}'
+      - Key: ResourceName
+        Value: BRASA1DBDUDA01
+      - Key: adDomain
+        Value: br.experian.local
+      - Key: PCI
+        Value: no
+      - Key: ResourceOwner
+        Value: "damsbrzdatasolutions@br.experian.com"
+      - Key: ResourceAppRole
+        Value: misc
+%{ if team != "" ~}
+      - Key : Team
+        Value: '${team}'
+%{ endif ~}
+
+Outputs:
+  MasterNodeHadoopURL:
+    Description: EMR Resource Manager
+    Value:
+      Fn::Sub: http://$${Cluster.MasterPublicDNS}:8088
+  SubnetId:
+    Description: Subnet
+    Value:
+      Ref: SubnetId
+  ClusterName:
+    Description: EMR Cluster Name
+    Value:
+      Ref: ClusterName

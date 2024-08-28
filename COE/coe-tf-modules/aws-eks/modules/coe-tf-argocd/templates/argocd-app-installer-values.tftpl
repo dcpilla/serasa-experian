@@ -1,0 +1,24 @@
+env: "${env}"
+cluster_informations:
+  name: "${eks_cluster_name}"
+  domain: "${external_dns_domain}"
+  aws_account_id: "${aws_account_id}"
+  project_name: "${project_name}"
+
+global:
+  cluster_informations_name: "${eks_cluster_name}"
+  cluster_informations_domain: "${external_dns_domain}"
+  cluster_informations_aws_account_id: "${aws_account_id}"
+  cluster_informations_project_name: "${project_name}"
+  monitoringRole: "${monitoring_role}"
+  monitoringAsm: "${monitoring_asm}"
+  env: ${env}
+
+defaut_applications:
+  source:
+    path: "${git_repository_path}/"
+    repoURL: "${git_repository_url}"
+    targetRevision: "${git_repository_branch}"
+
+
+

@@ -1,0 +1,21 @@
+{
+    "Version": "2012-10-17",
+    "Id": "Policy1569507463584",
+    "Statement": [
+          {
+            "Sid": "AllowSSLRequestsOnly",
+            "Effect": "Deny",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": [
+                "${bucket_arn}",
+                "${bucket_arn}/*"
+            ],
+            "Condition": {
+                "Bool": {
+                    "aws:SecureTransport": "false"
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,69 @@
+fullnameOverride: "argo-rollouts"
+controller:
+  # -- [Node selector]
+  nodeSelector:
+    Worker: infra
+  # -- [Tolerations] for use with node taints
+  tolerations:
+  - effect: NoSchedule
+    key: dedicated
+    operator: Equal
+    value: infra
+  replicas: 2
+  image:
+    # -- Registry to use
+    registry: ${repository}
+    # -- Repository to use
+    repository: argoproj/argo-rollouts
+    # -- Overrides the image tag (default is the chart appVersion)
+    tag: "latest"
+    # -- Image pull policy
+    pullPolicy: IfNotPresent
+dashboard:
+  # -- Deploy dashboard server
+  enabled: false
+  replicas: 1
+  image:
+    # -- Registry to use
+    registry: ${repository}
+    # --  Repository to use
+    repository: argoproj/kubectl-argo-rollouts
+    # -- Overrides the image tag (default is the chart appVersion)
+    tag: "latest"
+    # -- Image pull policy
+    pullPolicy: IfNotPresent
+  # -- Additional command line arguments to pass to rollouts-dashboard. A list of flags.
+  extraArgs: []
+  # -- Additional environment variables for rollouts-dashboard. A list of name/value maps.
+  extraEnv:
+    []
+    # - name: FOO
+    #   value: bar
+  # -- Resource limits and requests for the dashboard pods.
+  resources: {}
+  # -- Security Context to set on pod level
+  podSecurityContext:
+    runAsNonRoot: true
+  # -- Security Context to set on container level
+  containerSecurityContext: {}
+  service:
+    # -- Sets the type of the Service
+    type: ClusterIP
+    # -- LoadBalancer will get created with the IP specified in this field
+    loadBalancerIP: ""
+    # -- Source IP ranges to allow access to service from
+    loadBalancerSourceRanges: []
+    # -- Dashboard service external IPs
+    externalIPs: []
+    # -- Service annotations
+    annotations: {}
+    # -- Service labels
+    labels: {}
+    # -- Service port name
+    portName: dashboard
+    # -- Service port
+    port: 3100
+    # -- Service target port
+    targetPort: 3100
+    # -- (int) Service nodePort
+    nodePort:

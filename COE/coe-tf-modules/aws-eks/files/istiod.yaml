@@ -1,0 +1,17 @@
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+    - labelSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - istiod
+      topologyKey: kubernetes.io/hostname
+    - labelSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - istiod
+      topologyKey: topology.kubernetes.io/zone
