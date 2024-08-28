@@ -1,0 +1,43 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "job.name" . }}-ttl
+  namespace: kube-system
+  labels:
+    app: {{ template "app.name" . }}
+    chart: {{ template "chart.name" . }}
+spec:
+  ttlSecondsAfterFinished: 600
+  template:
+    spec:
+      containers:
+      - name: kubectl
+        image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
+        command: ["/bin/sh", "-c", "/opt/files/run.sh -n \"{{ .Values.nodeRoles }}\" -r \"{{ .Values.roles }}\" -u \"{{ .Values.users }}\" -i {{ .Values.accountid }}"]
+        volumeMounts:
+        - name: script-run-sh
+          mountPath: /opt/files
+      volumes:
+      - name: script-run-sh
+        configMap:
+          name: {{ template "app.name" . }}-configmap
+          defaultMode: 0777
+      restartPolicy: Never
+      automountServiceAccountToken: true
+      securityContext: {}
+      serviceAccount: {{ template "rbac.name.system.account" . }}
+      serviceAccountName: {{ template "rbac.name.system.account" . }}
+      shareProcessNamespace: false
+      terminationGracePeriodSeconds: 30
+      {{- if .Values.tolerations }}
+      tolerations:
+{{ toYaml .Values.tolerations | indent 8 }}
+      {{- end }}
+      {{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+      {{- end }}
+  backoffLimit: 4
+  completions: 1
+  manualSelector: false
+  parallelism: 1

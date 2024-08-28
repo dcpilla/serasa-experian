@@ -1,0 +1,10 @@
+nameOverride: ""
+
+fullnameOverride: ""
+
+istio:
+  domain: "br.experian.eeca"
+
+service:
+  name: app.svc.cluster.local
+  port: 80

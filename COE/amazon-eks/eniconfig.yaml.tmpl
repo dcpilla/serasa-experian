@@ -1,0 +1,7 @@
+apiVersion: crd.k8s.amazonaws.com/v1alpha1
+kind: ENIConfig
+metadata: 
+  name: ${resource_name}
+spec: 
+  securityGroups: [${security_group_ids}]
+  subnet: ${subnet_id}

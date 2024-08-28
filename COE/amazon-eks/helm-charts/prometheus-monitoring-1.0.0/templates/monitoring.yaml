@@ -1,0 +1,11 @@
+apiVersion: monitoring.coreos.com/v1
+kind: {{ .Values.monitoring.kind }}
+metadata:
+  name: {{ include "app.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+{{- with .Values.monitoring.spec }}
+spec:
+  {{- toYaml . | nindent 2 }}
+{{- end }}

@@ -1,0 +1,13 @@
+apiVersion: v2
+version: 1.0.0
+appVersion: 1.0.0
+description: Prometheus Monitoring for Istio, Flagger and Kubecost
+name: prometheus-monitoring
+type: application
+
+keywords:
+- istio
+- kubecost
+- flagger
+- podMonitor
+- serviceMonitor

@@ -1,0 +1,3573 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ printf "%s-%s" ( include "app.fullname" . ) "flagger" | trunc 63 | trimSuffix "-" }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ include "app.fullname" . }}-flagger
+    grafana_dashboard: "1"
+data:
+  flagger.json: |-
+    {{`{
+    "annotations": {
+        "list": [
+        {
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "target": {
+            "limit": 100,
+            "matchAny": false,
+            "tags": [],
+            "type": "dashboard"
+            },
+            "type": "dashboard"
+        }
+        ]
+    },
+    "description": "Watch the status of your canary deployments.",
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "gnetId": 15158,
+    "graphTooltip": 0,
+    "id": 37,
+    "iteration": 1657743026848,
+    "links": [],
+    "liveNow": false,
+    "panels": [
+        {
+        "collapsed": false,
+        "datasource": {
+            "type": "prometheus"
+        },
+        "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 0
+        },
+        "id": 119,
+        "panels": [],
+        "title": "Flagger Rollout Status",
+        "type": "row"
+        },
+        {
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "thresholds"
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "light-purple",
+                    "value": null
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 2,
+            "w": 10,
+            "x": 0,
+            "y": 1
+        },
+        "id": 136,
+        "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "center",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "lastNotNull"
+            ],
+            "fields": "/^image$/",
+            "values": false
+            },
+            "text": {},
+            "textMode": "auto"
+        },
+        "pluginVersion": "8.3.6",
+        "targets": [
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "kube_pod_container_info{namespace=\"$namespace\",pod=~\"$primary-.*\",container!~\"POD|istio-proxy\",account=~\"$awsaccount\",cluster=~\"$cluster\"}",
+            "format": "table",
+            "instant": false,
+            "interval": "",
+            "legendFormat": "",
+            "refId": "A"
+            }
+        ],
+        "title": "Primary: Image Tag",
+        "type": "stat"
+        },
+        {
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "thresholds"
+            },
+            "decimals": 0,
+            "mappings": [
+                {
+                "options": {
+                    "0": {
+                    "color": "purple",
+                    "index": 0,
+                    "text": "Running"
+                    },
+                    "1": {
+                    "color": "green",
+                    "index": 1,
+                    "text": "Success"
+                    },
+                    "2": {
+                    "color": "red",
+                    "index": 2,
+                    "text": "Fail"
+                    }
+                },
+                "type": "value"
+                },
+                {
+                "options": {
+                    "match": "null+nan",
+                    "result": {
+                    "color": "orange",
+                    "index": 3,
+                    "text": "No Flagger Data"
+                    }
+                },
+                "type": "special"
+                }
+            ],
+            "max": 2,
+            "min": 0,
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            },
+            "unit": "string"
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 6,
+            "w": 4,
+            "x": 10,
+            "y": 1
+        },
+        "id": 121,
+        "links": [],
+        "maxDataPoints": 100,
+        "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "last"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "8.3.6",
+        "targets": [
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "sum(flagger_canary_status{namespace=\"$namespace\",name=~\"$canary\",account=~\"$awsaccount\",cluster=~\"$cluster\"})",
+            "hide": false,
+            "interval": "",
+            "legendFormat": "",
+            "refId": "A"
+            }
+        ],
+        "title": "Flagger Canary: Last Result",
+        "type": "stat"
+        },
+        {
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "thresholds"
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "light-purple",
+                    "value": null
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 2,
+            "w": 10,
+            "x": 14,
+            "y": 1
+        },
+        "id": 138,
+        "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "center",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "lastNotNull"
+            ],
+            "fields": "/^image$/",
+            "values": false
+            },
+            "text": {},
+            "textMode": "auto"
+        },
+        "pluginVersion": "8.3.6",
+        "targets": [
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "kube_pod_container_info{namespace=\"$namespace\",pod=~\"$canary-.*\",pod!~\".primary.*\",container!~\"POD|istio-proxy\",account=~\"$awsaccount\",cluster=~\"$cluster\"}",
+            "format": "table",
+            "instant": false,
+            "interval": "",
+            "legendFormat": "",
+            "refId": "A"
+            }
+        ],
+        "title": "Canary: Image Tag",
+        "type": "stat"
+        },
+        {
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "min": 0,
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "blue",
+                    "value": null
+                }
+                ]
+            },
+            "unit": "replicas"
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 5,
+            "x": 0,
+            "y": 3
+        },
+        "id": 110,
+        "links": [],
+        "maxDataPoints": 100,
+        "options": {
+            "legend": {
+            "calcs": [],
+            "displayMode": "hidden",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "pluginVersion": "8.3.3",
+        "targets": [
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "kube_deployment_status_replicas_available{namespace=~\"$namespace\", deployment=~\"$primary\",account=~\"$awsaccount\",cluster=~\"$cluster\"}",
+            "hide": false,
+            "interval": "",
+            "legendFormat": "",
+            "refId": "B"
+            }
+        ],
+        "title": "Primary: Healthy POD Replicas",
+        "type": "timeseries"
+        },
+        {
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "fixedColor": "blue",
+                "mode": "fixed"
+            },
+            "mappings": [],
+            "max": 100,
+            "min": 0,
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            },
+            "unit": "percent"
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 5,
+            "x": 5,
+            "y": 3
+        },
+        "id": 111,
+        "links": [],
+        "maxDataPoints": 100,
+        "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "8.3.6",
+        "targets": [
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "flagger_canary_weight{namespace=~\"$namespace\",workload=~\"$primary\",account=~\"$awsaccount\",cluster=~\"$cluster\"}",
+            "hide": false,
+            "interval": "",
+            "legendFormat": "",
+            "refId": "B"
+            }
+        ],
+        "title": "Primary: Flagger Weighting",
+        "type": "stat"
+        },
+        {
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "thresholds"
+            },
+            "mappings": [],
+            "max": 100,
+            "min": 0,
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                },
+                {
+                    "color": "#6ED0E0",
+                    "value": 90
+                },
+                {
+                    "color": "#EAB839",
+                    "value": 95
+                },
+                {
+                    "color": "red",
+                    "value": 99
+                }
+                ]
+            },
+            "unit": "percent"
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 5,
+            "x": 14,
+            "y": 3
+        },
+        "id": 113,
+        "links": [],
+        "maxDataPoints": 100,
+        "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "8.3.6",
+        "targets": [
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "flagger_canary_weight{namespace=~\"$namespace\",workload=~\"$canary\",account=~\"$awsaccount\",cluster=~\"$cluster\"}",
+            "format": "time_series",
+            "interval": "",
+            "intervalFactor": 1,
+            "legendFormat": "",
+            "refId": "B"
+            }
+        ],
+        "title": "Canary: Flagger Weighting",
+        "type": "stat"
+        },
+        {
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "min": 0,
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            },
+            "unit": "replicas"
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 5,
+            "x": 19,
+            "y": 3
+        },
+        "id": 112,
+        "links": [],
+        "maxDataPoints": 100,
+        "options": {
+            "legend": {
+            "calcs": [],
+            "displayMode": "hidden",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "pluginVersion": "8.3.3",
+        "targets": [
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "kube_deployment_status_replicas_available{namespace=~\"$namespace\", deployment=~\"$canary\",account=~\"$awsaccount\",cluster=~\"$cluster\"}",
+            "format": "time_series",
+            "interval": "",
+            "intervalFactor": 1,
+            "legendFormat": "",
+            "refId": "A",
+            "step": 4
+            }
+        ],
+        "title": "Canary: Healthy POD Replicas",
+        "type": "timeseries"
+        },
+        {
+        "collapsed": false,
+        "datasource": {
+            "type": "prometheus"
+        },
+        "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 7
+        },
+        "id": 117,
+        "panels": [],
+        "title": "Requests, Error, Duration (RED)",
+        "type": "row"
+        },
+        {
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "min": 0,
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "blue",
+                    "value": null
+                }
+                ]
+            },
+            "unit": "reqps"
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 5,
+            "w": 6,
+            "x": 0,
+            "y": 8
+        },
+        "id": 90,
+        "links": [],
+        "maxDataPoints": 100,
+        "options": {
+            "legend": {
+            "calcs": [],
+            "displayMode": "hidden",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "pluginVersion": "8.3.3",
+        "targets": [
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "round(sum(rate(istio_requests_total{reporter=\"destination\",destination_workload_namespace=~\"$namespace\",destination_workload=~\"$primary\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval])), 0.001)",
+            "format": "time_series",
+            "interval": "",
+            "intervalFactor": 1,
+            "legendFormat": "",
+            "refId": "A",
+            "step": 4
+            }
+        ],
+        "title": "Primary: Incoming Request Volume",
+        "type": "timeseries"
+        },
+        {
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "min": 0,
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                },
+                {
+                    "color": "#EF843C",
+                    "value": 90
+                },
+                {
+                    "color": "#EAB839",
+                    "value": 95
+                },
+                {
+                    "color": "#6ED0E0",
+                    "value": 99
+                }
+                ]
+            },
+            "unit": "percentunit"
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 5,
+            "w": 6,
+            "x": 6,
+            "y": 8
+        },
+        "id": 98,
+        "links": [],
+        "maxDataPoints": 100,
+        "options": {
+            "legend": {
+            "calcs": [],
+            "displayMode": "hidden",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "pluginVersion": "8.3.3",
+        "targets": [
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "sum(irate(istio_requests_total{reporter=\"destination\",destination_workload_namespace=~\"$namespace\",destination_workload=~\"$primary\",response_code!~\"5.*\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval])) / sum(irate(istio_requests_total{reporter=\"destination\",destination_workload_namespace=~\"$namespace\",destination_workload=~\"$primary\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval]))",
+            "format": "time_series",
+            "interval": "",
+            "intervalFactor": 1,
+            "legendFormat": "",
+            "refId": "A"
+            }
+        ],
+        "title": "Primary: Incoming Success Rate",
+        "type": "timeseries"
+        },
+        {
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "min": 0,
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                },
+                {
+                    "color": "#6ED0E0",
+                    "value": 90
+                },
+                {
+                    "color": "#EAB839",
+                    "value": 95
+                },
+                {
+                    "color": "red",
+                    "value": 99
+                }
+                ]
+            },
+            "unit": "percentunit"
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 5,
+            "w": 6,
+            "x": 12,
+            "y": 8
+        },
+        "id": 99,
+        "links": [],
+        "maxDataPoints": 100,
+        "options": {
+            "legend": {
+            "calcs": [],
+            "displayMode": "hidden",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "pluginVersion": "8.3.3",
+        "targets": [
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "sum(irate(istio_requests_total{reporter=\"destination\",destination_workload_namespace=~\"$namespace\",destination_workload=~\"$canary\",response_code!~\"5.*\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval])) / sum(irate(istio_requests_total{reporter=\"destination\",destination_workload_namespace=~\"$namespace\",destination_workload=~\"$canary\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval]))",
+            "format": "time_series",
+            "interval": "",
+            "intervalFactor": 1,
+            "legendFormat": "",
+            "refId": "B"
+            }
+        ],
+        "title": "Canary: Incoming Success Rate",
+        "type": "timeseries"
+        },
+        {
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "min": 0,
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            },
+            "unit": "reqps"
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 5,
+            "w": 6,
+            "x": 18,
+            "y": 8
+        },
+        "id": 97,
+        "links": [],
+        "maxDataPoints": 100,
+        "options": {
+            "legend": {
+            "calcs": [],
+            "displayMode": "hidden",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "pluginVersion": "8.3.3",
+        "targets": [
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "round(sum(rate(istio_requests_total{reporter=\"destination\",destination_workload_namespace=~\"$namespace\",destination_workload=~\"$canary\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval])), 0.001)",
+            "format": "time_series",
+            "interval": "",
+            "intervalFactor": 1,
+            "legendFormat": "",
+            "refId": "A",
+            "step": 4
+            }
+        ],
+        "title": "Canary: Incoming Request Volume",
+        "type": "timeseries"
+        },
+        {
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                },
+                {
+                    "color": "red",
+                    "value": 80
+                }
+                ]
+            },
+            "unit": "s"
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 12,
+            "x": 0,
+            "y": 13
+        },
+        "id": 96,
+        "links": [],
+        "options": {
+            "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "pluginVersion": "8.3.3",
+        "targets": [
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "histogram_quantile(0.50, sum(irate(istio_request_duration_milliseconds_bucket{reporter=\"destination\",destination_workload=~\"$primary\", destination_workload_namespace=~\"$namespace\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval])) by (le)) / 1000",
+            "format": "time_series",
+            "interval": "",
+            "intervalFactor": 1,
+            "legendFormat": "P50",
+            "refId": "A"
+            },
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "histogram_quantile(0.90, sum(irate(istio_request_duration_milliseconds_bucket{reporter=\"destination\",destination_workload=~\"$primary\", destination_workload_namespace=~\"$namespace\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval])) by (le)) / 1000",
+            "format": "time_series",
+            "hide": false,
+            "interval": "",
+            "intervalFactor": 1,
+            "legendFormat": "P90",
+            "refId": "B"
+            },
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "histogram_quantile(0.99, sum(irate(istio_request_duration_milliseconds_bucket{reporter=\"destination\",destination_workload=~\"$primary\", destination_workload_namespace=~\"$namespace\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval])) by (le)) / 1000",
+            "format": "time_series",
+            "hide": false,
+            "interval": "",
+            "intervalFactor": 1,
+            "legendFormat": "P99",
+            "refId": "C"
+            }
+        ],
+        "title": "Primary: Request Duration",
+        "type": "timeseries"
+        },
+        {
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                },
+                {
+                    "color": "red",
+                    "value": 80
+                }
+                ]
+            },
+            "unit": "s"
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 12,
+            "x": 12,
+            "y": 13
+        },
+        "id": 91,
+        "links": [],
+        "options": {
+            "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "pluginVersion": "8.3.3",
+        "targets": [
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "histogram_quantile(0.50, sum(irate(istio_request_duration_milliseconds_bucket{reporter=\"destination\",destination_workload=~\"$canary\", destination_workload_namespace=~\"$namespace\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval])) by (le)) / 1000",
+            "format": "time_series",
+            "interval": "",
+            "intervalFactor": 1,
+            "legendFormat": "P50",
+            "refId": "A"
+            },
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "histogram_quantile(0.90, sum(irate(istio_request_duration_milliseconds_bucket{reporter=\"destination\",destination_workload=~\"$canary\", destination_workload_namespace=~\"$namespace\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval])) by (le)) / 1000",
+            "format": "time_series",
+            "hide": false,
+            "interval": "",
+            "intervalFactor": 1,
+            "legendFormat": "P90",
+            "refId": "B"
+            },
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "histogram_quantile(0.99, sum(irate(istio_request_duration_milliseconds_bucket{reporter=\"destination\",destination_workload=~\"$canary\", destination_workload_namespace=~\"$namespace\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval])) by (le)) / 1000",
+            "format": "time_series",
+            "hide": false,
+            "interval": "",
+            "intervalFactor": 1,
+            "legendFormat": "P99",
+            "refId": "C"
+            }
+        ],
+        "title": "Canary: Request Duration",
+        "type": "timeseries"
+        },
+        {
+        "datasource": {
+            "type": "prometheus"
+        },
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "min": 0,
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                },
+                {
+                    "color": "red",
+                    "value": 80
+                }
+                ]
+            },
+            "unit": "ops"
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 0,
+            "y": 17
+        },
+        "id": 25,
+        "links": [],
+        "options": {
+            "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "pluginVersion": "8.0.3",
+        "targets": [
+            {
+            "expr": "round(sum(irate(istio_requests_total{connection_security_policy=\"mutual_tls\", destination_workload_namespace=~\"$namespace\", destination_workload=~\"$primary\", reporter=\"destination\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval])) by (source_workload, source_workload_namespace, response_code), 0.001)",
+            "format": "time_series",
+            "hide": false,
+            "intervalFactor": 1,
+            "legendFormat": "{{ source_workload }}.{{ source_workload_namespace }} : {{ response_code }} (🔐mTLS)",
+            "refId": "B",
+            "step": 2
+            },
+            {
+            "expr": "round(sum(irate(istio_requests_total{connection_security_policy!=\"mutual_tls\", destination_workload_namespace=~\"$namespace\", destination_workload=~\"$primary\", reporter=\"destination\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval])) by (source_workload, source_workload_namespace, response_code), 0.001)",
+            "format": "time_series",
+            "hide": false,
+            "intervalFactor": 1,
+            "legendFormat": "{{ source_workload }}.{{ source_workload_namespace }} : {{ response_code }}",
+            "refId": "A",
+            "step": 2
+            }
+        ],
+        "title": "Primary: Incoming Requests by Source And Response Code",
+        "type": "timeseries"
+        },
+        {
+        "datasource": {
+            "type": "prometheus"
+        },
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "min": 0,
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            },
+            "unit": "ops"
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 12,
+            "y": 17
+        },
+        "id": 92,
+        "links": [],
+        "options": {
+            "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "pluginVersion": "8.0.3",
+        "targets": [
+            {
+            "expr": "round(sum(irate(istio_requests_total{connection_security_policy=\"mutual_tls\", destination_workload_namespace=~\"$namespace\", destination_workload=~\"$canary\", reporter=\"destination\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval])) by (source_workload, source_workload_namespace, response_code), 0.001)",
+            "format": "time_series",
+            "hide": false,
+            "intervalFactor": 1,
+            "legendFormat": "{{ source_workload }}.{{ source_workload_namespace }} : {{ response_code }} (🔐mTLS)",
+            "refId": "B",
+            "step": 2
+            },
+            {
+            "expr": "round(sum(irate(istio_requests_total{connection_security_policy!=\"mutual_tls\", destination_workload_namespace=~\"$namespace\", destination_workload=~\"$canary\", reporter=\"destination\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval])) by (source_workload, source_workload_namespace, response_code), 0.001)",
+            "format": "time_series",
+            "hide": false,
+            "intervalFactor": 1,
+            "legendFormat": "{{ source_workload }}.{{ source_workload_namespace }} : {{ response_code }}",
+            "refId": "A",
+            "step": 2
+            }
+        ],
+        "title": "Canary: Incoming Requests by Source And Response Code",
+        "type": "timeseries"
+        },
+        {
+        "datasource": {
+            "type": "prometheus"
+        },
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "min": 0,
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            },
+            "unit": "ops"
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 0,
+            "y": 23
+        },
+        "id": 70,
+        "links": [],
+        "options": {
+            "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "pluginVersion": "8.0.3",
+        "targets": [
+            {
+            "exemplar": true,
+            "expr": "round(sum(irate(istio_requests_total{connection_security_policy=\"mutual_tls\", source_workload_namespace=~\"$namespace\", source_workload=~\"$primary\", reporter=\"source\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval])) by (destination_service, response_code), 0.001)",
+            "format": "time_series",
+            "interval": "",
+            "intervalFactor": 1,
+            "legendFormat": "{{ destination_service }} : {{ response_code }} (🔐mTLS)",
+            "refId": "B",
+            "step": 2
+            },
+            {
+            "exemplar": true,
+            "expr": "round(sum(irate(istio_requests_total{connection_security_policy!=\"mutual_tls\", source_workload_namespace=~\"$namespace\", source_workload=~\"$primary\", reporter=\"source\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval])) by (destination_service, response_code), 0.001)",
+            "format": "time_series",
+            "hide": false,
+            "interval": "",
+            "intervalFactor": 1,
+            "legendFormat": "{{ destination_service }} : {{ response_code }}",
+            "refId": "A",
+            "step": 2
+            }
+        ],
+        "title": "Primary: Outgoing Requests by Destination And Response Code",
+        "type": "timeseries"
+        },
+        {
+        "datasource": {
+            "type": "prometheus"
+        },
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "min": 0,
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            },
+            "unit": "ops"
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 12,
+            "y": 23
+        },
+        "id": 94,
+        "links": [],
+        "options": {
+            "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "pluginVersion": "8.0.3",
+        "targets": [
+            {
+            "expr": "round(sum(irate(istio_requests_total{connection_security_policy=\"mutual_tls\", source_workload_namespace=~\"$namespace\", source_workload=~\"$canary\", reporter=\"source\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval])) by (destination_service, response_code), 0.001)",
+            "format": "time_series",
+            "intervalFactor": 1,
+            "legendFormat": "{{ destination_service }} : {{ response_code }} (🔐mTLS)",
+            "refId": "B",
+            "step": 2
+            },
+            {
+            "expr": "round(sum(irate(istio_requests_total{connection_security_policy!=\"mutual_tls\", source_workload_namespace=~\"$namespace\", source_workload=~\"$canary\", reporter=\"source\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval])) by (destination_service, response_code), 0.001)",
+            "format": "time_series",
+            "hide": false,
+            "intervalFactor": 1,
+            "legendFormat": "{{ destination_service }} : {{ response_code }}",
+            "refId": "A",
+            "step": 2
+            }
+        ],
+        "title": "Canary: Outgoing Requests by Destination And Response Code",
+        "type": "timeseries"
+        },
+        {
+        "collapsed": false,
+        "datasource": {
+            "type": "prometheus"
+        },
+        "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 29
+        },
+        "id": 115,
+        "panels": [],
+        "title": "Utilization, Saturation, Errors (USE)",
+        "type": "row"
+        },
+        {
+        "datasource": {
+            "type": "prometheus"
+        },
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "CPU Usage (Percent)",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineStyle": {
+                "fill": "solid"
+                },
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "min": 0,
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            },
+            "unit": "percent"
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 0,
+            "y": 30
+        },
+        "id": 100,
+        "links": [],
+        "options": {
+            "legend": {
+            "calcs": [
+                "lastNotNull"
+            ],
+            "displayMode": "table",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "pluginVersion": "8.0.3",
+        "targets": [
+            {
+            "exemplar": true,
+            "expr": "100 - (avg (rate(container_cpu_usage_seconds_total{cpu=\"total\",namespace=\"$namespace\",pod=~\"$primary.*\", container!~\"POD|istio-proxy\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval])) * 100)",
+            "hide": false,
+            "interval": "",
+            "legendFormat": "Average CPU Usage",
+            "refId": "A"
+            },
+            {
+            "exemplar": true,
+            "expr": "kube_horizontalpodautoscaler_spec_target_metric{namespace=\"$namespace\",horizontalpodautoscaler=\"$namespace-hpa\",account=~\"$awsaccount\",cluster=~\"$cluster\"}",
+            "hide": false,
+            "interval": "",
+            "legendFormat": "Target Metric for $namespace-hpa",
+            "refId": "B"
+            }
+        ],
+        "title": "Primary: CPU Usage (Avg all PODs)",
+        "type": "timeseries"
+        },
+        {
+        "datasource": {
+            "type": "prometheus"
+        },
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "CPU Usage (Percent)",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "min": 0,
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            },
+            "unit": "percent"
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 12,
+            "y": 30
+        },
+        "id": 102,
+        "links": [],
+        "options": {
+            "legend": {
+            "calcs": [
+                "lastNotNull"
+            ],
+            "displayMode": "table",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "pluginVersion": "8.0.3",
+        "targets": [
+            {
+            "exemplar": true,
+            "expr": "100 - (avg (rate(container_cpu_usage_seconds_total{cpu=\"total\",namespace=\"$namespace\",pod=~\"$canary.*\", pod!~\"$primary.*\", container!~\"POD|istio-proxy\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval])) * 100)",
+            "hide": false,
+            "interval": "",
+            "legendFormat": "Average CPU Usage",
+            "refId": "A"
+            },
+            {
+            "exemplar": true,
+            "expr": "kube_horizontalpodautoscaler_spec_target_metric{namespace=\"$namespace\",horizontalpodautoscaler=\"$namespace-canary-hpa\",account=~\"$awsaccount\",cluster=~\"$cluster\"}",
+            "hide": false,
+            "interval": "",
+            "legendFormat": "Target Metric for $namespace-hpa",
+            "refId": "B"
+            }
+        ],
+        "title": "Canary: CPU Usage (Avg all PODs)",
+        "type": "timeseries"
+        },
+        {
+        "datasource": {
+            "type": "prometheus"
+        },
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            },
+            "unit": "bytes"
+            },
+            "overrides": [
+            {
+                "matcher": {
+                "id": "byName",
+                "options": "Memory Request"
+                },
+                "properties": [
+                {
+                    "id": "custom.spanNulls",
+                    "value": true
+                },
+                {
+                    "id": "color",
+                    "value": {
+                    "fixedColor": "yellow",
+                    "mode": "fixed"
+                    }
+                },
+                {
+                    "id": "custom.hideFrom",
+                    "value": {
+                    "legend": true,
+                    "tooltip": true,
+                    "viz": false
+                    }
+                },
+                {
+                    "id": "custom.fillOpacity",
+                    "value": 0
+                }
+                ]
+            },
+            {
+                "matcher": {
+                "id": "byName",
+                "options": "Memory Limit"
+                },
+                "properties": [
+                {
+                    "id": "custom.fillOpacity",
+                    "value": 0
+                },
+                {
+                    "id": "custom.spanNulls",
+                    "value": true
+                },
+                {
+                    "id": "custom.hideFrom",
+                    "value": {
+                    "legend": true,
+                    "tooltip": true,
+                    "viz": false
+                    }
+                },
+                {
+                    "id": "color",
+                    "value": {
+                    "fixedColor": "red",
+                    "mode": "fixed"
+                    }
+                }
+                ]
+            }
+            ]
+        },
+        "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 0,
+            "y": 36
+        },
+        "id": 103,
+        "links": [],
+        "options": {
+            "legend": {
+            "calcs": [
+                "lastNotNull"
+            ],
+            "displayMode": "table",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "pluginVersion": "8.0.3",
+        "targets": [
+            {
+            "exemplar": true,
+            "expr": "max(sum by (pod) (container_memory_working_set_bytes{namespace=\"$namespace\",pod=~\"$primary.*\", container!~\"POD|istio-proxy\",account=~\"$awsaccount\",cluster=~\"$cluster\"}))",
+            "format": "time_series",
+            "hide": false,
+            "interval": "",
+            "intervalFactor": 1,
+            "legendFormat": "Max Memory Usage",
+            "refId": "B"
+            },
+            {
+            "exemplar": true,
+            "expr": "max(kube_pod_container_resource_requests{namespace=\"$namespace\",pod=~\"$primary.*\", container!~\"POD|istio-proxy\",account=~\"$awsaccount\",cluster=~\"$cluster\"})",
+            "hide": false,
+            "interval": "",
+            "legendFormat": "Memory Request",
+            "refId": "A"
+            },
+            {
+            "exemplar": true,
+            "expr": "max(kube_pod_container_resource_limits{namespace=\"$namespace\",pod=~\"$primary.*\", container!~\"POD|istio-proxy\",account=~\"$awsaccount\",cluster=~\"$cluster\"})",
+            "hide": false,
+            "interval": "",
+            "legendFormat": "Memory Limit",
+            "refId": "C"
+            }
+        ],
+        "title": "Primary: Max POD Memory Usage",
+        "type": "timeseries"
+        },
+        {
+        "datasource": {
+            "type": "prometheus"
+        },
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            },
+            "unit": "bytes"
+            },
+            "overrides": [
+            {
+                "matcher": {
+                "id": "byName",
+                "options": "Memory Request"
+                },
+                "properties": [
+                {
+                    "id": "custom.spanNulls",
+                    "value": true
+                },
+                {
+                    "id": "color",
+                    "value": {
+                    "fixedColor": "yellow",
+                    "mode": "fixed"
+                    }
+                },
+                {
+                    "id": "custom.hideFrom",
+                    "value": {
+                    "legend": true,
+                    "tooltip": true,
+                    "viz": false
+                    }
+                },
+                {
+                    "id": "custom.fillOpacity",
+                    "value": 0
+                }
+                ]
+            },
+            {
+                "matcher": {
+                "id": "byName",
+                "options": "Memory Limit"
+                },
+                "properties": [
+                {
+                    "id": "custom.fillOpacity",
+                    "value": 0
+                },
+                {
+                    "id": "custom.spanNulls",
+                    "value": true
+                },
+                {
+                    "id": "custom.hideFrom",
+                    "value": {
+                    "legend": true,
+                    "tooltip": true,
+                    "viz": false
+                    }
+                },
+                {
+                    "id": "color",
+                    "value": {
+                    "fixedColor": "red",
+                    "mode": "fixed"
+                    }
+                }
+                ]
+            }
+            ]
+        },
+        "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 12,
+            "y": 36
+        },
+        "id": 120,
+        "links": [],
+        "options": {
+            "legend": {
+            "calcs": [
+                "lastNotNull"
+            ],
+            "displayMode": "table",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "pluginVersion": "8.0.3",
+        "targets": [
+            {
+            "exemplar": true,
+            "expr": "max(sum by (pod) (container_memory_working_set_bytes{namespace=\"$namespace\",pod=~\"$canary.*\", pod!~\"$primary.*\", container!~\"POD|istio-proxy\",account=~\"$awsaccount\",cluster=~\"$cluster\"}))",
+            "format": "time_series",
+            "hide": false,
+            "interval": "",
+            "intervalFactor": 1,
+            "legendFormat": "Max Memory Usage",
+            "refId": "B"
+            },
+            {
+            "exemplar": true,
+            "expr": "max(kube_pod_container_resource_requests{namespace=\"$namespace\",pod=~\"$canary.*\", pod!~\"$primary.*\", container!~\"POD|istio-proxy\",account=~\"$awsaccount\",cluster=~\"$cluster\"})",
+            "hide": false,
+            "interval": "",
+            "legendFormat": "Memory Request",
+            "refId": "A"
+            },
+            {
+            "exemplar": true,
+            "expr": "max(kube_pod_container_resource_limits{namespace=\"$namespace\",pod=~\"$canary.*\", pod!~\"$primary.*\", container!~\"POD|istio-proxy\",account=~\"$awsaccount\",cluster=~\"$cluster\"})",
+            "hide": false,
+            "interval": "",
+            "legendFormat": "Memory Limit",
+            "refId": "C"
+            }
+        ],
+        "title": "Canary: Max POD Memory Usage",
+        "type": "timeseries"
+        },
+        {
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            },
+            "unit": "Bps"
+            },
+            "overrides": [
+            {
+                "matcher": {
+                "id": "byName",
+                "options": "received"
+                },
+                "properties": [
+                {
+                    "id": "color",
+                    "value": {
+                    "fixedColor": "#f9d9f9",
+                    "mode": "fixed"
+                    }
+                }
+                ]
+            },
+            {
+                "matcher": {
+                "id": "byName",
+                "options": "transmited"
+                },
+                "properties": [
+                {
+                    "id": "color",
+                    "value": {
+                    "fixedColor": "#f29191",
+                    "mode": "fixed"
+                    }
+                }
+                ]
+            }
+            ]
+        },
+        "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 0,
+            "y": 42
+        },
+        "id": 105,
+        "links": [],
+        "options": {
+            "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "pluginVersion": "8.0.3",
+        "targets": [
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "expr": "sum(rate (container_network_receive_bytes_total{namespace=\"$namespace\",pod=~\"$primary.*\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval])) ",
+            "format": "time_series",
+            "intervalFactor": 1,
+            "legendFormat": "received",
+            "refId": "A"
+            },
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "-sum (rate (container_network_transmit_bytes_total{namespace=\"$namespace\",pod=~\"$primary.*\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval]))",
+            "format": "time_series",
+            "interval": "",
+            "intervalFactor": 1,
+            "legendFormat": "-transmited",
+            "refId": "B"
+            }
+        ],
+        "title": "Primary: Network I/O",
+        "type": "timeseries"
+        },
+        {
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            },
+            "unit": "Bps"
+            },
+            "overrides": [
+            {
+                "matcher": {
+                "id": "byName",
+                "options": "received"
+                },
+                "properties": [
+                {
+                    "id": "color",
+                    "value": {
+                    "fixedColor": "#f9d9f9",
+                    "mode": "fixed"
+                    }
+                }
+                ]
+            },
+            {
+                "matcher": {
+                "id": "byName",
+                "options": "transmited"
+                },
+                "properties": [
+                {
+                    "id": "color",
+                    "value": {
+                    "fixedColor": "#f29191",
+                    "mode": "fixed"
+                    }
+                }
+                ]
+            }
+            ]
+        },
+        "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 12,
+            "y": 42
+        },
+        "id": 106,
+        "links": [],
+        "options": {
+            "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "pluginVersion": "8.0.3",
+        "targets": [
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "expr": "sum(rate (container_network_receive_bytes_total{namespace=\"$namespace\",pod=~\"$canary.*\",pod!~\"$primary.*\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval])) ",
+            "format": "time_series",
+            "intervalFactor": 1,
+            "legendFormat": "received",
+            "refId": "A"
+            },
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "-sum (rate (container_network_transmit_bytes_total{namespace=\"$namespace\",pod=~\"$canary.*\",pod!~\"$primary.*\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval]))",
+            "format": "time_series",
+            "interval": "",
+            "intervalFactor": 1,
+            "legendFormat": "-transmited",
+            "refId": "B"
+            }
+        ],
+        "title": "Canary: Network I/O",
+        "type": "timeseries"
+        },
+        {
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            },
+            "unit": "iops"
+            },
+            "overrides": [
+            {
+                "matcher": {
+                "id": "byName",
+                "options": "transmited"
+                },
+                "properties": [
+                {
+                    "id": "color",
+                    "value": {
+                    "fixedColor": "#f29191",
+                    "mode": "fixed"
+                    }
+                }
+                ]
+            }
+            ]
+        },
+        "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 0,
+            "y": 48
+        },
+        "id": 124,
+        "links": [],
+        "options": {
+            "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "pluginVersion": "8.0.3",
+        "targets": [
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "sum(rate (container_fs_reads_total{namespace=\"$namespace\",pod=~\"$primary.*\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval])) ",
+            "hide": false,
+            "interval": "",
+            "legendFormat": "read",
+            "refId": "C"
+            },
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "-sum(rate (container_fs_writes_total{namespace=\"$namespace\",pod=~\"$primary.*\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval])) ",
+            "hide": false,
+            "interval": "",
+            "legendFormat": "-write",
+            "refId": "A"
+            }
+        ],
+        "title": "Primary: Disk I/O (IOPS)",
+        "type": "timeseries"
+        },
+        {
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            },
+            "unit": "iops"
+            },
+            "overrides": [
+            {
+                "matcher": {
+                "id": "byName",
+                "options": "transmited"
+                },
+                "properties": [
+                {
+                    "id": "color",
+                    "value": {
+                    "fixedColor": "#f29191",
+                    "mode": "fixed"
+                    }
+                }
+                ]
+            }
+            ]
+        },
+        "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 12,
+            "y": 48
+        },
+        "id": 125,
+        "links": [],
+        "options": {
+            "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "pluginVersion": "8.0.3",
+        "targets": [
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "sum(rate (container_fs_reads_total{namespace=\"$namespace\",pod=~\"$canary.*\",pod!~\"$primary.*\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval])) ",
+            "hide": false,
+            "interval": "",
+            "legendFormat": "read",
+            "refId": "C"
+            },
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "-sum(rate (container_fs_writes_total{namespace=\"$namespace\",pod=~\"$canary.*\",pod!~\"$primary.*\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval])) ",
+            "hide": false,
+            "interval": "",
+            "legendFormat": "-write",
+            "refId": "A"
+            }
+        ],
+        "title": "Canary: Disk I/O (IOPS)",
+        "type": "timeseries"
+        },
+        {
+        "collapsed": false,
+        "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 54
+        },
+        "id": 127,
+        "panels": [],
+        "title": "Infrastructure Resources and Events",
+        "type": "row"
+        },
+        {
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                "group": "A",
+                "mode": "normal"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "min": 0,
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                },
+                {
+                    "color": "red",
+                    "value": 80
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 55
+        },
+        "id": 142,
+        "options": {
+            "legend": {
+            "calcs": [
+                "lastNotNull"
+            ],
+            "displayMode": "list",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "targets": [
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "sum(count(count(container_cpu_usage_seconds_total{namespace=\"$namespace\",pod=~\"$primary-.*\",container!~\"POD|istio-proxy\",account=~\"$awsaccount\",cluster=~\"$cluster\"}) by (instance,node_type,node_kubernetes_io_instance_type,failure_domain_beta_kubernetes_io_zone)) by (instance,node_type,node_kubernetes_io_instance_type,failure_domain_beta_kubernetes_io_zone)) by (node_type,failure_domain_beta_kubernetes_io_zone)",
+            "interval": "",
+            "legendFormat": "{{ failure_domain_beta_kubernetes_io_zone }} - {{node_type}}",
+            "refId": "A"
+            }
+        ],
+        "title": "Primary: Node & AZ Distribution",
+        "type": "timeseries"
+        },
+        {
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                "group": "A",
+                "mode": "normal"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "min": 0,
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                },
+                {
+                    "color": "red",
+                    "value": 80
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 55
+        },
+        "id": 143,
+        "options": {
+            "legend": {
+            "calcs": [
+                "lastNotNull"
+            ],
+            "displayMode": "list",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "targets": [
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "sum(count(count(container_cpu_usage_seconds_total{namespace=\"$namespace\",pod=~\"$canary-.*\",pod!~\".*primary.*\",container!~\"POD|istio-proxy\",account=~\"$awsaccount\",cluster=~\"$cluster\"}) by (instance,node_type,node_kubernetes_io_instance_type,failure_domain_beta_kubernetes_io_zone)) by (instance,node_type,node_kubernetes_io_instance_type,failure_domain_beta_kubernetes_io_zone)) by (node_type,failure_domain_beta_kubernetes_io_zone)",
+            "interval": "",
+            "legendFormat": "{{ failure_domain_beta_kubernetes_io_zone }} - {{node_type}}",
+            "refId": "A"
+            }
+        ],
+        "title": "Canary: Node & AZ Distribution",
+        "type": "timeseries"
+        },
+        {
+        "datasource": {
+            "type": "prometheus"
+        },
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "min": 0,
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            }
+            },
+            "overrides": [
+            {
+                "__systemRef": "hideSeriesFrom",
+                "matcher": {
+                "id": "byNames",
+                "options": {
+                    "mode": "exclude",
+                    "names": [
+                    "amoeba-global-primary Healthy"
+                    ],
+                    "prefix": "All except:",
+                    "readOnly": true
+                }
+                },
+                "properties": [
+                {
+                    "id": "custom.hideFrom",
+                    "value": {
+                    "legend": false,
+                    "tooltip": false,
+                    "viz": true
+                    }
+                }
+                ]
+            }
+            ]
+        },
+        "gridPos": {
+            "h": 9,
+            "w": 12,
+            "x": 0,
+            "y": 63
+        },
+        "id": 135,
+        "options": {
+            "legend": {
+            "calcs": [
+                "lastNotNull"
+            ],
+            "displayMode": "table",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "targets": [
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "kube_horizontalpodautoscaler_status_current_replicas{namespace=\"$namespace\",horizontalpodautoscaler=~\"$primary\",account=~\"$awsaccount\",cluster=~\"$cluster\"}",
+            "interval": "",
+            "legendFormat": "{{ horizontalpodautoscaler }} Healthy",
+            "refId": "A"
+            },
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "kube_horizontalpodautoscaler_status_desired_replicas{namespace=\"$namespace\",horizontalpodautoscaler=~\"$primary\",account=~\"$awsaccount\",cluster=~\"$cluster\"}",
+            "hide": true,
+            "interval": "",
+            "legendFormat": "{{ horizontalpodautoscaler }} Desired",
+            "refId": "B"
+            },
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "kube_horizontalpodautoscaler_spec_min_replicas{namespace=\"$namespace\",horizontalpodautoscaler=~\"$primary\",account=~\"$awsaccount\",cluster=~\"$cluster\"}",
+            "hide": false,
+            "interval": "",
+            "legendFormat": "{{ horizontalpodautoscaler }} Minimum",
+            "refId": "C"
+            },
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "kube_horizontalpodautoscaler_spec_max_replicas{namespace=\"$namespace\",horizontalpodautoscaler=~\"$primary\",account=~\"$awsaccount\",cluster=~\"$cluster\"}",
+            "hide": false,
+            "interval": "",
+            "legendFormat": "{{ horizontalpodautoscaler }} Maximum",
+            "refId": "D"
+            },
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "kube_deployment_status_replicas_unavailable{namespace=\"$namespace\",deployment=\"$primary\",account=~\"$awsaccount\",cluster=~\"$cluster\"}",
+            "hide": false,
+            "interval": "",
+            "legendFormat": "{{ deployment }} Not Ready",
+            "refId": "E"
+            }
+        ],
+        "title": "Primary: Workload Replicas (PODs)",
+        "type": "timeseries"
+        },
+        {
+        "datasource": {
+            "type": "prometheus"
+        },
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            }
+            },
+            "overrides": [
+            {
+                "__systemRef": "hideSeriesFrom",
+                "matcher": {
+                "id": "byNames",
+                "options": {
+                    "mode": "exclude",
+                    "names": [
+                    "amoeba-global Healthy"
+                    ],
+                    "prefix": "All except:",
+                    "readOnly": true
+                }
+                },
+                "properties": [
+                {
+                    "id": "custom.hideFrom",
+                    "value": {
+                    "legend": false,
+                    "tooltip": false,
+                    "viz": true
+                    }
+                }
+                ]
+            }
+            ]
+        },
+        "gridPos": {
+            "h": 9,
+            "w": 12,
+            "x": 12,
+            "y": 63
+        },
+        "id": 136,
+        "options": {
+            "legend": {
+            "calcs": [
+                "lastNotNull"
+            ],
+            "displayMode": "table",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "targets": [
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "kube_horizontalpodautoscaler_status_current_replicas{namespace=\"$namespace\",horizontalpodautoscaler=~\"$canary\",account=~\"$awsaccount\",cluster=~\"$cluster\"}",
+            "interval": "",
+            "legendFormat": "{{ horizontalpodautoscaler }} Healthy",
+            "refId": "A"
+            },
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "kube_horizontalpodautoscaler_status_desired_replicas{namespace=\"$namespace\",horizontalpodautoscaler=~\"$canary\",account=~\"$awsaccount\",cluster=~\"$cluster\"}",
+            "hide": true,
+            "interval": "",
+            "legendFormat": "{{ horizontalpodautoscaler }} Desired",
+            "refId": "B"
+            },
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "kube_horizontalpodautoscaler_spec_min_replicas{namespace=\"$namespace\",horizontalpodautoscaler=~\"$canary\",account=~\"$awsaccount\",cluster=~\"$cluster\"}",
+            "hide": false,
+            "interval": "",
+            "legendFormat": "{{ horizontalpodautoscaler }} Minimum",
+            "refId": "C"
+            },
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "kube_horizontalpodautoscaler_spec_max_replicas{namespace=\"$namespace\",horizontalpodautoscaler=~\"$canary\",account=~\"$awsaccount\",cluster=~\"$cluster\"}",
+            "hide": false,
+            "interval": "",
+            "legendFormat": "{{ horizontalpodautoscaler }} Maximum",
+            "refId": "D"
+            },
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "kube_deployment_status_replicas_unavailable{namespace=\"$namespace\",deployment=\"$canary\",account=~\"$awsaccount\",cluster=~\"$cluster\"}",
+            "hide": false,
+            "interval": "",
+            "legendFormat": "{{ deployment }} Not Ready",
+            "refId": "E"
+            }
+        ],
+        "title": "Canary: Workload Replicas (PODs)",
+        "type": "timeseries"
+        },
+        {
+        "description": "",
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "blue",
+                    "value": null
+                }
+                ]
+            },
+            "unit": "none"
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 9,
+            "w": 12,
+            "x": 0,
+            "y": 72
+        },
+        "id": 139,
+        "links": [],
+        "maxDataPoints": 100,
+        "options": {
+            "legend": {
+            "calcs": [],
+            "displayMode": "table",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "pluginVersion": "8.3.3",
+        "targets": [
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "avg(kube_replicaset_status_ready_replicas{namespace=\"$namespace\",replicaset=~\"$primary-.*\",account=~\"$awsaccount\",cluster=~\"$cluster\"}) by (replicaset)",
+            "hide": false,
+            "interval": "",
+            "legendFormat": "{{ replicaset }}",
+            "refId": "B"
+            }
+        ],
+        "title": "Primary: PODs by ReplicaSet",
+        "type": "timeseries"
+        },
+        {
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "blue",
+                    "value": null
+                }
+                ]
+            },
+            "unit": "none"
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 9,
+            "w": 12,
+            "x": 12,
+            "y": 72
+        },
+        "id": 140,
+        "links": [],
+        "maxDataPoints": 100,
+        "options": {
+            "legend": {
+            "calcs": [],
+            "displayMode": "table",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "pluginVersion": "8.3.3",
+        "targets": [
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "avg(kube_replicaset_status_ready_replicas{namespace=\"$namespace\",replicaset=~\"$canary-.*\",replicaset!~\".*primary.*\",account=~\"$awsaccount\",cluster=~\"$cluster\"}) by (replicaset)",
+            "hide": false,
+            "interval": "",
+            "legendFormat": "{{ replicaset }}",
+            "refId": "B"
+            }
+        ],
+        "title": "Canary: PODs by ReplicaSet",
+        "type": "timeseries"
+        },
+        {
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                "group": "A",
+                "mode": "normal"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            },
+            "unit": "s"
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 5,
+            "w": 12,
+            "x": 0,
+            "y": 81
+        },
+        "id": 130,
+        "options": {
+            "legend": {
+            "calcs": [
+                "lastNotNull"
+            ],
+            "displayMode": "table",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "targets": [
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "avg(rate(container_cpu_cfs_throttled_seconds_total{namespace=\"$namespace\",pod=~\"$primary-.*\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval]))",
+            "format": "time_series",
+            "interval": "",
+            "legendFormat": "Average Throttle Rate",
+            "refId": "A"
+            }
+        ],
+        "title": "Primary: CPU Throttling",
+        "type": "timeseries"
+        },
+        {
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                "group": "A",
+                "mode": "normal"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            },
+            "unit": "s"
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 5,
+            "w": 12,
+            "x": 12,
+            "y": 81
+        },
+        "id": 137,
+        "options": {
+            "legend": {
+            "calcs": [
+                "lastNotNull"
+            ],
+            "displayMode": "table",
+            "placement": "bottom"
+            },
+            "tooltip": {
+            "mode": "single"
+            }
+        },
+        "targets": [
+            {
+            "datasource": {
+                "type": "prometheus"
+            },
+            "exemplar": true,
+            "expr": "avg(rate(container_cpu_cfs_throttled_seconds_total{namespace=\"$namespace\",pod=~\"$canary-.*\",pod!~\".*primary.*\",account=~\"$awsaccount\",cluster=~\"$cluster\"}[$__rate_interval]))",
+            "format": "time_series",
+            "interval": "",
+            "legendFormat": "Average Throttle Rate",
+            "refId": "A"
+            }
+        ],
+        "title": "Canary: CPU Throttling",
+        "type": "timeseries"
+        }
+    ],
+    "refresh": "5s",
+    "schemaVersion": 34,
+    "style": "dark",
+    "tags": [
+        "canary",
+        "deploy"
+    ],
+    "templating": {
+        "list": [
+        {
+            "current": {
+            "selected": false,
+            "text": [
+                "None"
+            ],
+            "value": [
+                ""
+            ]
+            },
+            "datasource": {
+            "type": "prometheus"
+            },
+            "definition": "query_result(avg(kube_deployment_labels) by (account))",
+            "hide": 2,
+            "includeAll": false,
+            "label": "AWS Account",
+            "multi": true,
+            "name": "awsaccount",
+            "options": [],
+            "query": {
+            "query": "query_result(avg(kube_deployment_labels) by (account))",
+            "refId": "StandardVariableQuery"
+            },
+            "refresh": 1,
+            "regex": "/.*(?:account)=\"([^\"]*).*/",
+            "skipUrlSync": false,
+            "sort": 0,
+            "type": "query"
+        },
+        {
+            "current": {
+            "selected": false,
+            "text": [
+                "None"
+            ],
+            "value": [
+                ""
+            ]
+            },
+            "datasource": {
+            "type": "prometheus"
+            },
+            "definition": "query_result(avg(kube_deployment_labels{account=~\"$awsaccount\"}) by (cluster))",
+            "hide": 2,
+            "includeAll": false,
+            "label": "Cluster",
+            "multi": true,
+            "name": "cluster",
+            "options": [],
+            "query": {
+            "query": "query_result(avg(kube_deployment_labels{account=~\"$awsaccount\"}) by (cluster))",
+            "refId": "StandardVariableQuery"
+            },
+            "refresh": 1,
+            "regex": "/.*(?:cluster)=\"([^\"]*).*/",
+            "skipUrlSync": false,
+            "sort": 0,
+            "type": "query"
+        },
+        {
+            "current": {
+            "selected": true,
+            "text": "kube-system",
+            "value": "kube-system"
+            },
+            "datasource": {
+            "type": "prometheus"
+            },
+            "definition": "query_result(avg(kube_deployment_labels{cluster=~\"$cluster\"}) by (namespace))",
+            "hide": 0,
+            "includeAll": false,
+            "label": "Namespace",
+            "multi": false,
+            "name": "namespace",
+            "options": [],
+            "query": {
+            "query": "query_result(avg(kube_deployment_labels{cluster=~\"$cluster\"}) by (namespace))",
+            "refId": "StandardVariableQuery"
+            },
+            "refresh": 1,
+            "regex": "/.*namespace=\"([^\"]*).*/",
+            "skipUrlSync": false,
+            "sort": 0,
+            "type": "query"
+        },
+        {
+            "current": {
+            "selected": true,
+            "text": "metrics-server",
+            "value": "metrics-server"
+            },
+            "datasource": {
+            "type": "prometheus"
+            },
+            "definition": "query_result((avg(kube_deployment_labels{namespace=~\"$namespace\",deployment!~\".*primary.*\"}) by (deployment)) or (avg(kube_statefulset_labels{namespace=~\"$namespace\",statefulset!~\".*primary.*\"}) by (statefulset)))",
+            "hide": 0,
+            "includeAll": false,
+            "label": "Workload",
+            "multi": false,
+            "name": "canary",
+            "options": [],
+            "query": {
+            "query": "query_result((avg(kube_deployment_labels{namespace=~\"$namespace\",deployment!~\".*primary.*\"}) by (deployment)) or (avg(kube_statefulset_labels{namespace=~\"$namespace\",statefulset!~\".*primary.*\"}) by (statefulset)))",
+            "refId": "StandardVariableQuery"
+            },
+            "refresh": 1,
+            "regex": "/.*(?:deployment|statefulset)=\"([^\"]*).*/",
+            "skipUrlSync": false,
+            "sort": 0,
+            "type": "query"
+        },
+        {
+            "current": {
+            "isNone": true,
+            "selected": false,
+            "text": "None",
+            "value": ""
+            },
+            "datasource": {
+            "type": "prometheus"
+            },
+            "definition": "query_result((avg(kube_deployment_labels{namespace=~\"$namespace\",deployment=~\"$canary-primary\"}) by (deployment)) or (avg(kube_statefulset_labels{namespace=~\"$namespace\",statefulset=~\"$canary-primary\"}) by (statefulset)))",
+            "hide": 2,
+            "includeAll": false,
+            "label": "Primary",
+            "multi": false,
+            "name": "primary",
+            "options": [],
+            "query": {
+            "query": "query_result((avg(kube_deployment_labels{namespace=~\"$namespace\",deployment=~\"$canary-primary\"}) by (deployment)) or (avg(kube_statefulset_labels{namespace=~\"$namespace\",statefulset=~\"$canary-primary\"}) by (statefulset)))",
+            "refId": "StandardVariableQuery"
+            },
+            "refresh": 1,
+            "regex": "/.*(?:deployment|statefulset)=\"([^\"]*).*/",
+            "skipUrlSync": false,
+            "sort": 0,
+            "type": "query"
+        }
+        ]
+    },
+    "time": {
+        "from": "now-15m",
+        "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "",
+    "title": "Flagger Canary Status",
+    "uid": "sKpk6zF7z",
+    "version": 4,
+    "weekStart": ""
+    }`}}

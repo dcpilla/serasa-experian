@@ -1,0 +1,10 @@
+apiVersion: v2
+name: setup-rbac
+description: Setup RBAC for EEC access
+type: application
+version: 1.1.11
+appVersion: "1"
+maintainers:
+  - name: SRE Core
+    email: srecore@br.experian.com
+keywords: []
