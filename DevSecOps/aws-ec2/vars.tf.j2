@@ -1,0 +1,125 @@
+#####Tags####
+variable "bu"{
+  description = "Tag BU"
+  default = "{{ tribe }}"
+}
+variable "env" {
+  description = "Tag Environment"
+  default = "@@ENVIRONMENT@@"
+}
+
+variable "appid" {
+  description = "Tag AppID"
+  default = "@@APPID@@"
+}
+
+variable "coststring" {
+  description = "Tag CostString"
+  default = "@@COSTSTRING@@"
+}
+
+variable "tag_value_eec" {
+  default = "{{ tag_value[tags] }}"
+}
+
+variable "namespace" {
+  type        = string
+  description = "Namespace (e.g. `eg` or `cp`)"
+  default     = "{{ tribe }}"
+}
+variable "stage" {
+  type        = string
+  description = "Stage (e.g. `prod`, `dev`, `staging`, `infra`)"
+  default     = "{{ env }}"
+}
+variable "name" {
+  type        = string
+  description = "Name  (e.g. `app` or `cluster`)"
+  default      = "{{ prefix_stack_hostname }}{{ app_name }}{{ prefix_stack_name }}{{ env }}"
+}
+####Account Variable######
+variable "aws_account_id" {
+  description = "AWS Id Account"
+  default = "{{ aws_account_id }}"
+}
+variable "region" {
+  description = "Region that will be used in AWS"
+  default = "{{ aws_region }}"
+}
+
+variable "vpc_id" {
+  description = "Region that we're gonna use to create EC2"
+  default = "{{ vpi_id }}"
+}
+variable "aws_region" {
+  default = "{{ aws_region }}"
+}
+variable "zone_id" {
+  default = ""
+}
+variable "ec2_kms_key_id" {
+  description = "kMS Encrypt Key ARN"
+  default = "arn:aws:kms:{{ aws_region }}:{{ aws_account_id }}:key/{{ kms_id }}"
+}
+variable "ami_name" {
+  description = "Serasa AMI"
+  default = "{{ ami_name[so] }}"
+}
+variable "subnet_private_a" {
+  default = "{{ subnet.a }}"
+}
+
+variable "subnet_private_b" {
+  default = "{{ subnet.b }}"
+}
+###jenkins###
+variable "ec2_name" {
+  description = "ec2 or Servername"
+  default      = "{{ prefix_stack_hostname }}{{ app_name }}{{ prefix_stack_name }}{{ env }}"
+}
+variable "instance_count" {
+  description = "Number of Instances"
+  default = "@@INSTANCE_COUNT@@"
+}
+
+variable "role_names"{
+  description = "Policies used on IAM Role creation"
+  type        = list(string)
+  default     = ["AmazonS3ReadOnlyAccess", "IAMReadOnlyAccess", "AmazonEC2ReadOnlyAccess"] 
+}
+
+variable "instance_type" {
+  description = "Instance Types or Instance Size"
+  default = "@@INSTANCE_TYPE@@"
+}
+variable "root_volume_size" {
+  description = "Root volume size in GB"
+  default = "50"
+}
+variable "instance_encrypt" {
+  description = "encrypt of volume"
+  type        = string
+  default     = "{{ instance_encrypt }}"
+}
+
+variable "ebs_volume_size" {
+  description = "EBS volume size in GB"
+  default = "@@INSTANCE_VOLUME_APP_SIZE@@"
+}
+###Universal###
+variable "ip_sg_list_ec2" {
+  default = ["10.0.0.0/9"]
+}
+
+variable "country" {
+  default = "{{ country }}"
+}
+
+variable "bu_name" {
+  default = "{{ bu_name[bu] }}"
+}
+
+variable "assume_role_arn" {
+  description = "Assume Role ARN"
+  default = "arn:aws:iam::{{ aws_account_id }}:role/BURoleForDevSecOpsCockpitService"
+}

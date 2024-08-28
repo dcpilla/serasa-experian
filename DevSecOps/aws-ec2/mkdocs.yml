@@ -1,0 +1,11 @@
+site_name: "aws-ec2"
+site_description: "AWS EC2"
+
+plugins:
+  - techdocs-core
+
+nav:
+  - Overview:
+      - About the Project: "about.md"
+  - Getting Started:
+      - Project Configuration: "started.md"

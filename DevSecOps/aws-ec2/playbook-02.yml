@@ -1,0 +1,23 @@
+##NAO ALTERAR!!!!!!######
+#Role for ALL
+- hosts: @@APP_NAME@@
+  become: true
+  environment: "{{ proxy_env }}"
+  vars_files:
+#FIXO
+    - ans-shared-vars/aws-@@AWS_ACCOUNT_ID@@-env.yml
+    - ans-shared-vars/lnx-onboarding-env.yml
+    - ans-shared-vars/pwd-credentials.yml
+    - ans-shared-vars/lnx-certificate-env.yml
+    - ans-shared-vars/lnx-proxy-env.yml
+    - ans-shared-vars/lnx-user-env.yml
+#FIXO
+    - ans-shared-vars/lnx-ec2-std.yml
+    - ans-shared-vars/lnx-tags-eec.yml
+  roles:
+     - certificate
+     - proxy
+     - geerlingguy.java
+     - lvm
+     - user
+     - hostname

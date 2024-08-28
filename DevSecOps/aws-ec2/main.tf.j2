@@ -1,0 +1,127 @@
+provider "aws" {
+  region = "${var.region}"
+ 
+  assume_role {
+    role_arn = "${var.assume_role_arn}"
+ }
+}
+
+terraform {
+ backend "s3" {
+   encrypt = true
+   bucket = "cockpit-devsecops-states-@@AWS_ACCOUNT_ID@@"
+   region = "sa-east-1"
+   role_arn = "arn:aws:iam::@@AWS_ACCOUNT_ID@@:role/BURoleForDevSecOpsCockpitService"
+   key = "aws-ec2/{{ prefix_stack_hostname }}{{ app_name }}{{ prefix_stack_name }}{{ env }}.tfstate"
+ }
+}
+
+
+###########
+###IAM ROLES####
+module "aws_iam_role" {
+  source                  = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/iam/role"
+  name                    = "BURoleFor${var.ec2_name}"
+  aws_account_id          = "${var.aws_account_id}"
+  path_role               = "${data.template_file.role.rendered}"
+  policy_names            = "${var.role_names}"
+}
+
+data "aws_ami" "ami-type" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["${var.ami_name}"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  owners = ["363353661606"]
+}
+
+##data.json###
+data "template_file" "role" {
+  template = "${file("./role_ec2.json")}"
+}
+
+data "template_file" "userdata" {
+  template = "${file("userdata/install_wizard.sh")}"
+}
+
+###EC2
+####SG####
+
+module "aws_security_group_ec2" {
+
+  source  = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/security_group/create_sg"
+  sg_name = "${var.ec2_name}-sg"
+  vpc_id  = var.vpc_id
+  tags = {
+    "Environment"                 = var.env
+    "AppID"                       = var.appid
+    "CostString"                  = var.coststring
+  }
+}
+####SGRULES####
+module "sg_rule_22" {
+
+  source            = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/security_group/create_sg_rule"
+  port              = 22
+  protocol          = "TCP"
+  ips_sg_list       = var.ip_sg_list_ec2
+  security_group_id = module.aws_security_group_ec2.id
+
+}
+
+####ec2 Instance####
+
+module "ec2_instance" {
+  source                      = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/ec2"        
+  instance_count              = var.instance_count
+  name                        = var.ec2_name
+  ami                         = data.aws_ami.ami-type.id
+  instance_type               = var.instance_type 
+  subnet_ids                  = ["${var.subnet_private_a}", "${var.subnet_private_b}"]
+  vpc_security_group_ids      = [module.aws_security_group_ec2.id]
+  associate_public_ip_address = false
+  iam_instance_profile        = "BURoleFor${var.ec2_name}"
+  user_data                   = "${data.template_file.userdata.rendered}"
+  instance_encrypt             = var.instance_encrypt
+
+  root_block_device           = [
+    {
+      volume_type             = "gp2"
+      volume_size             = var.root_volume_size
+      encrypted               = true
+      kms_key_id              = var.ec2_kms_key_id
+    },
+  ]
+
+  ebs_block_device = [
+    {
+      device_name             = "/dev/sdf"
+      volume_type             = "gp2"
+      volume_size             = var.ebs_volume_size
+      encrypted               = true
+      kms_key_id              = var.ec2_kms_key_id
+    }
+  ]
+
+  tags = {
+    "Environment"             = var.env
+    "AppID"                   = var.appid
+    "CostString"              = var.coststring
+    "Location"                = var.country
+    "BU"                      = var.bu_name
+    ### Nao Alterar ### Inicio
+    "servers"                 = "{{ app_name }}"
+    "Instance-Scheduler"      = var.tag_value_eec
+    ### Nao Alterar ### FIM
+  }
+} 
+
+

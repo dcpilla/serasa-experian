@@ -1,0 +1,118 @@
+running_in: aws
+itil: 
+  request: true
+  changeorder: false
+definition: Creates a EC2
+team_owner: DevSecOps PaaS Brazil
+manual_time: 30
+global:
+  aws_account_id:
+    type: text 
+    pattern: ^(\d{1,12}|\d{1,12})$
+    description : Qual o ID da conta AWS?
+    required: true
+    answer: null
+    validationEndpoint: '/catalog-jenkins/v1/validate/aws_account'
+  country:
+    type: options
+    options: US;CA;BR;UK;DE;IE;FR;SE;BH;ZA;IN;CN;SG;AU;KR;JP;IT
+    description: Defina o país
+    required: true
+    answer: null
+  bu:
+    type: options 
+    options: Decision_Analytics;Marketing_Services;EITS_Enterprise;Credit_Services;Experian_Consumer_Services;Automotive_Services
+    description: Defina a unidade de negócio
+    required: true
+    answer: null
+  environment:
+    type: options
+    options: prd;stg;uat;tst;dev;sbx
+    description: Informe o ambiente do recurso
+    required: true
+    answer: null
+  coststring:
+    type: text
+    description: Informe o seu centro de custo. Caso nao o possua, entre em contato com seu gestor.
+    required: true
+    answer: null
+  AppID:
+    type: text
+    pattern: ^\d{1,5}$
+    description: Informe o gearr ID ao qual pertencerá esse recurso.
+    required: true
+    answer: null
+  tags_schedule:
+    type: options
+    options: utilizar_horario_comercial;nao
+    description: Gostaria de utilizar as tags EEC para definir o recurso para utilização apenas em horario comercial (8h até 20h)?
+    required: true
+    answer: null 
+  so:
+    type: options 
+    options: Redhat;Amazon_Linux
+    description: Qual distribuição deseja utilizar?
+    required: true
+    answer: null
+  ssh_username: 
+    type: text 
+    pattern: ^\S*$
+    description: Nome do usuario para conexao SSH no EC2
+    required: true
+    answer: null
+  ssh_username_key: 
+    type: password
+    pattern: (?:ssh-rsa|ssh-ed25519) AAAA[0-9A-Za-z+\/]+[=]{0,3}
+    description: Insira uma chave SSH publica para permitir a conexao SSH. Voce pode criar uma executando o seguinte comando 'ssh-keygen'
+    required: true
+    answer: null
+  stack_name:
+    type: text 
+    pattern: ^[0-9a-z_-]{1,10}$
+    description: Defina um nome de stack para compor o nome da instancia (entre 1 e 10 caracteres minúsculos)
+    required: true
+    answer: null
+  prefix_hostname:
+    type: text 
+    pattern: ^[0-9a-z_-]{1,10}$
+    description: Defina um prefixo para compor o nome da instancia, o padrão é spobr (entre 1 e 10 caracteres minúsculos)
+    required: true
+    answer: null
+  app_name:
+    type: text 
+    pattern: ^[0-9a-z_-]{1,10}$
+    description: Nome da aplicacao a ser usada na instancia. exemplo 'grafana' (entre 1 e 10 caracteres minúsculos)
+    required: true
+    answer: null
+  instance_type:
+    type: options 
+    options: t3.medium;t3.micro
+    description: Tamanho da Instancia
+    required: false
+    answer: null
+  instance_count:
+    type: options 
+    options: 1;2;3;4;5;6
+    description: Quantidades de Instancias
+    required: false
+    answer: null
+  instance_volume_app_size:
+    type: options 
+    options: 50;100;200
+    description: Tamanho Filesystem
+    required: false
+    answer: null
+  instance_encrypt:
+    type: options 
+    options: true;false
+    description: Encrypt do volume da instancia
+    required: false
+    answer: null
+
+before_plan:
+  - replace playbook-01.yml,playbook-02.yml,ans-shared-vars/lnx-ec2-std.yml,inventory_fix.sh,ans-shared-vars/lnx-onboarding-env.yml,ans-shared-vars/lnx-tags-eec.yml,ans-shared-vars/lnx-user-env.yml,main.tf.j2,vars.tf.j2,ans-shared-roles/user/files/public_keys/jenkins_id_rsa.pub,ans-shared-vars/lnx-ec2-std.yml
+plan:
+  - infra vars
+  - infra up
+
+  
