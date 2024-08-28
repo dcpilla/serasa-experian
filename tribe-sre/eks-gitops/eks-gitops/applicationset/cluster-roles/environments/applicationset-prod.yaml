@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cluster-role-prod
+spec:
+  generators:
+  - list:
+      # Lista de clusters que irá deployar
+      elements:
+      # Cluster ArgoCD
+      - cluster: reports-eks-01-uat
+        url: https://CE8B6382B2610F6BB45AC24158EB9BD9.yl4.sa-east-1.eks.amazonaws.com
+
+  template:
+    metadata:
+      name: 'cluster-role-{{cluster}}'
+    spec:
+      project: default
+      source:
+        repoURL: ssh://git@code.experian.local/trsrecs/eks-gitops.git
+        targetRevision: HEAD
+        path: applicationset/cluster-roles/{{cluster}}
+      destination:
+        server: '{{url}}'
+#        namespace: app-test
+      syncPolicy:
+        automated:
+          allowEmpty: true
+          prune: true
+          selfHeal: true

@@ -1,0 +1,123 @@
+apiVersion: karpenter.k8s.aws/v1beta1
+kind: EC2NodeClass
+metadata:
+  annotations:
+    karpenter.k8s.aws/ec2nodeclass-hash: '9255232363563643059'
+    karpenter.k8s.aws/ec2nodeclass-hash-version: v1
+  finalizers:
+    - karpenter.k8s.aws/termination
+  labels:
+    k8slens-edit-resource-version: v1beta1
+  name: servicecatalog
+spec:
+  amiFamily: AL2
+  amiSelectorTerms:
+    - id: ami-01844980991206892
+  blockDeviceMappings:
+    - deviceName: /dev/xvda
+      ebs:
+        deleteOnTermination: true
+        iops: 3000
+        throughput: 250
+        volumeSize: 120Gi
+        volumeType: gp3
+  metadataOptions:
+    httpEndpoint: enabled
+    httpProtocolIPv6: disabled
+    httpPutResponseHopLimit: 2
+    httpTokens: required
+  role: KarpenterNodeRole-sre-cs-cross-01-prod
+  securityGroupSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: sre-cs-cross-01-prod
+  subnetSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: sre-cs-cross-01-prod
+  tags:
+    AppID: '12345'
+    Application: EKS
+    ClusterName: sre-cs-cross-01-prod
+    CostString: 1800.BR.600.404511
+    Environment: prd
+    Instance-Scheduler: opt-out
+    ManagedBy: Terraform
+    Name: EKS-sre-cs-cross-01-prod-I-karpenter
+    PCI: 'false'
+    Project: SRECSCross
+    ResourceAppRole: app
+    ResourceBusinessUnit: BRASA1SAPUCS1
+    ResourceCostCenter: 1800.BR.600.404511
+    ResourceName: sre-worker-node-eks
+    ResourceOwner: srecscross@br.experian.com
+    adDomain: br.experian.local
+    map-migrated: d-server-01riktnbfe0092
+  userData: >
+    MIME-Version: 1.0
+
+    Content-Type: multipart/mixed; boundary="//"
+
+
+    --//
+
+    Content-Type: text/x-shellscript; charset="us-ascii"
+
+
+    PROXY="spobrproxy.serasa.intranet:3128"
+
+    MAC=$(curl -s http://169.254.169.254/latest/meta-data/mac/)
+
+    VPC_CIDR=$(curl -s
+    http://169.254.169.254/latest/meta-data/network/interfaces/macs/$MAC/vpc-ipv4-cidr-blocks
+    | xargs | tr ' ' ',')
+
+
+    mkdir -p /etc/systemd/system/containerd.service.d
+
+
+    cloud-init-per instance yum_proxy_config cat << EOF >> /etc/yum.conf
+
+    proxy=http://$PROXY
+
+    EOF
+
+
+    cloud-init-per instance proxy_config cat << EOF >> /etc/environment
+
+    http_proxy=http://$PROXY
+
+    https_proxy=http://$PROXY
+
+    HTTP_PROXY=http://$PROXY
+
+    HTTPS_PROXY=http://$PROXY
+
+    no_proxy=$VPC_CIDR,172.20.0.0/16,localhost,127.0.0.1,169.254.169.254,100.64.0.0/16,10.0.0.0/8,.internal,.s3.amazonaws.com,.s3.sa-east-1.amazonaws.com,api.ecr.sa-east-1.amazonaws.com,dkr.ecr.sa-east-1.amazonaws.com,.ec2.sa-east-1.amazonaws.com,.eks.amazonaws.com,.sa-east-1.eks.amazonaws.com
+
+    NO_PROXY=$VPC_CIDR,172.20.0.0/16,localhost,127.0.0.1,169.254.169.254,100.64.0.0/16,10.0.0.0/8,.internal,.s3.amazonaws.com,.s3.sa-east-1.amazonaws.com,api.ecr.sa-east-1.amazonaws.com,dkr.ecr.sa-east-1.amazonaws.com,.ec2.sa-east-1.amazonaws.com,.eks.amazonaws.com,.sa-east-1.eks.amazonaws.com
+
+    EOF
+
+
+    cloud-init-per instance containerd_proxy_config tee <<EOF
+    /etc/systemd/system/containerd.service.d/http-proxy.conf >/dev/null
+
+    [Service]    
+
+    EnvironmentFile=/etc/environment
+
+    EOF
+
+
+    cloud-init-per instance kubelet_proxy_config tee <<EOF
+    /etc/systemd/system/kubelet.service.d/proxy.conf >/dev/null
+
+    [Service]
+
+    EnvironmentFile=/etc/environment
+
+    EOF
+
+
+    cloud-init-per instance reload_daemon systemctl daemon-reload
+
+    --//--

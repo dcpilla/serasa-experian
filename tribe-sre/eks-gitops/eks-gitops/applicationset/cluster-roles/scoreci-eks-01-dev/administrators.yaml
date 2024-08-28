@@ -1,0 +1,59 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: administrators
+  selfLink: /apis/rbac.authorization.k8s.io/v1/clusterrolebindings/administrators
+subjects:
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Cristian.Alexandre@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: JulioCesar.Domingues@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Cleber.JSantos@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Othon.FerreiraCrespo@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: JulioCesar.Domingues@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Mitchell.Xavier@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Fernanda.Ferreira@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Felipe.Navalho@br.experian.com
+  - kind: User
+    apiGroup: rbac.authorization.k8s.io
+    name: Deivid.Pilla@br.experian.com
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cluster-admin
+  labels:
+    kubernetes.io/bootstrapping: rbac-defaults
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: 'true'
+  selfLink: /apis/rbac.authorization.k8s.io/v1/clusterroles/cluster-admin
+rules:
+  - verbs:
+      - '*'
+    apiGroups:
+      - '*'
+    resources:
+      - '*'
+  - verbs:
+      - '*'
+    nonResourceURLs:
+      - '*'

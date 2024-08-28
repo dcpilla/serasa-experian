@@ -1,0 +1,13 @@
+resources:
+  limits:
+    cpu: 256m
+    memory: 512Mi
+  requests:
+    cpu: 256m
+    memory: 512Mi
+
+livenessProbe:
+  timeoutSeconds: 120
+
+metricsScraper: 
+  enabled: true
