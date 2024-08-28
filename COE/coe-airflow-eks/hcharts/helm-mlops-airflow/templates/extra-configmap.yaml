@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-extra-configmap
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+    {{- if .Values.annotations }}
+      {{- toYaml .Values.annotations | nindent 4 }}
+    {{- end }}
+  labels:
+    {{- include "airflow.labels" . | nindent 4 }}
+    component: configmap
+    {{- if .Values.labels }}
+    {{- toYaml .Values.labels | nindent 4 }}
+    {{- end }}
+data: 
+  AIRFLOW__LOGGING__ENCRYPT_S3_LOGS: "True"
+  AIRFLOW__LOGGING__COLORED_CONSOLE_LOG: "True"
+  AIRFLOW_VAR_MODEL_AWS_ACCOUNT: "{{ .Values.cluster_informations.aws_account_id }}"
+  AIRFLOW_VAR_MODEL_SERVICE_ACCOUNT: "{{ .Values.service_account.name }}"
+  AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER: "{{- .Values.s3_log_dag_name }}"
+  {{ if .Values.extraEnvVars }}
+  {{- with .Values.extraEnvVars }}
+    {{- toYaml . | trim | nindent 2 }}
+  {{- end }}
+  {{ end }}

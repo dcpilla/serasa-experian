@@ -1,0 +1,18 @@
+apiVersion: v2
+type: application
+name: helm-mlops-airflow
+version: 2.7.5
+appVersion: "v2.7.3"
+kubeVersion: ">=1.25.0-0"
+description: MLOps Airflow EKS
+sources:
+  - https://code.experian.local/projects/CDEAMLO/repos/coe-airflow-eks/browse
+maintainers:
+  - name: gleiseteixeira
+    email: mlops.sre@br.expiran.com
+  - name: diegorodrigues
+    email: mlops.sre@br.expiran.com
+dependencies:
+  - name: airflow
+    version: "1.11.0"
+    repository: "https://airflow.apache.org"

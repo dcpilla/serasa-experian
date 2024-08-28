@@ -1,0 +1,5 @@
+images:
+  airflow:
+    source: "837714169011.dkr.ecr.sa-east-1.amazonaws.com/airflow"
+    destination_path: "airflow"
+    version: "v2.7.3-p3.11-bookworm-IQI-wzhPT76GV51irnQoJQ"

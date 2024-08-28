@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: {{ .Release.Name }}-pod-monitor
+  labels:
+    team: frontend
+spec:
+  selector:
+    matchLabels:
+      component: pgbouncer
+      release: {{ .Release.Name }}
+  namespaceSelector:
+    matchNames:
+    - {{ .Release.Namespace }}      
+  podMetricsEndpoints:
+  - port: metrics
+    interval: 15s

@@ -1,0 +1,8 @@
+# Airflow 2.7.3 with Python 3.11-bookworm
+
+## Docker build
+docker build --progress plain .      --build-arg PYTHON_BASE_IMAGE=837714169011.dkr.ecr.sa-east-1.amazonaws.com/python:3.11-bookworm      --build-arg AIRFLOW_VERSION="2.7.3"      --build-arg INSTALL_PACKAGES_FROM_CONTEXT="false"      --build-arg DOCKER_CONTEXT_FILES="docker-context-files"      --build-arg AIRFLOW_CONSTRAINTS_LOCATION=""      --build-arg INSTALL_MSSQL_CLIENT="false"      --build-arg INSTALL_MYSQL_CLIENT="false"      --build-arg ADDITIONAL_PIP_INSTALL_FLAGS="--trusted-host pypi.org --trusted-host pypi.python.org --trusted-host=files.pythonhosted.org"      --build-arg RUNTIME_APT_DEPS="build-essential libsasl2-dev vim libsasl2-dev python-dev-is-python3 libldap2-dev libssl-dev apt-transport-https apt-utils ca-certificates curl dumb-init freetds-bin gosu krb5-user ldap-utils libldap-common libsasl2-2 libsasl2-modules  locales lsb-release netcat-openbsd openssh-client python3-selinux rsync sasl2-bin sqlite3 sudo unixodbc default-mysql-client"      --build-arg DEV_APT_DEPS="build-essential libsasl2-dev vim libsasl2-dev python-dev-is-python3 libldap2-dev libssl-dev"      --build-arg ADDITIONAL_PYTHON_DEPS="apache-airflow-providers-cncf-kubernetes apache-airflow-providers-apache-spark apache-airflow-providers-common-sql apache-airflow-providers-apache-hive apache-airflow-providers-apache-cassandra apache-airflow-providers-mysql astronomer-cosmos"      --build-arg ADDITIONAL_RUNTIME_APT_COMMAND="ls -lap"      --build-arg POST_SCRIPT_FUNCATION_TO_CALL="fix_zookeeper"      --tag "airflow:v2.7.3-p3.11-bookworm-9unJdYSmTG6TrZkLCY6rzQ"
+
+## ECR repository
+
+837714169011.dkr.ecr.sa-east-1.amazonaws.com/airflow:v2.7.3-p3.11-bookworm-9unJdYSmTG6TrZkLCY6rzQ-temp

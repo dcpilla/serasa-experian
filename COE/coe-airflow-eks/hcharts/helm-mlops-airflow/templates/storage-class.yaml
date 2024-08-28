@@ -1,0 +1,15 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: airflowgp2
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+parameters:
+  fsType: ext4
+  type: gp2
+  tagSpecification_1: {{ printf "CostString=%s" .Values.labels.CostString | trunc 32 }}
+  tagSpecification_2: {{ printf "AppID=%s" .Values.labels.AppID | trunc 32 }}
+  tagSpecification_3: {{ printf "Environment=%s" .Values.env | trunc 32 }}
+provisioner: ebs.csi.aws.com
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer

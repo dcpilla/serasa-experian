@@ -1,0 +1,626 @@
+env: prod
+# All the information in the map "cluster_informations",
+# is given automatically by ArgoCD; if you are NOT USING ArgoCD for the installation, please set it manually.
+cluster_informations:
+  aws_account_id: 000000000000
+  name: cluster-name
+  domain: prod-mlops.br.experian.eeca
+  project_name: cluster_project_name
+project_name: coe_airflow
+# It need to be the same set up in the Terraform.
+application_name: airflow
+# Labels that required by Security team
+labels:
+  CostString: 1100.US.127.601606
+  AppID: "18003"
+annotations: {}
+service_account:
+  create: true
+  name: "airflow-sa"
+  grantAdminsRights: false
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+    eks.amazonaws.com/role-arn: arn:aws:iam::164921038622:role/BURoleForEKSKafkaUI20230613194731909300000003
+# The principal URL used to access airflow,
+# Additionally, the helm will create a unique URL per eks-application application_name-EKS_cluster_name.domain.
+host: airflow.example.local
+# S3 to store all DAGs log
+s3_log_dag_name: s3://serasaexperian-airflow-coe-data-platform-03-dev-logs
+# extraEnvVars 
+extraEnvVars: {}
+# This value is get from AWS secret manager
+# AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER: "s3://serasaexperian-dragon-dev-airflow-logs"
+# AIRFLOW__LOGGING__ENCRYPT_S3_LOGS: "True"
+# AIRFLOW__LOGGING__COLORED_CONSOLE_LOG: "True"
+# AIRFLOW_VAR_MODEL_AWS_ACCOUNT: "750324458733"
+# AIRFLOW_VAR_MODEL_SERVICE_ACCOUNT: "airflow-sa"
+
+# extraEextraEnvVarsFile It's here just for compatibility; if you need to send additional variables, please put them in airflow.extraEnvFrom
+extraEnvVarsFile: {}
+# AIRFLOW_VAR_TEST_MESSAGE: "Testing environment vars - develop"
+
+# The name of the AWS secret manager to use
+# If left blank, the installation will use the default pattern:
+# application_name-project_name-eks_cluster_name/component_name-env"
+secretmanager: {}
+#datasource: ""
+#websecretkey: ""
+#gitsshprivkey: ""
+#webserverconfig: ""
+
+airflow:
+  # Check the full value to get other parameters https://github.com/apache/airflow/blob/main/chart/values.yaml
+
+  # Fernet key settings, to use the default fernetkey installation keep the fernetKeySecretName value unset
+  fernetKeySecretName: mlops-airflow-fernetkey
+  # Default airflow tag to deploy
+  defaultAirflowTag: "v2.7.3-p3.11-bookworm-j6yDP0pyTui7_gypNYPyyw-temp"
+  # Airflow version (Used to make some decisions based on Airflow Version being deployed)
+  airflowVersion: "v2.7.3"
+  # to check the configuration
+  config:
+    webserver:
+      expose_config: "True" # by default this is 'False'
+    api:
+      auth_backends: airflow.api.auth.backend.basic_auth
+    logging:
+      colored_console_log: "True"
+      remote_logging: "True"
+      logging_level: "INFO"
+      #remote_base_log_folder: "s3://serasaexperian-dragon-dev-airflow-logs"
+      remote_log_conn_id: "aws_conn"
+      delete_worker_pods: "False"
+      encrypt_s3_logs: "True"
+  # logs:
+  #   persistence:
+  #     enabled: true
+
+  # Airflow database & redis config
+  data:
+    metadataSecretName: mlops-airflow-db-url
+  # Flask secret key for Airflow Webserver: `[webserver] secret_key` in airflow.cfg
+  webserverSecretKeySecretName: mlops-airflow-webserver-secretkey
+  executor: "KubernetesExecutor"
+  # Extra env 'items' that will be added to the definition of airflow containers
+  # a string is expected (can be templated).
+  # TODO: difference from `env`? This is a templated string. Probably should template `env` and remove this.
+  #extraEnv: ~
+  # eg:
+  extraEnv: |
+    - name: AIRFLOW__CORE__LOAD_EXAMPLES
+      value: 'False'
+    - name: AIRFLOW_CONN_AWS_CONN
+      value: '{
+        "conn_type": "aws",
+        "extra": {
+            "region_name": "sa-east-1"
+        }
+      }'
+    - name: AIRFLOW__LOGGING__REMOTE_LOGGING
+      value: 'True'
+    - name: AIRFLOW__LOGGING__REMOTE_LOG_CONN_ID
+      value: 'aws_conn'
+  #extraConfigMaps: {}
+  # eg:
+  # extraConfigMaps:
+  #   "{{ .Release.Name }}-dragon-variables":
+  #     data: |
+  #       AIRFLOW_VAR_HELLO_MESSAGE: "Hi!"
+  # Extra envFrom 'items' that will be added to the definition of airflow containers
+  # A string is expected (can be templated).
+  #extraEnvFrom: ~
+  # eg:
+  extraEnvFrom: |
+    - configMapRef:
+           name: '{{ .Release.Name }}-extra-configmap'
+  # Images
+  images:
+    airflow:
+      repository: 837714169011.dkr.ecr.sa-east-1.amazonaws.com/airflow
+      tag: v2.7.3-p3.11-bookworm-j6yDP0pyTui7_gypNYPyyw-temp
+      pullPolicy: IfNotPresent
+    # To avoid images with user code, you can turn this to 'true' and
+    # all the 'run-airflow-migrations' and 'wait-for-airflow-migrations' containers/jobs
+    # will use the images from 'defaultAirflowRepository:defaultAirflowTag' values
+    # to run and wait for DB migrations .
+    useDefaultImageForMigration: false
+    gitSync:
+      repository: 837714169011.dkr.ecr.sa-east-1.amazonaws.com/airflow-git-sync # k8s.gcr.io/git-sync
+      tag: v1.0.1__linux_amd64
+      pullPolicy: IfNotPresent
+    pgbouncer:
+      repository: 837714169011.dkr.ecr.sa-east-1.amazonaws.com/airflow
+      tag: airflow-pgbouncer-2023.02.24-1.16.1
+      pullPolicy: IfNotPresent
+    pgbouncerExporter:
+      repository: 837714169011.dkr.ecr.sa-east-1.amazonaws.com/airflow
+      tag: airflow-pgbouncer-exporter-2023.02.21-0.14.0
+      pullPolicy: IfNotPresent
+    statsd:
+      repository: 837714169011.dkr.ecr.sa-east-1.amazonaws.com/prometheus/statsd-exporter
+      tag: v0.22.8
+      pullPolicy: IfNotPresent
+  # Airflow Worker Config
+  workers:
+    # These labels are REQUIRED by the security team
+    # If you are installing over ArgoCD, this can be set up using the application there; otherwise, you need to change it manually.
+    labels:
+      CostString: 1100.US.127.601606
+      AppID: "18003"
+      Environment: prod
+      version: "0.3.3"
+    # Create ServiceAccount
+    serviceAccount:
+      # Specifies whether a ServiceAccount should be created
+      create: false
+      # The name of the ServiceAccount to use.
+      # If not set and create is true, a name is generated using the release name
+      name: airflow-sa
+    # permit initiate in larger nodes
+    tolerations:
+      - effect: NoExecute
+        operator: Equal
+        key: dedicated
+        value: larger
+    # Grace period for tasks to finish after SIGTERM is sent from kubernetes
+    terminationGracePeriodSeconds: 600
+    # This setting tells kubernetes that its not ok to evict
+    # when it wants to scale a node down.
+    safeToEvict: false
+    # this config realmente activies the safe-to-evict
+    annotations:
+      cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+    podAnnotations:
+      cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+  # Airflow scheduler settings
+  scheduler:
+    # These labels are REQUIRED by the security team
+    # If you are installing over ArgoCD, this can be set up using the application there; otherwise, you need to change it manually.
+    labels:
+      CostString: 1100.US.127.601606
+      AppID: "18003"
+      Environment: prod
+      version: "0.3.3"
+    serviceAccount:
+      create: false
+      name: airflow-sa
+    replicas: 3
+    # Scheduler pod disruption budget
+    podDisruptionBudget:
+      enabled: true
+      # PDB configuration
+      config:
+        maxUnavailable: 1
+    resources:
+      limits:
+        cpu: 2
+        memory: 1.5Gi
+      requests:
+        cpu: 1
+        memory: 1Gi
+    # permit initiate in larger nodes
+    tolerations:
+      - effect: NoExecute
+        operator: Equal
+        key: dedicated
+        value: larger
+  # Airflow Triggerer Config
+  triggerer:
+    # These labels are REQUIRED by the security team
+    # If you are installing over ArgoCD, this can be set up using the application there; otherwise, you need to change it manually.
+    labels:
+      CostString: 1100.US.127.601606
+      AppID: "18003"
+      Environment: prod
+      version: "0.3.3"
+    serviceAccount:
+      create: false
+      name: airflow-sa
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1.5Gi
+      requests:
+        cpu: 250m
+        memory: 1Gi
+    # permit initiate in larger nodes
+    tolerations:
+      - effect: NoExecute
+        operator: Equal
+        key: dedicated
+        value: larger
+  # Airflow UI
+  webserver:
+    # Webserver can take a long long time to startup
+    startupProbe:
+      timeoutSeconds: 30
+      failureThreshold: 30
+      periodSeconds: 10
+      scheme: HTTP
+    # These labels are REQUIRED by the security team
+    # If you are installing over ArgoCD, this can be set up using the application there; otherwise, you need to change it manually.
+    labels:
+      CostString: 1100.US.127.601606
+      AppID: "18003"
+      Environment: prod
+      version: "0.3.3"
+    serviceAccount:
+      create: false
+      name: airflow-sa
+    extraVolumes:
+      - name: webserver-config
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: mlops-airflow-webconfig-spc
+      - name: secrets-store-inline
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: airflow-secrets-configs-spc
+      - name: fernet-config
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: airflow-fernetkey-spc
+    extraVolumeMounts:
+      - name: webserver-config
+        mountPath: /opt/airflow/webserver_config.py
+        subPath: webserver_config.py
+        readOnly: true
+      - name: secrets-store-inline
+        mountPath: "/mnt/secrets"
+        readOnly: true
+      - name: fernet-config
+        mountPath: "/mnt/fernet"
+        readOnly: true
+    replicas: 1
+    # Scheduler pod disruption budget
+    podDisruptionBudget:
+      enabled: false
+      # PDB configuration
+      config:
+        maxUnavailable: 1
+    resources:
+      limits:
+        cpu: 200m
+        memory: 1.5Gi
+      requests:
+        cpu: 100m
+        memory: 1Gi
+    # permit initiate in larger nodes
+    tolerations:
+      - effect: NoExecute
+        operator: Equal
+        key: dedicated
+        value: larger
+  # Configuration for postgresql subchart
+  # disabled
+  postgresql:
+    enabled: false
+  pgbouncer:
+    enabled: true
+    # The maximum number of connections to PgBouncer
+    maxClientConn: 100
+    # The maximum number of server connections to the metadata database from PgBouncer
+    metadataPoolSize: 10
+    # The maximum number of server connections to the result backend database from PgBouncer
+    resultBackendPoolSize: 5 
+  dags:
+    gitSync:
+      enabled: true
+      # git repo clone url
+      # ssh examples ssh://git@github.com/apache/airflow.git
+      # git@github.com:apache/airflow.git
+      # https example: https://github.com/apache/airflow.git
+      repo: ssh://git@code.experian.local/cdeamlo/dragon-data-orchestration-da-backtest.git
+      branch: dis_x_dragon
+      rev: HEAD
+      depth: 1
+      # the number of consecutive failures allowed before aborting
+      maxFailures: 5
+      # subpath within the repo where dags are located
+      # should be "" if dags are at repo root
+      subPath: "dags"
+      # If you are using an ssh clone url, you can load
+      # the ssh private key to a k8s secret like the one below
+      #   ---
+      #   apiVersion: v1
+      #   kind: Secret
+      #   metadata:
+      #     name: airflow-ssh-secret
+      #   data:
+      #     # key needs to be gitSshKey
+      #     gitSshKey: <base64_encoded_data>
+      # and specify the name of the secret below
+      sshKeySecret: mlops-airflow-ssh-secret
+      knownHosts: |-
+        code.experian.local ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCSFF3tE6OdnmmsC+PxL+7v8S80ZG1mnz6XEmeZQpZAiDFx4OmVjBPbQevWyyTpkjKPtv+zJWjFuaeOGAi//G+tDjQylpXQ1lNlnH6Msh3+MTS30EeyGyLhskNJoq6dnsbjTcT0eG5EqQRZ7TK6Rtx+xBNngu+jefa3o+XrWGrEElKuOgPMIH1jQaxVHrSvEorD0mGf0AA2ggGW85eFqS3ZrFqc4byR+Hh4lBqM2ls+YzhHJo/X70dZkfPV7inkYDhlQiM+rdPbboWiA3yDna1vLKOEs8aDQ0Xwv+TrJnh13u6gGx4lbKi3QBoVHN8RHPFuhdlpT0EPb/4Os0gOYHEd
+        10.31.202.58 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCSFF3tE6OdnmmsC+PxL+7v8S80ZG1mnz6XEmeZQpZAiDFx4OmVjBPbQevWyyTpkjKPtv+zJWjFuaeOGAi//G+tDjQylpXQ1lNlnH6Msh3+MTS30EeyGyLhskNJoq6dnsbjTcT0eG5EqQRZ7TK6Rtx+xBNngu+jefa3o+XrWGrEElKuOgPMIH1jQaxVHrSvEorD0mGf0AA2ggGW85eFqS3ZrFqc4byR+Hh4lBqM2ls+YzhHJo/X70dZkfPV7inkYDhlQiM+rdPbboWiA3yDna1vLKOEs8aDQ0Xwv+TrJnh13u6gGx4lbKi3QBoVHN8RHPFuhdlpT0EPb/4Os0gOYHEd
+        10.31.202.197 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCSFF3tE6OdnmmsC+PxL+7v8S80ZG1mnz6XEmeZQpZAiDFx4OmVjBPbQevWyyTpkjKPtv+zJWjFuaeOGAi//G+tDjQylpXQ1lNlnH6Msh3+MTS30EeyGyLhskNJoq6dnsbjTcT0eG5EqQRZ7TK6Rtx+xBNngu+jefa3o+XrWGrEElKuOgPMIH1jQaxVHrSvEorD0mGf0AA2ggGW85eFqS3ZrFqc4byR+Hh4lBqM2ls+YzhHJo/X70dZkfPV7inkYDhlQiM+rdPbboWiA3yDna1vLKOEs8aDQ0Xwv+TrJnh13u6gGx4lbKi3QBoVHN8RHPFuhdlpT0EPb/4Os0gOYHEd
+        10.31.202.155 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCSFF3tE6OdnmmsC+PxL+7v8S80ZG1mnz6XEmeZQpZAiDFx4OmVjBPbQevWyyTpkjKPtv+zJWjFuaeOGAi//G+tDjQylpXQ1lNlnH6Msh3+MTS30EeyGyLhskNJoq6dnsbjTcT0eG5EqQRZ7TK6Rtx+xBNngu+jefa3o+XrWGrEElKuOgPMIH1jQaxVHrSvEorD0mGf0AA2ggGW85eFqS3ZrFqc4byR+Hh4lBqM2ls+YzhHJo/X70dZkfPV7inkYDhlQiM+rdPbboWiA3yDna1vLKOEs8aDQ0Xwv+TrJnh13u6gGx4lbKi3QBoVHN8RHPFuhdlpT0EPb/4Os0gOYHEd
+      wait: 30
+      containerName: git-sync
+      uid: 65533
+      # When not set, the values defined in the global securityContext will be used
+      securityContext: {}
+      #  runAsUser: 65533
+      #  runAsGroup: 0
+
+      extraVolumeMounts: []
+      env: []
+      resources: {}
+      #  limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      #  requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+  # StatsD settings
+  statsd:
+    enabled: true
+    extraMappings:
+      # Airflow StatsD metrics mappings (https://airflow.apache.org/docs/apache-airflow/stable/logging-monitoring/metrics.html)
+      # === Counters ===
+      - match: "(.+)\\.(.+)_start$"
+        match_metric_type: counter
+        name: "af_agg_job_start"
+        match_type: regex
+        labels:
+          airflow_id: "$1"
+          job_name: "$2"
+      - match: "(.+)\\.(.+)_end$"
+        match_metric_type: counter
+        name: "af_agg_job_end"
+        match_type: regex
+        labels:
+          airflow_id: "$1"
+          job_name: "$2"
+      - match: "(.+)\\.operator_failures_(.+)$"
+        match_metric_type: counter
+        name: "af_agg_operator_failures"
+        match_type: regex
+        labels:
+          airflow_id: "$1"
+          operator_name: "$2"
+      - match: "(.+)\\.operator_successes_(.+)$"
+        match_metric_type: counter
+        name: "af_agg_operator_successes"
+        match_type: regex
+        labels:
+          airflow_id: "$1"
+          operator_name: "$2"
+      - match: "*.ti_failures"
+        match_metric_type: counter
+        name: "af_agg_ti_failures"
+        labels:
+          airflow_id: "$1"
+      - match: "*.ti_successes"
+        match_metric_type: counter
+        name: "af_agg_ti_successes"
+        labels:
+          airflow_id: "$1"
+      - match: "*.zombies_killed"
+        match_metric_type: counter
+        name: "af_agg_zombies_killed"
+        labels:
+          airflow_id: "$1"
+      - match: "*.scheduler_heartbeat"
+        match_metric_type: counter
+        name: "af_agg_scheduler_heartbeat"
+        labels:
+          airflow_id: "$1"
+      - match: "*.dag_processing.processes"
+        match_metric_type: counter
+        name: "af_agg_dag_processing_processes"
+        labels:
+          airflow_id: "$1"
+      - match: "*.scheduler.tasks.killed_externally"
+        match_metric_type: counter
+        name: "af_agg_scheduler_tasks_killed_externally"
+        labels:
+          airflow_id: "$1"
+      - match: "*.scheduler.tasks.running"
+        match_metric_type: counter
+        name: "af_agg_scheduler_tasks_running"
+        labels:
+          airflow_id: "$1"
+      - match: "*.scheduler.tasks.starving"
+        match_metric_type: counter
+        name: "af_agg_scheduler_tasks_starving"
+        labels:
+          airflow_id: "$1"
+      - match: "*.scheduler.orphaned_tasks.cleared"
+        match_metric_type: counter
+        name: "af_agg_scheduler_orphaned_tasks_cleared"
+        labels:
+          airflow_id: "$1"
+      - match: "*.scheduler.orphaned_tasks.adopted"
+        match_metric_type: counter
+        name: "af_agg_scheduler_orphaned_tasks_adopted"
+        labels:
+          airflow_id: "$1"
+      - match: "*.scheduler.critical_section_busy"
+        match_metric_type: counter
+        name: "af_agg_scheduler_critical_section_busy"
+        labels:
+          airflow_id: "$1"
+      - match: "*.sla_email_notification_failure"
+        match_metric_type: counter
+        name: "af_agg_sla_email_notification_failure"
+        labels:
+          airflow_id: "$1"
+      - match: "*.ti.start.*.*"
+        match_metric_type: counter
+        name: "af_agg_ti_start"
+        labels:
+          airflow_id: "$1"
+          dag_id: "$2"
+          task_id: "$3"
+      - match: "*.ti.finish.*.*.*"
+        match_metric_type: counter
+        name: "af_agg_ti_finish"
+        labels:
+          airflow_id: "$1"
+          dag_id: "$2"
+          task_id: "$3"
+          state: "$4"
+      - match: "*.dag.callback_exceptions"
+        match_metric_type: counter
+        name: "af_agg_dag_callback_exceptions"
+        labels:
+          airflow_id: "$1"
+      - match: "*.celery.task_timeout_error"
+        match_metric_type: counter
+        name: "af_agg_celery_task_timeout_error"
+        labels:
+          airflow_id: "$1"
+      # === Gauges ===
+      - match: "*.dagbag_size"
+        match_metric_type: gauge
+        name: "af_agg_dagbag_size"
+        labels:
+          airflow_id: "$1"
+      - match: "*.dag_processing.import_errors"
+        match_metric_type: gauge
+        name: "af_agg_dag_processing_import_errors"
+        labels:
+          airflow_id: "$1"
+      - match: "*.dag_processing.total_parse_time"
+        match_metric_type: gauge
+        name: "af_agg_dag_processing_total_parse_time"
+        labels:
+          airflow_id: "$1"
+      - match: "*.dag_processing.last_runtime.*"
+        match_metric_type: gauge
+        name: "af_agg_dag_processing_last_runtime"
+        labels:
+          airflow_id: "$1"
+          dag_file: "$2"
+      - match: "*.dag_processing.last_run.seconds_ago.*"
+        match_metric_type: gauge
+        name: "af_agg_dag_processing_last_run_seconds"
+        labels:
+          airflow_id: "$1"
+          dag_file: "$2"
+      - match: "*.dag_processing.processor_timeouts"
+        match_metric_type: gauge
+        name: "af_agg_dag_processing_processor_timeouts"
+        labels:
+          airflow_id: "$1"
+      - match: "*.executor.open_slots"
+        match_metric_type: gauge
+        name: "af_agg_executor_open_slots"
+        labels:
+          airflow_id: "$1"
+      - match: "*.executor.queued_tasks"
+        match_metric_type: gauge
+        name: "af_agg_executor_queued_tasks"
+        labels:
+          airflow_id: "$1"
+      - match: "*.executor.running_tasks"
+        match_metric_type: gauge
+        name: "af_agg_executor_running_tasks"
+        labels:
+          airflow_id: "$1"
+      - match: "*.pool.open_slots.*"
+        match_metric_type: gauge
+        name: "af_agg_pool_open_slots"
+        labels:
+          airflow_id: "$1"
+          pool_name: "$2"
+      - match: "*.pool.queued_slots.*"
+        match_metric_type: gauge
+        name: "af_agg_pool_queued_slots"
+        labels:
+          airflow_id: "$1"
+          pool_name: "$2"
+      - match: "*.pool.running_slots.*"
+        match_metric_type: gauge
+        name: "af_agg_pool_running_slots"
+        labels:
+          airflow_id: "$1"
+          pool_name: "$2"
+      - match: "*.pool.starving_tasks.*"
+        match_metric_type: gauge
+        name: "af_agg_pool_starving_tasks"
+        labels:
+          airflow_id: "$1"
+          pool_name: "$2"
+      - match: "*.smart_sensor_operator.poked_tasks"
+        match_metric_type: gauge
+        name: "af_agg_smart_sensor_operator_poked_tasks"
+        labels:
+          airflow_id: "$1"
+      - match: "*.smart_sensor_operator.poked_success"
+        match_metric_type: gauge
+        name: "af_agg_smart_sensor_operator_poked_success"
+        labels:
+          airflow_id: "$1"
+      - match: "*.smart_sensor_operator.poked_exception"
+        match_metric_type: gauge
+        name: "af_agg_smart_sensor_operator_poked_exception"
+        labels:
+          airflow_id: "$1"
+      - match: "*.smart_sensor_operator.exception_failures"
+        match_metric_type: gauge
+        name: "af_agg_smart_sensor_operator_exception_failures"
+        labels:
+          airflow_id: "$1"
+      - match: "*.smart_sensor_operator.infra_failures"
+        match_metric_type: gauge
+        name: "af_agg_smart_sensor_operator_infra_failures"
+        labels:
+          airflow_id: "$1"
+      # === Timers ===
+      - match: "*.dagrun.dependency-check.*"
+        match_metric_type: observer
+        name: "af_agg_dagrun_dependency_check"
+        labels:
+          airflow_id: "$1"
+          dag_id: "$2"
+      - match: "*.dag.*.*.duration"
+        match_metric_type: observer
+        name: "af_agg_dag_task_duration"
+        labels:
+          airflow_id: "$1"
+          dag_id: "$2"
+          task_id: "$3"
+      - match: "*.dag_processing.last_duration.*"
+        match_metric_type: observer
+        name: "af_agg_dag_processing_duration"
+        labels:
+          airflow_id: "$1"
+          dag_file: "$2"
+      - match: "*.dagrun.duration.success.*"
+        match_metric_type: observer
+        name: "af_agg_dagrun_duration_success"
+        labels:
+          airflow_id: "$1"
+          dag_id: "$2"
+      - match: "*.dagrun.duration.failed.*"
+        match_metric_type: observer
+        name: "af_agg_dagrun_duration_failed"
+        labels:
+          airflow_id: "$1"
+          dag_id: "$2"
+      - match: "*.dagrun.schedule_delay.*"
+        match_metric_type: observer
+        name: "af_agg_dagrun_schedule_delay"
+        labels:
+          airflow_id: "$1"
+          dag_id: "$2"
+      - match: "*.scheduler.critical_section_duration"
+        match_metric_type: observer
+        name: "af_agg_scheduler_critical_section_duration"
+        labels:
+          airflow_id: "$1"
+      - match: "*.dagrun.*.first_task_scheduling_delay"
+        match_metric_type: observer
+        name: "af_agg_dagrun_first_task_scheduling_delay"
+        labels:
+          airflow_id: "$1"
+          dag_id: "$2"
