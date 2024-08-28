@@ -1,0 +1,26 @@
+# reference: https://github.com/argoproj/argo-cd/issues/8097
+# Apply this file so the ArgoCD can pull Helm Charts from ECRs
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: ecr-credentials-sync-operations
+rules:
+- apiGroups: [""]
+  resources:
+  - secrets
+  verbs:
+  - get
+  - create
+  - patch
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: ecr-credentials-sync-operations
+subjects:
+- kind: ServiceAccount
+  name: ecr-credentials-sync-operations
+roleRef:
+  kind: Role
+  name: ecr-credentials-sync-operations
+  apiGroup: ""

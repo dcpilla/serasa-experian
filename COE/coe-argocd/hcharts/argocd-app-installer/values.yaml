@@ -1,0 +1,15 @@
+env: uat
+
+# cluster_informations:
+#   name: default
+#   domain: dev-mlops.br.experian.eeca
+
+# global:
+#   name2: default
+#   domain2: dev-mlops.br.experian.eeca
+
+defaut_applications:
+  source:
+    path: "app/mlops-dragon-02"
+    repoURL: ssh://git@code.experian.local/cdeamlo/coe-dragon-infra.git
+    targetRevision: feature/COMLDE-1627

@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd-app-installer
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    path: {{  .Values.defaut_applications.source.path }}
+    repoURL: {{  .Values.defaut_applications.source.repoURL }}
+    targetRevision: {{ .Values.defaut_applications.source.targetRevision }}
+    helm:
+      valueFiles:
+        - {{ include "default.applications.helm.values.file" .}}
+      {{ if or (.Values.cluster_informations) (.Values.global) }}
+      parameters:
+      {{ if .Values.cluster_informations }}
+        {{ range $k, $v := .Values.cluster_informations }}
+        - name: {{ printf "cluster_informations.%s" $k }}
+          value: {{ $v | quote }}
+          forceString: true
+        {{ end }}
+      {{ end }}
+      {{ if .Values.global }}
+        {{ range $k, $v := .Values.global }}
+        - name: {{ printf "global.%s" $k }}
+          value: {{ $v | quote }}
+          forceString: true
+        {{ end }}
+      {{ end }}
+      {{ end }}
+  destination:
+    namespace: deploy-system
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - Validate=false
+    automated:
+      selfHeal: true
+      prune: true

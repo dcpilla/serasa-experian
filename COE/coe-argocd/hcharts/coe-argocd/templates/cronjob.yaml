@@ -1,0 +1,72 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ecr-credentials-sync-operations
+  namespace: deploy-system
+spec:
+  schedule: "*/10 * * * *"
+  successfulJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          serviceAccountName: ecr-credentials-sync-operations
+          volumes:
+            - emptyDir:
+                medium: Memory
+              name: token
+
+          initContainers:
+            - image: amazon/aws-cli
+              name: get-token
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: REGION
+                  value: sa-east-1
+              command:
+                - /bin/sh
+                - -ce
+                - aws ecr get-login-password --region ${REGION} > /token/ecr-token
+              volumeMounts:
+                - mountPath: /token
+                  name: token
+
+          containers:
+            - name: create-secret
+              image: bitnami/kubectl
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: SECRET_NAME
+                  value: ecr-credentials
+                - name: ECR_REGISTRY
+                  value: 837714169011.dkr.ecr.sa-east-1.amazonaws.com
+              command:
+                - /bin/bash
+                - -ce
+                - |-
+                  kubectl -n deploy-system create secret docker-registry $SECRET_NAME \
+                    --dry-run=client \
+                    --docker-server="$ECR_REGISTRY" \
+                    --docker-username=AWS \
+                    --docker-password="$(</token/ecr-token)" \
+                    -o yaml | kubectl apply -f - && \
+                  cat <<EOF | kubectl apply -f -
+                  apiVersion: v1
+                  kind: Secret
+                  metadata:
+                    name: argocd-ecr-helm-credentials-operations
+                    namespace: deploy-system
+                    labels:
+                      argocd.argoproj.io/secret-type: repository
+                  stringData:
+                    username: AWS
+                    password: $(</token/ecr-token)
+                    enableOCI: "true"
+                    name: "ECR"
+                    type: "helm"
+                    url: "837714169011.dkr.ecr.sa-east-1.amazonaws.com"
+                  EOF
+              volumeMounts:
+                - mountPath: /token
+                  name: token

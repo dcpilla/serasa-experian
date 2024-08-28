@@ -1,0 +1,11 @@
+USER-SUPPLIED VALUES:
+defaut_applications:
+  source:
+    path: apps/mlops-odin-02/
+    repoURL: ssh://git@code.experian.local/cdeamlo/coe-odin-infra.git
+    targetRevision: feature/COMLDE-1686
+env: dev
+
+cluster_informations:
+  name: mlops-odin-02
+  domain: dev-mlops.br.experian.eeca

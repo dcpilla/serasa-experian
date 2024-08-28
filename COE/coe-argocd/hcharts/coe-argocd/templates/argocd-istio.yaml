@@ -1,0 +1,33 @@
+
+{{- if .Values.coe_argocd.istio.enabled }}
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: {{ include "istio.gw.name" . }}
+spec:
+  selector:
+    istio: {{ .Values.coe_argocd.istio.gateway.selector }}
+  servers:
+    - hosts:
+        - {{ include "argocd.url" .}}
+      port: 
+        name: {{  .Values.coe_argocd.istio.gateway.port.name }}
+        number: {{ .Values.coe_argocd.istio.gateway.port.number }}
+        protocol: {{  .Values.coe_argocd.istio.gateway.port.protocol }}
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ include "istio.vs.name" .}}
+spec:
+  gateways:
+    - {{ include "istio.gw.name" .}}
+  hosts:
+    - {{ include "argocd.url" .}}
+  http:
+    - route:
+        - destination:
+            host: {{ template "argo_cd.server.fullname" . }}
+            port:
+              number: 80
+{{- end }}

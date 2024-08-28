@@ -1,0 +1,12 @@
+apiVersion: v2
+name: argocd-app-installer
+kubeVersion: ">=1.22.0-0"
+version: v1.0.0-34-gf91dcd0
+icon: https://argo-cd.readthedocs.io/en/stable/assets/logo.png
+source:
+  - https://code.experian.local/projects/CDEAMLO/repos/coe-argocd/
+maintainers:
+  - name: diegorodrigues
+    email: mlops.sre@br.expiran.com
+  - name: gleiseteixeira
+    email: mlops.sre@br.expiran.com
