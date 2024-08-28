@@ -1,0 +1,4 @@
+apiVersion: v1
+description: CI/CD PoC Applications
+name: cicd-poc
+version: "0.1.1"

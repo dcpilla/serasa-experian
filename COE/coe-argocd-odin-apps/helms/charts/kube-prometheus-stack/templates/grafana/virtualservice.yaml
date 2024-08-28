@@ -1,0 +1,16 @@
+{{- if  .Values.grafana.istio.enabled }}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ template "kube-prometheus-stack.fullname" . }}-grafana-vs
+  namespace: {{ template "kube-prometheus-stack-grafana.namespace" . }}
+spec:
+  hosts:
+  - {{ printf "grafana-%s" (include "kube-prometheus-stack.istio.domain" $) | trunc 63 | trimSuffix "-" }}
+  gateways:
+  - {{ printf "%s/%s" (include "kube-prometheus-stack.istio.namespace" $) (include "kube-prometheus-stack.istio.gateway.name" $) }}
+  http:
+  - route:
+    - destination:
+        host: {{ template "kube-prometheus-stack.fullname" . }}-grafana
+{{- end }}

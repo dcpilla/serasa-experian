@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: model-hdm2-dev
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/manifest-generate-paths: ..
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  source:
+    path: helm
+    repoURL: https://bb-drone-poc.dev-mlops.br.experian.eeca/scm/drag/model-hdm2-infra.git
+    targetRevision: {{ .Values.targetRevision }}
+    helm:
+      valueFiles:
+        - values-develop.yaml
+
+  destination:
+    namespace: model-hdm2-dev
+    server: https://kubernetes.default.svc
+  
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      selfHeal: true
+      prune: true

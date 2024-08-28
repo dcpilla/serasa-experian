@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metabase-gov
+  namespace: deploy-system
+  annotations:
+    argocd.argoproj.io/manifest-generate-paths: ..
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    path: helm
+    repoURL: ssh://git@code.experian.local/cdeamlo/coe-metabase-gov-infra.git
+    targetRevision: {{ .Values.targetRevision }}
+    helm:
+      valueFiles:
+        - values-dev.yaml
+  destination:
+    namespace: ns-metabase-gov
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      selfHeal: true
+      prune: true

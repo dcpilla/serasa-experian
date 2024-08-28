@@ -1,0 +1,29 @@
+{{- if  .Values.istio.enabled }}
+{{- $hostServices := list -}}
+{{- if  .Values.grafana.istio.enabled }}
+{{- $hostServices = append $hostServices "grafana" -}}
+{{- end }}
+{{- if  .Values.prometheus.istio.enabled }}
+{{- $hostServices = append $hostServices "prometheus" -}}
+{{- end }}
+{{- if  .Values.alertmanager.istio.enabled }}
+{{- $hostServices = append $hostServices "alertmanager" -}}
+{{- end }}
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: {{ template "kube-prometheus-stack.istio.gateway.name" $ }}
+  namespace: {{ template "kube-prometheus-stack.istio.namespace" $ }}
+spec:
+  selector:
+    {{ .Values.istio.gatewaySelectors.name }}: {{ .Values.istio.gatewaySelectors.value }}
+  servers:
+  - hosts:
+      {{- range $hostServices }}
+      - {{ printf "%s-%s" . (include "kube-prometheus-stack.istio.domain" $) | trunc 63 | trimSuffix "-" }}
+      {{- end }}
+    port:
+        name: http
+        number: 8080
+        protocol: HTTP
+{{- end }}

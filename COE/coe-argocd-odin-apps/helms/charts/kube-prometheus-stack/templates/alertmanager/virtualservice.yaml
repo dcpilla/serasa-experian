@@ -1,0 +1,18 @@
+{{- if  .Values.alertmanager.istio.enabled }}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ template "kube-prometheus-stack.fullname" . }}-alertmanager-vs
+  namespace: {{ template "kube-prometheus-stack.namespace" . }}
+spec:
+  hosts:
+  - {{ printf "alertmanager-%s" (include "kube-prometheus-stack.istio.domain" $) | trunc 63 | trimSuffix "-" }}
+  gateways:
+  - {{ printf "%s/%s" (include "kube-prometheus-stack.istio.namespace" $) (include "kube-prometheus-stack.istio.gateway.name" $) }}
+  http:
+  - route:
+    - destination:
+        host: {{ template "kube-prometheus-stack.fullname" . }}-alertmanager
+        port:
+          number: {{ .Values.alertmanager.service.port }}
+{{- end }}

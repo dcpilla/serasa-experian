@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dex
+  namespace: deploy-system
+  annotations:
+    argocd.argoproj.io/manifest-generate-paths: ..
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    path: helms/charts/dex
+    repoURL: ssh://git@code.experian.local/cdeamlo/coe-argocd-odin-apps.git
+    targetRevision: {{ .Values.targetRevision }}
+    helm:
+      valueFiles:
+        - ../../../coe-odin-01-dev/default-apps/values-dex-develop.yaml
+  destination:
+    namespace: oauth-system
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      selfHeal: true
+      prune: true

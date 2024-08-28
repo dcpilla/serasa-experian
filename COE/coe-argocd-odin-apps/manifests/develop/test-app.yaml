@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: test-app
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    path: helm
+    repoURL: https://bb-drone-poc.dev-mlops.br.experian.eeca/scm/dron/drone-test-app-infra.git
+    targetRevision: develop
+  destination:
+    namespace: test-app
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
