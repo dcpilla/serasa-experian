@@ -1,0 +1,20 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: aws-eks-oidc
+  description: AWS EKS OIDC
+  annotations:
+    argocd/app-name: exampleguest
+    grafana/tag-selector: "kubernetes-mixin"
+    backstage.io/techdocs-ref: dir:.
+  links:
+    - url: https://code.experian.local/projects/SCIB/repos/aws-eks-oidc/browse/README.md
+      title: About the Project
+      icon: dashboard
+    - url: https://code.experian.local/projects/SCIB/repos/aws-eks-oidc/browse/README.md
+      title: Project Configuration
+      icon: dashboard
+spec:
+  type: library
+  owner: APP-dev-hub-portal-galacticos-devsecops
+  lifecycle: experimental

@@ -1,0 +1,11 @@
+site_name: "aws-eks-oidc"
+site_description: "AWS EKS OIDC"
+
+plugins:
+  - techdocs-core
+
+nav:
+  - Overview:
+      - About the Project: "about.md"
+  - Getting Started:
+      - Project Configuration: "started.md"
