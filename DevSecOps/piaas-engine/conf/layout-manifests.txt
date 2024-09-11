@@ -1,0 +1,10 @@
+@displayName@ @package@
+        *classLoadingMode PARENT_FIRST
+        *startingWeight 1
+        *webModuleClassLoadingMode
+                @ear/uri@;PARENT_FIRST
+        MapModulesToServers
+                @ear/uri@;@ear/uri@,WEB-INF/web.xml;WebSphere:cell=ambwebwas01-deCell01,@cluster@
+        MapWebModToVH
+                @ear/uri@;@ear/uri@,WEB-INF/web.xml;default_host
+        distributeApp AppDeploymentOption.Yes

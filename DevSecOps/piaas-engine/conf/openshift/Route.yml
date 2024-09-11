@@ -1,0 +1,29 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  annotations:
+    openshift.io/host.generated: 'true'
+  creationTimestamp: null
+  name: @@artifactIdSmall@@
+  namespace: @@project@@
+  selfLink: /oapi/v1/namespaces/@@project@@/routes/@@artifactIdSmall@@
+spec:
+  host: @@artifactIdSmall@@-@@project@@.@@domain@@
+  port:
+    targetPort: 8080-tcp
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: @@artifactId@@
+    weight: 100
+  wildcardPolicy: None
+status:
+  ingress:
+    - conditions:
+        - lastTransitionTime: null
+          status: 'True'
+          type: Admitted
+      host: @@artifactIdSmall@@-@@project@@.@@domain@@
+      routerName: router
+      wildcardPolicy: None

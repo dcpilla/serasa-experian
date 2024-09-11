@@ -1,0 +1,10 @@
+experian-geolocalization-domain-services experian-geolocalization-domain-services-1.0.0.0-20180605.173218-3.ear
+	*classLoadingMode PARENT_FIRST
+	*startingWeight 1
+	*webModuleClassLoadingMode
+		experian-geolocalization-domain-services-web.war;PARENT_FIRST
+	MapModulesToServers
+		experian-geolocalization-domain-services-web.war;experian-geolocalization-domain-services-web.war,WEB-INF/web.xml;WebSphere:cell=ambwebwas01-deCell01,cluster=cluster-ms-j8
+	MapWebModToVH
+		experian-geolocalization-domain-services-web.war;experian-geolocalization-domain-services-web.war,WEB-INF/web.xml;default_host
+	distributeApp AppDeploymentOption.Yes

@@ -1,0 +1,48 @@
+global: 
+  version: 3.0.0
+  language: java
+before_build: 
+  test:
+    provider: sonarqube
+    provider: veracode
+    provider: cumcumber
+build:
+after_build:
+after_success:
+after_failure:
+before_deploy:
+deploy:
+  provider: script|RA|openshift|bluegreen|ansible
+    script: provisionar.sh $TAG_BRANCH deployMenuProdutos
+    on:
+      branch: $TAG_BRANCH
+    ra: ra_name_app
+    openshift: 
+      app:
+         master: my-app-staging
+         production: my-app-production
+after_deploy:
+notifications: 
+  jira : projeto
+  email : 
+  changeOrder : COMANDO_COMPLETO
+
+
+  deploy:
+  # deploy develop to the staging environment
+  - provider: script
+    script: scripts/deploy.sh staging
+    on:
+      branch: develop
+  # deploy master to production
+  - provider: script
+    script: scripts/deploy.sh production
+    on:
+      branch: master
+
+deploy:
+  provider: script
+  script: scripts/deploy.sh production $TRAVIS_TAG
+  on:
+    tags: true
+    all_branches: true

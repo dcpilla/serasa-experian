@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<appdeployment:Deployment xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:appdeployment="http://www.ibm.com/websphere/appserver/schemas/5.0/appdeployment.xmi" xmi:id="Deployment_0000000000001">
+  <deployedObject xmi:type="appdeployment:ApplicationDeployment" xmi:id="ApplicationDeployment_0000000000001" deploymentId="0" startingWeight="1" warClassLoaderPolicy="@@warClassLoaderPolicy@@">
+    <targetMappings xmi:id="DeploymentTargetMapping_0000000000001" enable="true" target="ClusteredTarget_0000000000001"/>
+    <classloader xmi:id="Classloader_0000000000001" mode="@@classLoaderMode@@"/>
+    <modules xmi:type="appdeployment:WebModuleDeployment" xmi:id="WebModuleDeployment_0000000000001" deploymentId="1" startingWeight="10000" uri="@@moduleUri@@" containsEJBContent="0">
+      <targetMappings xmi:id="DeploymentTargetMapping_0000000000001" target="ClusteredTarget_0000000000001"/>
+    </modules>
+  </deployedObject>
+  <deploymentTargets xmi:type="appdeployment:ClusteredTarget" xmi:id="ClusteredTarget_0000000000001" name="@@ClusteredTarget@@"/>
+</appdeployment:Deployment> 

@@ -1,0 +1,110 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  annotations:
+    openshift.io/generated-by: OpenShiftNewApp
+  generation: 2
+  labels:
+    app: @@artifactId@@
+  name: @@artifactId@@
+  namespace: @@project@@
+  selfLink: /oapi/v1/namespaces/@@project@@/deploymentconfigs/@@artifactId@@
+spec:
+  replicas: 1
+  selector:
+    app: @@artifactId@@
+    deploymentconfig: @@artifactId@@
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      annotations:
+        openshift.io/generated-by: OpenShiftNewApp
+      creationTimestamp: null
+      labels:
+        app: @@artifactId@@
+        deploymentconfig: @@artifactId@@
+    spec:
+      containers:
+        - env:
+            - name: TZ
+              value: America/Sao_Paulo
+          image: >-
+             @@registry@@/@@project@@/@@artifactId@@:latest
+          imagePullPolicy: Always
+          name: @@artifactId@@
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            tcpSocket:
+              port: 8080
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 60
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1024Mi
+            requests:
+              cpu: 10m
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+  test: false
+  triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - @@artifactId@@
+        from:
+          kind: ImageStreamTag
+          name: '@@artifactId@@:latest'
+          namespace: @@project@@
+        lastTriggeredImage: >-
+           @@registry@@/@@project@@/@@artifactId@@:latest
+      type: ImageChange
+status:
+  availableReplicas: 1
+  conditions:
+    - lastTransitionTime: null
+      lastUpdateTime: null
+      message: Deployment config has minimum availability.
+      status: 'True'
+      type: Available
+    - lastTransitionTime: null
+      lastUpdateTime: null
+      message: replication controller "@@artifactId@@-1" successfully rolled out
+      reason: NewReplicationControllerAvailable
+      status: 'True'
+      type: Progressing
+  details:
+    causes:
+      - imageTrigger:
+          from:
+            kind: ImageStreamTag
+            name: '@@artifactId@@:latest'
+            namespace: @@project@@
+        type: ImageChange
+    message: image change
+  latestVersion: 1
+  observedGeneration: 2
+  readyReplicas: 1
+  replicas: 1
+  unavailableReplicas: 0
+  updatedReplicas: 1

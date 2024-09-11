@@ -1,0 +1,21 @@
+<server description="new server">
+   <dataSource id="DefaultDataSource" jndiName="jdbc/SegundoFatorDS">
+      <jdbcDriver libraryRef="OracleLib"/>
+      <properties.oracle URL="${env.ORACLE_URL}" password="${env.ORACLE_PASS}" user="${env.ORACLE_USER}"/>
+   </dataSource>
+   <library id="OracleLib">
+      <file name="/opt/oracle-driver/ojdbc6-11.2.0.4.jar"/>
+   </library>
+   <!-- Enable features -->
+   <featureManager>
+      <feature>webProfile-8.0</feature>
+      <feature>localConnector-1.0</feature>
+   </featureManager>
+   <!-- To access this server from a remote client add a host attribute to the following element, e.g. host="*" -->
+   <httpEndpoint httpPort="9080" httpsPort="9443" id="defaultHttpEndpoint"/>
+   <!-- Automatically expand WAR files and EAR files -->
+   <applicationManager autoExpand="true"/>
+   <applicationMonitor updateTrigger="mbean"/>
+
+    <enterpriseApplication id="experian-consultahttps-ear" location="@@NOME_PACOTE@@" name="experian-consultahttps-ear"/>
+</server>

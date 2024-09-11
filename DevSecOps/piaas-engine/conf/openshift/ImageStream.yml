@@ -1,0 +1,15 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  creationTimestamp: null
+  generation: 1
+  name: @@artifactId@@
+  namespace: @@project@@
+  selfLink: >-
+    /oapi/v1/namespaces/@@project@@/imagestreams/@@artifactId@@
+spec:
+  lookupPolicy:
+    local: false
+status:
+  dockerImageRepository: '@@registry@@/@@project@@/@@artifactId@@'
+  tags: null

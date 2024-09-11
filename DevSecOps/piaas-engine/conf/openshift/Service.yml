@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    openshift.io/generated-by: OpenShiftNewApp
+  creationTimestamp: null
+  labels:
+    app: @@artifactId@@
+  name: @@artifactId@@
+  namespace: @@project@@
+  selfLink: /api/v1/namespaces/@@project@@/services/@@artifactId@@
+spec:
+  ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: @@artifactId@@
+    deploymentconfig: @@artifactId@@
+  sessionAffinity: None
+status:
+  loadBalancer: {}
