@@ -1,0 +1,92 @@
+{
+    "monitored_requests": [
+        {
+            "template_name":"Qualidade de dados - Request de envio de dados para clientes e fornecedores",
+            "template_id":"49aa17251b8149542e00a860f54bcba8",
+            "template_path":"Service Catalog>Security & Compliance>Engineering & Innovation>Data Protection>Request Envio de dados para clientes - Qualidade de Dados",
+            "owner":"Brazil Qualidade de Dados",
+            "owner_email":"enviodearquivos.qualidadededados@br.experian.com"
+        }
+        ,
+        {
+            "template_name":"Request Custom IT Deliveries - Validate and Send",
+            "template_id":"32e8df771bf241144ec7b8c8dc4bcbd7",
+            "template_path":"Service Catalog > Security & Compliance > Engineering & Innovation > Data Protection > Request Custom IT Deliveries - Validate and Send",
+            "owner":"Brazil Custom IT Delivery",
+            "owner_email":"CustomItDeliveryMS@br.experian.com"
+        }
+        ,
+        {
+            "template_name": "Formulário criação de logons AST",
+            "template_id": "77d11e13db73e784f2212418489619e7",
+            "template_path": "Service Catalog>Applications>Product>IT Services>Request Criação Logon AST ",
+            "owner": "Brazil File Transfer",
+            "owner_email": "filetransfer@br.experian.com"
+        }
+        ,
+        {
+            "template_name": "Request Extração Relatório via Cockipt",
+            "template_id": "67ccfa38935b3dd4a387309febba105c",
+            "template_path": "Service Catalog > Applications > Product > DA > Request Extração Relatório via Cockipt",
+            "owner": "DA BRZ - Delivery Architecture",
+            "owner_email": "dabrzdeliveryarch@br.experian.com"
+        }
+        ,
+        {
+            "template_name": "Request Custom IT Deliveries - Validate and Send - Marketing Services",
+            "template_id": "173f5dac9357fd5467ce3024fbba10a6",
+            "template_path": "Service Catalog > Security & Compliance > Engineering & Innovation > Data Protection > Request Custom IT Deliveries - Validate and Send - Marketing Services",
+            "owner": "Brazil Custom IT Delivery",
+            "owner_email": "CustomItDeliveryMS@br.experian.com"
+        },
+        {
+            "template_name": "Solicitar Automação CSD Delivery - PicPay",
+            "template_id": "f557c52f83294a18918dca70deaad319",
+            "template_path": "Service Catalog > Infrastructure & Operations > Operational Support > Client Support > Solicitar Automação CSD Delivery PicPay",
+            "owner": "ESS&MS",
+            "owner_email": "csd_filetransfer@br.experian.com"
+        },
+        {
+            "template_name": "Solicitar Automação CSD Delivery - Low Touch",
+            "template_id": "2d461dc783fd06dc918dca70deaad376",
+            "template_path": "Service Catalog > Infrastructure & Operations > Operational Support > Client Support > Solicitar Automação CSD Delivery Low Touch",
+            "owner": "ESS&MS",
+            "owner_email": "csd_filetransfer@br.experian.com"
+        },
+        {
+            "template_name": "Solicitar Automação CSD Delivery High Touch",
+            "template_id": "ef83f98f837ec210918dca70deaad305",
+            "template_path": "Service Catalog > Infrastructure & Operations > Operational Support > Client Support > Solicitar Automação CSD Delivery High Touch",
+            "owner": "ESS&MS",
+            "owner_email": "csd_filetransfer@br.experian.com"
+        },
+        {
+            "template_name": "Solicitar Automação CSD Delivery IDF Solutioning",
+            "template_id": "c93d798783360610918dca70deaad3b8",
+            "template_path": "Service Catalog > Infrastructure & Operations > Operational Support > Client Support > Solicitar Automação CSD Delivery IDF Solutioning",
+            "owner": "ESS&MS",
+            "owner_email": "csd_filetransfer@br.experian.com"
+        },
+        {
+            "template_name": "Create Active Directory Group (Brazil)",
+            "template_id": "6e0a0926db0c2700af053b2ffe9619b7",
+            "template_path": "Service Catalog > Security & Compliance > Identity & Access Management > Identity & Access Management Brasil > Create Active Directory Group (Brazil)",
+            "owner": "EITS IAM BR AD Requests",
+            "owner_email": "GSABrasil@br.experian.com"
+        },
+        {
+            "template_name": "Solicitar Automação CSD Delivery Support ST",
+            "template_id": "af6e883693eb4e9067ce3024fbba102d",
+            "template_path": "Service Catalog > Infrastructure & Operations > Operational Support > Client Support > Solicitar Automação CSD Delivery Support ST",
+            "owner": "ESS&MS",
+            "owner_email": "csd_filetransfer@br.experian.com "
+        },
+        {
+            "template_name": " Solicitar Automação CSD Delivery Decisioning ST",
+            "template_id": "e972483693a74e9067ce3024fbba1013",
+            "template_path": "Service Catalog > Infrastructure & Operations > Operational Support > Client Support > Solicitar Automação CSD Delivery Decisioning ST",
+            "owner": "ESS&MS",
+            "owner_email": "csd_filetransfer@br.experian.com "
+        }
+    ]
+}

@@ -1,0 +1,92 @@
+# /**
+# *
+# * @package        Service Catalog Infrastructure
+# * @name           joaquin-infra.convencao.yml
+# * @version        2.3.0
+# * @description    Convenção do arquivo joaquin-infra.convencao.yml
+# * @copyright      2020 &copy Serasa Experian
+# *
+# * @version        2.3.0
+# * @change         - [ADD] Adicionado atributo running_in
+# * @author         DevSecOps Architecture Brazil
+# * @contribution   Joao Paulo Bastos L. <Joao.Leite2@br.experian.com>
+# * @dependencies   
+# * @references     
+# * @date           03-Ago-2021
+# *
+# * @version        1.0.0
+# * @change         - [ADD] Criação do tempalte inicial
+# * @author         DevSecOps Architecture Brazil
+# * @contribution   Joao Paulo Bastos L. <Joao.Leite2@br.experian.com>
+# * @dependencies   
+# * @references     
+# * @date           07-Jul-2020
+# **/  
+
+running_in: slave_aws | slave_azure | onprimess | not define = local
+itil: 
+  request: true | false
+  changeorder: true | false
+definition: Este job cria um bucket s3 na aws
+notification:
+  onfailure:
+    email:
+      recipients: joao.leite2@br.experian.com
+      subject: 'JoaquinX falha automacao - tools-test '
+  onsuccess:
+    email:
+      recipients: joao.leite2@br.experian.com
+      subject: 'JoaquinX sucesso automacao - tools-test '
+global:
+  project:
+    type: text 
+    pattern: ~/\w{4}/
+    description: Define o nome do projeto/tribe, exemplo devsecops-arquitetura
+    required: true
+    answer: null ou campo da request ritm.campo
+    reference:
+      table_name: nome_table
+      field_name: nome_do_campo
+  name_resource:
+    type: text 
+    pattern : ~/\w{4}/
+    description : Define o nome do recurso que sera criado, exemplo prod-s3-positivo
+    required: true
+    answer: null
+  tags: 
+    type: text 
+    pattern: ~/\w{4}/
+    description: Define tags para a criacao do recursos, exemplo TAG2,TAG2
+    required: false
+    answer: null
+  environment:
+    type: options 
+    options: Staging;Dev;UAT;Production
+    description: Define o ambiente de criacao
+    required: true
+    answer: null
+  size_ec2:
+    type: options 
+    options: t3.nano;m5.larger
+    description: Define o ambiente de criacao
+    required: true
+    answer: null
+  aws_account: 
+    type: vault
+    description: Define a conta aws 
+    required: true
+    answer: null
+  credencial2: 
+    type: vault
+    description: Define o vault da key/secret da conta aws 
+    required: true
+    answer: null  ou com valor já definido do vault
+  ssh_key: 
+    type: password
+    description: Define o ssh_key da conta
+    required: true
+    answer: null
+before_plan:
+  - replace vars.tf,apply.sh
+plan:
+  - ./apply.sh
