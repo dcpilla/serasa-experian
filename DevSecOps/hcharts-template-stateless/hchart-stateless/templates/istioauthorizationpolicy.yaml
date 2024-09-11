@@ -1,0 +1,18 @@
+{{- $authpolicy := .Values.authorizationPolicy | default dict }}
+{{- if $authpolicy.enabled }}
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: {{ include "stateless-app.fullname" . }}-authorization
+  labels:
+    {{- include "stateless-app.labels" . | nindent 4 }}
+spec:
+  action: {{ $authpolicy.action | default "ALLOW" }}
+  {{- if $authpolicy.rules }}
+  rules:
+    {{- toYaml $authpolicy.rules | nindent 4 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "stateless-app.selectorLabels" . | nindent 6 }}
+{{- end }}

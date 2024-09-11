@@ -1,0 +1,197 @@
+{{- $strategy := .Values.deployment.strategy | default dict }}
+{{- $manager := "flagger" }}
+{{- if and $strategy $strategy.manager }}
+{{- $manager = $strategy.manager }}
+{{- end }}
+{{- if and (eq "Canary" $strategy.type) (eq "argo-rollouts" $manager) }}
+{{- $replicas := .Values.deployment.production.replicaCount }}
+{{- if .Values.autoscaling.enabled }}
+{{- $replicas = .Values.autoscaling.minReplicas }}
+{{- end }}
+{{- $vsvc := .Values.virtualService | default dict }}
+{{- $fullname := include "stateless-app.fullname" . }}
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: {{ $fullname }}
+  labels:
+    {{- include "stateless-app.labels" . | nindent 4 }}
+spec:
+  replicas: {{ $replicas }}
+  analysis:
+    successfulRunHistoryLimit: {{ $strategy.analysis.successfulRunHistoryLimit | default 5 }}
+    unsuccessfulRunHistoryLimit: {{ $strategy.analysis.unsuccessfulRunHistoryLimit | default 5 }}
+  selector:
+    matchLabels:
+      {{- include "stateless-app.selectorLabels" . | nindent 6 }}
+  {{- if .Values.readinessProbe.initialDelaySeconds }}
+  minReadySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+  {{- end }}
+  revisionHistoryLimit: {{ $strategy.revisionHistoryLimit | default 3 }}
+  progressDeadlineSeconds: {{ $strategy.progressDeadlineSeconds | default 600 }}
+  progressDeadlineAbort: {{ $strategy.progressDeadlineAbort | default false }}
+  rollbackWindow:
+    revisions: {{ (default $strategy.rollbackWindow).revisions | default 2 }}
+  strategy:
+    {{- if $strategy.strategy.canary | default false }}
+    canary:
+      canaryService: {{ $fullname }}-service-canary
+      stableService: {{ $fullname }}-service-stable
+      canaryMetadata:
+        labels:
+          role: canary
+      stableMetadata:
+        labels:
+          role: stable
+      maxUnavailable: {{ $strategy.strategy.canary.maxUnavailable | default 1 }}
+      maxSurge: {{ $strategy.strategy.canary.maxSurge | default "20%" }}
+      scaleDownDelaySeconds: {{ $strategy.strategy.canary.scaleDownDelaySeconds | default 30 }}
+      minPodsPerReplicaSet: {{ $strategy.strategy.canary.minPodsPerReplicaSet | default 1 }}
+      scaleDownDelayRevisionLimit: {{ $strategy.strategy.canary.scaleDownDelayRevisionLimit | default 1 }}
+      {{- with $strategy.strategy.canary.analysis }}
+      analysis:
+        {{- range $i, $arg := .args }}
+          {{- if eq $arg.value "REPLACE_BY_NAMESPACE" }}
+          {{- $_ := set $arg "value" $.Release.Namespace }}
+          {{- end }}
+        {{- end }}
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $strategy.strategy.canary.steps }}
+      steps:
+      {{- range . }}
+        {{- if typeIs "map[string]interface {}" . }}
+          {{- range $key, $value := . }}
+            {{- if eq $key "analysis" }}
+              {{- range $i, $arg := $value.args }}
+                {{- if eq $arg.value "REPLACE_BY_NAMESPACE" }}
+                {{- $_ := set $arg "value" $.Release.Namespace }}
+                {{- end }}
+              {{- end }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      trafficRouting:
+        {{- if (default $strategy.strategy.canary.trafficRouting).managedRoutes }}
+        {{- with $strategy.strategy.canary.trafficRouting.managedRoutes }}
+        managedRoutes:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- end }}
+        istio:
+          virtualServices:
+          {{- if $vsvc.enabled }}
+          - name: {{ $fullname }}-virtual-service
+            routes:
+            - {{ $fullname }}-route
+          {{- end }}
+          {{- range $i, $e := .Values.additionalVirtualServices }}
+          {{- $basename := printf "%s-%d" $fullname (add $i 1) }}
+          - name: {{ $basename }}-virtual-service
+            routes:
+            - {{ $basename }}-route
+          {{- end }}
+      abortScaleDownDelaySeconds: {{ $strategy.strategy.canary.abortScaleDownDelaySeconds | default 30 }}
+    {{- end }}
+  template:
+    metadata:
+      annotations:
+        timestamp: {{ now | unixEpoch | quote }}
+        {{- with .Values.podAnnotations }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "stateless-app.labels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "stateless-app.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.deployment.repository }}:{{ .Values.deployment.production.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.deployment.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.containerPort }}
+              protocol: TCP
+            {{- if .Values.additionalContainerPorts }}
+            {{- range .Values.additionalContainerPorts }}
+            - containerPort: {{ . }}
+              protocol: TCP
+            {{- end }}
+            {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            - name: GEARR_ID
+              value: {{ .Values.app.labels.gearr | squote }}
+            - name: CLUSTER_NAME
+              value: {{ .Values.deployment.cluster }}
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          envFrom:
+          	{{- if .Values.secretsRefs }}
+            {{- range .Values.secretsRefs }}
+            - secretRef:
+                name: {{ . }}
+            {{- end }}
+            {{- end }}
+            {{- if .Values.configMapsRefs }}
+            {{- range .Values.configMapsRefs }}
+            - configMapRef:
+                name: {{ . }}
+            {{- end }}
+            {{- end }}
+            {{- if or (.Values.envFile) (.Values.envVars) }}
+            - configMapRef:
+                name: {{ .Release.Name }}-configmap
+            {{- end }}
+          {{- with .Values.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.hostAliases }}
+      hostAliases:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

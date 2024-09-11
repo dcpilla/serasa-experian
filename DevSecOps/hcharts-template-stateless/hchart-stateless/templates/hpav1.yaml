@@ -1,0 +1,29 @@
+{{- if and (.Values.autoscaling.enabled) (eq .Values.autoscaling.apiVersion "v1") }}
+{{- $targetApiVersion := "apps/v1" }}
+{{- $targetKind := "Deployment" }}
+{{- $strategy := .Values.deployment.strategy | default dict }}
+{{- if (eq "Canary" $strategy.type) }}
+{{- $manager := "flagger" }}
+{{- if and $strategy $strategy.manager }}
+{{- $manager = $strategy.manager }}
+{{- end }}
+{{- if (eq "argo-rollouts" $manager) }}
+{{- $targetApiVersion = "argoproj.io/v1alpha1" }}
+{{- $targetKind = "Rollout" }}
+{{- end }}
+{{- end }}
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "stateless-app.fullname" . }}
+  labels:
+    {{- include "stateless-app.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: {{ $targetApiVersion }}
+    kind: {{ $targetKind }}
+    name: {{ include "stateless-app.fullname" . }}
+  minReplicas: {{ .Values.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  targetCPUUtilizationPercentage: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
+{{- end }}

@@ -1,0 +1,15 @@
+{{- $strategy := .Values.deployment.strategy | default dict }}
+{{- $labels := include "stateless-app.labels" . | nindent 4 }}
+{{- if or (not $strategy) (ne "Canary" $strategy.type) }}
+{{- range $i, $e := .Values.additionalServices }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $e.name }}
+  labels:
+    {{ $labels }}
+spec:
+   {{- toYaml $e.spec | nindent 2 }}
+---
+{{- end }}
+{{- end }}

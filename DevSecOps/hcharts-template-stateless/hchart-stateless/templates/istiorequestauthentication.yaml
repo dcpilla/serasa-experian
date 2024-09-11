@@ -1,0 +1,23 @@
+{{- $reqauth := .Values.requestAuthentication | default dict }}
+{{- if $reqauth.enabled }}
+apiVersion: security.istio.io/v1
+kind: RequestAuthentication
+metadata:
+  name: {{ include "stateless-app.fullname" . }}-authentication
+  labels:
+    {{- include "stateless-app.labels" . | nindent 4 }}
+spec:
+  jwtRules:
+    - issuer: {{ $reqauth.jwt.issuer }}
+      {{- if hasPrefix "https://" $reqauth.jwt.jwks }}
+      jwksUri: {{ $reqauth.jwt.jwks}}
+      {{- else }}
+      jwks: >- {{ $reqauth.jwt.jwks | nindent 8 }}
+      {{- end }}
+      {{- with $reqauth.jwt.payloadToHeader }}
+      outputPayloadToHeader: {{ $reqauth.jwt.payloadToHeader }}
+      {{- end }}
+  selector:
+    matchLabels:
+      {{- include "stateless-app.selectorLabels" . | nindent 6 }}
+{{- end }}

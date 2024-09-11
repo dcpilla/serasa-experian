@@ -1,0 +1,47 @@
+{{- $strategy := .Values.deployment.strategy | default dict }}
+{{- if and $strategy (eq "Canary" $strategy.type) }}
+{{- $manager := "flagger" }}
+{{- if $strategy.manager }}
+{{- $manager = $strategy.manager }}
+{{- end }}
+{{- if (eq "flagger" $manager) }}
+apiVersion: flagger.app/v1beta1
+kind: Canary
+metadata:
+  name: {{ include "stateless-app.fullname" . }}
+  labels:
+    version: {{ .Values.deployment.production.image.tag }}
+    {{- include "stateless-app.labels" . | nindent 4 }}
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "stateless-app.fullname" . }}
+  {{- $apiVersion := .Values.autoscaling.apiVersion | default "v2" }}
+  autoscalerRef:
+    apiVersion: autoscaling/{{ $apiVersion }}
+    kind: HorizontalPodAutoscaler
+    name: {{ include "stateless-app.fullname" . }}
+  service:
+    port: {{ .Values.service.port }}
+    targetPort: {{ .Values.containerPort }}
+    gateways:
+    - {{ include "stateless-app.fullname" . }}-gateway
+    hosts:
+    - "{{ .Values.deployment.host }}"
+  analysis:
+  {{- if .Values.deployment.strategy.analysis }}
+    {{- toYaml .Values.deployment.strategy.analysis | nindent 4 }}
+  {{- else }}
+    interval: 60s
+    threshold: 3
+    maxWeight: 100
+    stepWeight: 10
+    metrics:
+    - name: request-success-rate
+      interval: 60s
+      thresholdRange:
+        min: 95
+  {{- end }}
+{{- end }}
+{{- end }}

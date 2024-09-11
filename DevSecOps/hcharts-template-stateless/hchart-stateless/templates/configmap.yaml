@@ -1,0 +1,20 @@
+{{- if or (.Values.envFile) (.Values.envVars) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+  labels:
+    app.kubernetes.io/version: {{ .Chart.Version }}
+    {{- include "stateless-app.labels" . | nindent 4 }}
+  annotations:
+    app.kubernetes.io/version: {{ .Chart.Version }}
+data:
+  {{- if .Values.envFile }}
+  {{ range .Files.Lines .Values.envFile }}
+    {{ . }}
+  {{ end }}
+  {{- end }}
+  {{- with .Values.envVars }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}

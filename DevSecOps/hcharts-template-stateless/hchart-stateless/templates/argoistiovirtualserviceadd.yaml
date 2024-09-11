@@ -1,0 +1,72 @@
+{{- $strategy := .Values.deployment.strategy | default dict }}
+{{- $manager := "flagger" }}
+{{- if and $strategy $strategy.manager }}
+{{- $manager = $strategy.manager }}
+{{- end }}
+{{- if and (eq "Canary" $strategy.type) (eq "argo-rollouts" $manager) }}
+{{- $fullname := include "stateless-app.fullname" . }}
+{{- $labels := include "stateless-app.labels" . | nindent 4 }}
+{{- range $i, $e := .Values.additionalVirtualServices }}
+{{- $basename := printf "%s-%d" $fullname (add $i 1) }}
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ $basename }}-virtual-service
+  labels:
+    {{ $labels }}
+spec:
+  hosts:
+  - {{ $e.host | quote}}
+  gateways:
+  - {{ $basename }}-gateway
+  http:
+  {{- $header := $strategy.canaryHeader | default dict }}
+  {{- if $header.enabled }}
+  - name: {{ $basename }}-canary-route    
+    match:
+    - headers:
+        x-canary:
+          exact: "true"
+    {{- with $e.match }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with $e.rewrite }}
+    rewrite:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    headers:
+      request:
+        set:
+          X-Forwarded-Proto: https
+    route:
+    - destination:
+        host: {{ $fullname }}-service-canary
+        port:
+          number: {{ $e.destination.port }}
+  {{- end }}
+  - name: {{ $basename }}-route
+    {{- with $e.match }}
+    match:
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with $e.rewrite }}
+    rewrite:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    headers:
+      request:
+        set:
+          X-Forwarded-Proto: https
+    route:
+    - destination:
+        host: {{ $fullname }}-service-stable
+        port:
+          number: {{ $e.destination.port }}
+      weight: 100
+    - destination:
+        host: {{ $fullname }}-service-canary
+        port:
+          number: {{ $e.destination.port }}
+      weight: 0
+{{- end }}
+{{- end }}

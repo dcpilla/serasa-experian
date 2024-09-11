@@ -1,0 +1,80 @@
+{{- $strategy := .Values.deployment.strategy | default dict }}
+{{- $manager := "flagger" }}
+{{- if and $strategy $strategy.manager }}
+{{- $manager = $strategy.manager }}
+{{- end }}
+{{- if or (not $strategy) (not (and (eq "Canary" $strategy.type) (eq "flagger" $manager ))) }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "stateless-app.fullname" . }}-service
+  labels:
+    {{- include "stateless-app.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: {{ .Values.service.port }}-tcp
+      port: {{ .Values.service.port }}
+      protocol: TCP
+      targetPort: {{ .Values.containerPort }}
+    {{- if .Values.additionalServicePorts }}
+    {{- range .Values.additionalServicePorts }}
+    - name: {{ .port }}-tcp
+      port: {{ .port }}
+      protocol: TCP
+      targetPort: {{ .containerPort }}
+    {{- end }}
+    {{- end }}
+  selector:
+    {{- include "stateless-app.selectorLabels" . | nindent 4 }}
+{{- if (eq "argo-rollouts" $manager) }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "stateless-app.fullname" . }}-service-stable
+  labels:
+    {{- include "stateless-app.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: {{ .Values.service.port }}-tcp
+      port: {{ .Values.service.port }}
+      protocol: TCP
+      targetPort: {{ .Values.containerPort }}
+    {{- if .Values.additionalServicePorts }}
+    {{- range .Values.additionalServicePorts }}
+    - name: {{ .port }}-tcp
+      port: {{ .port }}
+      protocol: TCP
+      targetPort: {{ .containerPort }}
+    {{- end }}
+    {{- end }}
+  selector:
+    {{- include "stateless-app.selectorLabels" . | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "stateless-app.fullname" . }}-service-canary
+  labels:
+    {{- include "stateless-app.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: {{ .Values.service.port }}-tcp
+      port: {{ .Values.service.port }}
+      protocol: TCP
+      targetPort: {{ .Values.containerPort }}
+    {{- if .Values.additionalServicePorts }}
+    {{- range .Values.additionalServicePorts }}
+    - name: {{ .port }}-tcp
+      port: {{ .port }}
+      protocol: TCP
+      targetPort: {{ .containerPort }}
+    {{- end }}
+    {{- end }}
+  selector:
+    {{- include "stateless-app.selectorLabels" . | nindent 4 }}
+{{- end }}
+{{- end }}

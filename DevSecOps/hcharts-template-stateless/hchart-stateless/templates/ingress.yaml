@@ -1,0 +1,25 @@
+{{- $ingress := .Values.ingress | default dict }}
+{{- if $ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "stateless-app.fullname" . }}
+  annotations:
+    konghq.com/preserve-host: 'false'
+    kubernetes.io/ingress.class: kong
+    ingress.kubernetes.io/service-upstream: 'true'
+  labels:
+    {{- include "stateless-app.labels" . | nindent 4 }}
+spec:
+  rules:
+    - host: "{{ .Values.deployment.host }}"
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ include "stateless-app.fullname" . }}-service
+                port:
+                  number: {{ .Values.service.port }}
+{{- end }}

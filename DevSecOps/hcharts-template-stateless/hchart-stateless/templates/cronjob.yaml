@@ -1,0 +1,107 @@
+{{- $cronjob := .Values.cronJob | default dict }}
+{{- if $cronjob.schedule }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "stateless-app.fullname" . }}
+  labels:
+    {{- include "stateless-app.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.cronJob.schedule | squote }}
+  startingDeadlineSeconds: {{ .Values.cronJob.startingDeadlineSeconds }}
+  concurrencyPolicy: {{ .Values.cronJob.concurrencyPolicy }}
+  suspend: {{ .Values.cronJob.suspend }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          serviceAccountName: {{ include "stateless-app.serviceAccountName" . }}
+          {{- with .Values.podSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          containers:
+            - name: {{ .Chart.Name }}
+              {{- with .Values.securityContext }}
+              securityContext:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+              image: "{{ .Values.deployment.repository }}:{{ .Values.deployment.production.image.tag | default .Chart.AppVersion }}"
+              imagePullPolicy: {{ .Values.deployment.pullPolicy }}
+              ports:
+                - containerPort: {{ .Values.containerPort }}
+                  protocol: TCP
+                {{- if .Values.additionalContainerPorts }}
+                {{- range .Values.additionalContainerPorts }}
+                - containerPort: {{ . }}
+                  protocol: TCP
+                {{- end }}
+                {{- end }}
+              {{- with .Values.readinessProbe }}
+              readinessProbe:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+              {{- with .Values.livenessProbe }}
+              livenessProbe:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+              {{- with .Values.resources }}
+              resources:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+              env:
+                - name: GEARR_ID
+                  value: {{ .Values.app.labels.gearr | squote }}
+                - name: CLUSTER_NAME
+                  value: {{ .Values.deployment.cluster }}
+                - name: POD_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
+              envFrom:
+                {{- if .Values.secretsRefs }}
+                {{- range .Values.secretsRefs }}
+                - secretRef:
+                    name: {{ . }}
+                {{- end }}
+                {{- end }}
+                {{- if .Values.configMapsRefs }}
+                {{- range .Values.configMapsRefs }}
+                - configMapRef:
+                    name: {{ . }}
+                {{- end }}
+                {{- end }}
+                {{- if or (.Values.envFile) (.Values.envVars) }}
+                - configMapRef:
+                    name: {{ .Release.Name }}-configmap
+                {{- end }}
+              {{- with .Values.volumeMounts }}
+              volumeMounts:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+          {{- with .Values.hostAliases }}
+          hostAliases:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.volumes }}
+          volumes:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end }}

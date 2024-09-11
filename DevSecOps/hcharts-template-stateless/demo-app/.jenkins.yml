@@ -1,0 +1,55 @@
+version: 0.1.0
+global:
+  application: demo-app
+  type: rest
+  tribe: architecture
+  jdk: 11
+  package: docker
+  language: python
+  gearr: 11111
+  squad: DevSecOps PaaS
+  business_service: Other
+  assignment_group: SRE
+feature*:
+  before_build:
+    sonarqube:
+    setenv: docker
+  build:
+    mvn: clean install package -Dmaven.test.skip=true
+    docker:
+  after_build:
+    veracode: --veracode-id=1201357 --extensao=jar
+develop:
+  before_build:
+    sonarqube:
+    setenv: docker
+  build:
+    mvn: clean install package -Dmaven.test.skip=true
+    docker:
+  after_build:
+    veracode: --veracode-id=1201357 --extensao=jar
+  deploy:
+    openshift: --method=container --project=piaas-devsecops-br-stg --environment=develop
+qa:
+  before_build:
+    sonarqube:
+    setenv: docker
+  build:
+    mvn: clean install package -Dmaven.test.skip=true
+    docker:
+  after_build:
+    veracode: --veracode-id=1201357 --extensao=jar
+  deploy:
+    openshift: --method=container --project=piaas-devsecops-br-qa --environment=qa
+  notifications:
+    pullrequest:
+    changeorder: normal
+master:
+  before_build:
+    sonarqube:
+    setenv: docker
+  build:
+    mvn: clean install package -Dmaven.test.skip=true
+    docker:
+  deploy:
+    openshift: --method=container --project=piaas-devsecops-br --environment=qa

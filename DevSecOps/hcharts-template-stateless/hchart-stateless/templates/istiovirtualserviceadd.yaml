@@ -1,0 +1,39 @@
+{{- $strategy := .Values.deployment.strategy | default dict }}
+{{- $fullname := include "stateless-app.fullname" . }}
+{{- $labels := include "stateless-app.labels" . | nindent 4 }}
+{{- if or (not $strategy) (ne "Canary" $strategy.type) }}
+{{- range $i, $e := .Values.additionalVirtualServices }}
+{{- $basename := printf "%s-%d" $fullname (add $i 1) }}
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ $basename }}-virtual-service
+  labels:
+    {{ $labels }}
+spec:
+  hosts:
+  - {{ $e.host | quote}}
+  gateways:
+  - {{ $basename }}-gateway
+  http:
+  - name: {{ $basename }}-route
+    {{- with $e.match }}
+    match:
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with $e.rewrite }}
+    rewrite:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    route:
+    - destination:
+        host: {{ $fullname }}-service
+        port:
+          number: {{ $e.destination.port }}
+      headers:
+        request:
+          set:
+            X-Forwarded-Proto: https
+---
+{{- end }}
+{{- end }}

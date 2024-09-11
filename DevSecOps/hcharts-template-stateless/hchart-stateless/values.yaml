@@ -1,0 +1,348 @@
+# Default values for stateless-app
+# This is a YAML-formatted file
+# Declare variables to be passed into your templates
+
+deployment:
+  # deployment.repository -- Docker image repository
+  repository: ${aws_account_id}.dkr.ecr.${aws_region}.amazonaws.com/${app_name}
+  pullPolicy: Always
+  # deployment.cluster -- Cluster name filled by the pipeline
+  cluster: cluster-name
+  host: "*"
+  # deployment.strategy -- Deployment using RollingUpdate or Canary strategy
+  strategy:
+    type: RollingUpdate
+    # type: Canary
+    # deployment.strategy.manager -- Deployment manager. Supported managers: flagger (Default) and argo-rollouts
+    # manager: flagger
+    # === Flagger Configurations ===
+    # # deployment.strategy.analysis -- Analysis configuration
+    # analysis:
+    #   interval: 60s
+    #   threshold: 3
+    #   maxWeight: 100
+    #   stepWeight: 20
+    #   metrics:
+    #   - name: request-success-rate
+    #     interval: 60s
+    #     thresholdRange:
+    #       min: 98
+    # === End ===
+    # === Argo Rollouts Configurations ===
+    # # deployment.strategy.analysis -- Analysis configuration
+    # analysis:
+    #   # Limits the number of successful analysis runs and experiments to be stored in a history
+    #   successfulRunHistoryLimit: 5
+    #   # Limits the number of unsuccessful analysis runs and experiments to be stored in a history
+    #   # Stages for unsuccessful: "Error", "Failed", "Inconclusive"
+    #   unsuccessfulRunHistoryLimit: 5
+    # # deployment.strategy.revisionHistoryLimit -- The number of old ReplicaSets to retain
+    # revisionHistoryLimit: 3
+    # # deployment.strategy.progressDeadlineSeconds -- The maximum time in seconds in which a rollout must make progress during an update,
+    # # before it is considered to be failed
+    # progressDeadlineSeconds: 600
+    # # deployment.strategy.progressDeadlineAbort -- Abort the rollout if the progress deadline is exceeded
+    # progressDeadlineAbort: false
+    # # deployment.strategy.rollbackWindow -- The rollback window provides a way to fast track deployments to previously deployed versions
+    # rollbackWindow:
+    #   revisions: 2
+    # # deployment.strategy -- Define the deployment strategy 
+    # strategy:
+    #   # Canary update strategy
+    #   canary:
+    #     # The maximum number of pods that can be unavailable during the update
+    #     maxUnavailable: 1
+    #     # The maximum number of pods that can be scheduled above the original number of pods
+    #     maxSurge: "20%"
+    #     # Adds a delay before scaling down the previous ReplicaSet when the canary strategy is used with traffic routing
+    #     scaleDownDelaySeconds: 30
+    #     # The minimum number of pods that will be requested for each ReplicaSet when using traffic routed canary
+    #     minPodsPerReplicaSet: 1
+    #     # Limits the number of old RS that can run at one time before getting scaled down
+    #     scaleDownDelayRevisionLimit: 1
+    #     # Background analysis to run during a rollout update
+    #     analysis:
+    #       templates:
+    #           # Template name to use for the analysis
+    #         - templateName: template-name
+    #           # The template is of kind ClusterAnalysisTemplate
+    #           clusterScope: true
+    #       # Delay analysis run until step number
+    #       startingStep: 2
+    #       # Arguments to pass to the analysis template
+    #       args:
+    #         - name: variable1
+    #           value: value1
+    #         - name: namespace
+    #           value: REPLACE_BY_NAMESPACE
+    #     # Steps define sequence of steps to take during an update of the canary
+    #     steps:
+    #         # Set the canary weight to 10 
+    #       - setWeight: 10
+    #         # Pause for 1 minute
+    #       - pause: {duration: 1m}
+    #         # Run the analysis template in a specific step
+    #       - analysis:
+    #           templates:
+    #             - templateName: template-name2
+    #               clusterScope: true
+    #           args:
+    #             - name: variable2
+    #               value: value2
+    #             - name: namespace
+    #               value: REPLACE_BY_NAMESPACE
+    #       - setWeight: 20
+    #         # Infinite pause. To proceed to the next step, you must use the promote command
+    #       - pause: {}
+    #       - setWeight: 50     
+    #     # Traffic routing specifies the ingress controller or service mesh configuration to achieve advanced traffic splitting
+    #     trafficRouting:
+    #       # This is a list of routes that Argo Rollouts has the rights to manage it is currently only required for setMirrorRoute and setHeaderRoute
+    #       managedRoutes: []
+    #     # Add a delay in second before scaling down the canary pods when update
+    #     # is aborted for canary strategy with traffic routing (not applicable for basic canary)
+    #     # 0 means canary pods are not scaled down
+    #     abortScaleDownDelaySeconds: 30
+    # # deployment.strategy.enableCanaryHeader -- Canary route header for traffic routing
+    # canaryHeader:
+    #   # Enable the canary route header for traffic routing (x-canary)
+    #   enabled: "false"
+  # === End ===
+
+  production:
+    replicaCount: 1
+    image:
+      # deployment.production.image.tag -- Docker image tag. to release
+      tag: ${version}
+
+app:
+  # app.labels -- labels to apply in the resources metadata 
+  labels:
+    # app.labels.gearrid -- GearrID recovered from .jenkins.yml
+    gearr: "${gearr_id}"
+
+# imagePullSecrets -- Defines secrets to use for pulling docker images
+imagePullSecrets: []
+
+# nameOverride -- overrides the default app name created by the charts: '.Chart.Name'
+nameOverride: ""
+
+# fullnameOverride -- overrides the default full name created by the charts: ''.Release.Name'-'.Chart.Name'
+fullnameOverride: ""
+
+# envFile -- Environment file to configure the app configmap
+#envFile: env-files/${environment}.env
+
+# envVars -- Environment variables to configure the app configmap
+envVars: {}
+
+# configsRefs -- ConfigMaps previously created by your SRE that needs to be referenced in the deployment
+configMapsRefs: []
+
+# secretsRefs -- Secrets previously created by your SRE that needs to be referenced in the deployment
+secretsRefs: []
+
+#cronJob -- Specify cron configurations to run jobs
+cronJob: {}
+#  schedule: '*/10 * * * *'
+#  startingDeadlineSeconds: 60
+#  concurrencyPolicy: Forbid
+#  suspend: true
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+# containerPort -- Container port and Deployment internal port
+containerPort: 8080
+
+# additionalContainerPorts -- Used when there are multiple container ports that must be exposed
+additionalContainerPorts: []
+#  - 9090
+
+# startupProbe -- Customize the startup probe
+startupProbe: {}
+#  tcpSocket:
+#    port: 8080
+#  failureThreshold: 30
+#  periodSeconds: 10
+
+# readinessProbe -- Customize the readiness probe
+readinessProbe:
+  initialDelaySeconds: 30
+  timeoutSeconds: 60
+  tcpSocket:
+    port: 8080
+
+# livenessProbe -- Customize the liveness probe
+livenessProbe: {}
+#  initialDelaySeconds: 30
+#  timeoutSeconds: 60
+#  httpGet:
+#    path: /actuator/health
+#    port: 8080
+
+# prometheus -- Enable prometheus ServiceMonitor
+prometheus:
+  scrape: false
+  interval: 30s
+  path:	/actuator/prometheus
+  port: 8080
+
+# service -- Service configuration binded to containerPort
+service:
+  type: ClusterIP
+  port: 80
+
+# ingress -- Kong Ingress Controller configuration
+ingress:
+  enabled: false
+
+# additionalServicePorts -- Used when there are multiple ports that needs to be binded
+additionalServicePorts: []
+#  - port: 8080
+#    type: ClusterIP
+#    containerPort: 8080
+#  - port: 9090
+#    type: ClusterIP
+#    containerPort: 9090
+
+# additionalServices -- Used when there are multiple services with different ports
+additionalServices: []
+  # - name: app-name-service
+  #   spec:
+  #     ports:
+  #       - name: https
+  #         protocol: TCP
+  #         port: 443
+  #         targetPort: 8443
+  #     selector:
+  #       app: app-name
+
+# resources -- Kubernetes resources for Deployment resources
+resources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+  apiVersion: v2
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# Add entries to Pod /etc/hosts
+hostAliases: []
+  # - ip: "127.0.0.1"
+  #   hostnames: [ "foo.local" ]
+  # - ip: "192.0.0.1"
+  #   hostnames: [ "bar.local" ]
+
+# nodeSelector -- Kubernetes node selectors for Deployment resources
+nodeSelector: {}
+
+# tolerations -- Kubernetes tolerations for Deployment resources
+tolerations: []
+
+# affinity -- Kubernetes affinity resource
+affinity: {}
+
+volumes: []
+  # - name: data-maas-grafana
+  #   persistentVolumeClaim:
+  #     claimName: data-maas-grafana
+  # - name: config-maas-grafana
+  #   configMap:
+  #     name: grafana-config
+  #     defaultMode: 420
+
+volumeMounts: []
+  # - name: data-maas-grafana
+  #   mountPath: /var/lib/grafana
+  # - name: config-maas-grafana
+  #   mountPath: /etc/grafana
+
+volumeClaims: []
+  # - name: data-maas-grafana
+  #   storageClassName: gp2
+  #   storage: 1Gi
+  #   accessModes:
+  #     - ReadWriteOnce
+
+# virtualService -- Istio Virtual Service configuration
+virtualService:
+  enabled: false
+  # match -- Optional path configuration
+  # match:
+  # - uri:
+  #     exact: /productpage
+  # - uri:
+  #     prefix: /static
+
+# additionalVirtualServices -- Istio Virtual Service configuration
+additionalVirtualServices: []
+#   - host: app1.business-uat.br.experian.eeca
+#     destination:
+#       port: 8080
+#     match:
+#       - uri:
+#           exact: /productpage
+#   - host: app2.business-uat.br.experian.eeca
+#     destination:
+#       port: 9090
+#     match:
+#       - uri:
+#           prefix: /static
+
+# authorizationPolicy -- Istio Authorization Policy configuration
+authorizationPolicy:
+  enabled: false
+  # rules:
+  #   - to:
+  #       - operation:
+  #           methods: 
+  #             - "POST"
+  #           paths:
+  #             - "/v1/consultar"
+  #     when:
+  #       - key: request.auth.claims[authorities]
+  #         values:
+  #           - "ROLE_CLI-1STPARTY"
+  #       - key: request.auth.claims[authorities]
+  #         values:
+  #           - "ROLE_CLI-AUTH-BASIC"
+
+# requestAuthentication -- Istio Request Authentication configuration
+requestAuthentication:
+  enabled: false
+  # jwt:
+  #   issuer: "http://experian-dp-iam-authorization-server-service.digital-identity-services-uat.svc"
+  #   jwks: "https://experian-dp-iam-authorization-server.uat-digital.br.experian.eeca/oauth2/jwks"
+  #   payloadToHeader: "X-JWT-PAYLOAD"

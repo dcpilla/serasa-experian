@@ -1,0 +1,22 @@
+{{- $prometheus := .Values.prometheus | default dict }}
+{{- if $prometheus.scrape }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    {{- include "stateless-app.labels" . | nindent 4 }}
+    release: kube-prometheus-stack
+  name: {{ include "stateless-app.fullname" . }}
+spec:
+  endpoints:
+  - honorLabels: true
+    interval: {{ .Values.prometheus.interval }}
+    path: {{ .Values.prometheus.path }}
+    port: {{ .Values.prometheus.port | default .Values.service.port }}-tcp
+  namespaceSelector:
+    matchNames:
+    - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      {{- include "stateless-app.selectorLabels" . | nindent 6 }}
+{{- end }}

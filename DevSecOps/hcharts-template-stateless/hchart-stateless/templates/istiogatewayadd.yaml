@@ -1,0 +1,39 @@
+{{- $strategy := .Values.deployment.strategy | default dict }}
+{{- $manager := "flagger" }}
+{{- if and $strategy $strategy.manager }}
+{{- $manager = $strategy.manager }}
+{{- end }}
+{{- $fullname := include "stateless-app.fullname" . }}
+{{- $labels := include "stateless-app.labels" . | nindent 4 }}
+{{- if .Values.additionalVirtualServices }}
+{{- if or (not $strategy) (not (and (eq "Canary" $strategy.type) (eq "flagger" $manager ))) }}
+{{- range $i, $e := .Values.additionalVirtualServices }}
+{{- $basename := printf "%s-%d" $fullname (add $i 1) }}
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: {{ $basename }}-gateway
+  labels:
+    {{ $labels }}
+spec:
+  selector:
+    istio: ingress
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    tls:
+      httpsRedirect: true
+    hosts:
+    - {{ $e.host | quote}}
+  - port:
+      number: 8080
+      name: https
+      protocol: HTTP
+    hosts:
+    - {{ $e.host | quote}}
+---
+{{- end }}
+{{- end }}
+{{- end }}

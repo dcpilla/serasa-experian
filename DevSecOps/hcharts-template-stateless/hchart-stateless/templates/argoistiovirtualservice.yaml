@@ -1,0 +1,80 @@
+{{- $vsvc := .Values.virtualService | default dict }}
+{{- $strategy := .Values.deployment.strategy | default dict }}
+{{- $manager := "flagger" }}
+{{- if and $strategy $strategy.manager }}
+{{- $manager = $strategy.manager }}
+{{- end }}
+{{- if and (eq "Canary" $strategy.type) (eq "argo-rollouts" $manager) }}
+{{- if $vsvc.enabled }}
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ include "stateless-app.fullname" . }}-virtual-service
+  labels:
+    {{- include "stateless-app.labels" . | nindent 4 }}
+spec:
+  hosts:
+  - "{{ .Values.deployment.host }}"
+  - "{{ include "stateless-app.fullname" . }}-service.{{ .Release.Namespace }}.svc.cluster.local"
+  gateways:
+  - {{ include "stateless-app.fullname" . }}-gateway
+  - mesh
+  http:
+  {{- $header := $strategy.canaryHeader | default dict }}
+  {{- if $header.enabled }}
+  - name: {{ include "stateless-app.fullname" . }}-canary-route
+    match:
+    - headers:
+        x-canary:
+          exact: "true"
+    {{- with .Values.virtualService.match }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .Values.virtualService.rewrite }}
+    rewrite:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    headers:
+      request:
+        set:
+          X-Forwarded-Proto: https
+    route:
+    - destination:
+        host: {{ include "stateless-app.fullname" . }}-service-canary
+        port:
+          number: {{ .Values.service.port }}
+    {{- with .Values.virtualService.corsPolicy }}
+    corsPolicy:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+  {{- end }}
+  - name: {{ include "stateless-app.fullname" . }}-route
+    {{- with .Values.virtualService.match }}
+    match:
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .Values.virtualService.rewrite }}
+    rewrite:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    headers:
+      request:
+        set:
+          X-Forwarded-Proto: https
+    route:
+    - destination:
+        host: {{ include "stateless-app.fullname" . }}-service-stable
+        port:
+          number: {{ .Values.service.port }}
+      weight: 100
+    - destination:
+        host: {{ include "stateless-app.fullname" . }}-service-canary
+        port:
+          number: {{ .Values.service.port }}
+      weight: 0  
+    {{- with .Values.virtualService.corsPolicy }}
+    corsPolicy:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+{{- end }}
+{{- end }}
