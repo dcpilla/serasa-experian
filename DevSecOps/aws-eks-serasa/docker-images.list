@@ -3,11 +3,13 @@ istio/pilot:1.20.6
 istio/pilot:1.20.7
 istio/pilot:1.21.2
 istio/pilot:1.21.3
+istio/pilot:1.21.4
 istio/proxyv2:1.18.7
 istio/proxyv2:1.20.6
 istio/proxyv2:1.20.7
 istio/proxyv2:1.21.2
 istio/proxyv2:1.21.3
+istio/proxyv2:1.21.4
 jaegertracing/all-in-one:1.35
 jaegertracing/jaeger-collector:1.35
 jaegertracing/jaeger-query:1.35
@@ -23,7 +25,9 @@ grafana/loki:2.6.1
 grafana/promtail:2.9.3
 velero/velero:v1.13.0
 velero/velero:v1.13.2
+velero/velero:v1.14.0
 velero/velero-plugin-for-aws:v1.6.1
 bitnami/kubectl:latest
 bitnami/kubectl:1.29
+bitnami/kubectl:1.30
 provectuslabs/kafka-ui:latest
