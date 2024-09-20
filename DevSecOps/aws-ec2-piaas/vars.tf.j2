@@ -1,0 +1,99 @@
+#####Tags####
+variable "env" {
+  description = "Tag Envirolment"
+  default = "{{ env }}"
+}
+variable "bu"{
+  description = "Tag BU"
+  default = "{{ tribe }}"
+}
+variable "namespace" {
+  type        = string
+  description = "Namespace (e.g. `eg` or `cp`)"
+  default     = "{{ tribe }}"
+}
+variable "stage" {
+  type        = string
+  description = "Stage (e.g. `prod`, `dev`, `staging`, `infra`)"
+  default     = "{{ env }}"
+}
+variable "name" {
+  type        = string
+  description = "Name  (e.g. `app` or `cluster`)"
+  default      = "{{ prefix_stack_hostname }}{{ app_name }}{{ prefix_stack_name }}{{ env }}"
+}
+####Account Variable######
+variable "aws_account_id" {
+  description = "AWS Id Account"
+  default = "{{ aws_account_id }}"
+}
+variable "region" {
+  description = "Region that will be used in AWS"
+  default = "{{ aws_region }}"
+}
+variable "access" { 
+  default = "{{ aws_key_id }}"
+  description = "access key aws account"
+}
+variable "secret" { 
+  default = "{{ aws_access_key }}"
+  description = "access key aws account"
+}
+variable "vpc_id" {
+  description = "Region that we're gonna use to create EC2"
+  default = "{{ vpi_id }}"
+}
+variable "aws_region" {
+  default = "{{ aws_region }}"
+}
+variable "zone_id" {
+  default = ""
+}
+variable "ec2_kms_key_id" {
+  description = "kMS Encrypt Key ARN"
+  default = "arn:aws:kms:{{ aws_region }}:{{ aws_account_id }}:key/{{ kms_id }}"
+}
+variable "ami_id" {
+  description = "Serasa IAM"
+  default = "{{ ami_id }}"
+}
+variable "subnet_private_a" {
+  default = "{{ subnet.a }}"
+}
+
+variable "subnet_private_b" {
+  default = "{{ subnet.b }}"
+}
+###jenkins###
+variable "jenkins_ec2_name" {
+  description = "ec2 or Servername"
+  default      = "{{ prefix_stack_hostname }}{{ app_name }}{{ prefix_stack_name }}{{ env }}"
+}
+variable "jenkins_instance_count" {
+  description = "Number of Instances"
+  default = "@@JENKINS_INSTANCE_COUNT@@"
+}
+
+variable "jenkins_role_names"{
+  description = "Policies used on IAM Role creation"
+  type        = list(string)
+  default     = ["AmazonS3ReadOnlyAccess", "IAMReadOnlyAccess", "AmazonEC2ReadOnlyAccess"] 
+}
+
+variable "jenkins_instance_type" {
+  description = "Instance Types or Instance Size"
+  default = "@@JENKINS_INSTANCE_TYPE@@"
+}
+variable "jenkins_root_volume_size" {
+  description = "Root volume size in GB"
+  default = "50"
+}
+
+variable "jenkins_ebs_volume_size" {
+  description = "EBS volume size in GB"
+  default = "@@JENKINS_INSTANCE_VOLUME_APP_SIZE@@"
+}
+###Universal###
+variable "ip_sg_list_ec2" {
+  default = ["10.0.0.0/8"]
+}

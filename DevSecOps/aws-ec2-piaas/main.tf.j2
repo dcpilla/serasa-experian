@@ -1,0 +1,130 @@
+provider "aws" {
+  access_key = "${var.access}"
+  secret_key = "${var.secret}"
+  region = "${var.region}"
+  profile = "default"
+
+}
+terraform {
+ backend "s3" {
+ encrypt = true
+ bucket = "secdevops-terraform-prd-tfstates"
+ region = "sa-east-1"
+ key = "jenkins/@@OM@@.tfstate"
+ access_key = "{{ s3_terraform_bucket_key_id_prd }}"
+ secret_key = "{{ s3_terraform_bucket_access_key_prd }}"
+ }
+}
+
+
+######jenkins#####
+###IAM ROLES####
+module "aws_jenkins_iam_role" {
+  source                  = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/iam/role"
+  name                    = "BURoleFor${var.jenkins_ec2_name}"
+  aws_account_id          = "${var.aws_account_id}"
+  path_role               = "${data.template_file.jenkins_role.rendered}"
+  policy_names            = "${var.jenkins_role_names}"
+}
+
+##data.json###
+data "template_file" "jenkins_role" {
+  template = "${file("./role_jenkins.json")}"
+}
+data "template_file" "userdata" {
+  template = "${file("userdata/install_wizard.sh")}"
+}
+###EC2
+####SG####
+
+module "aws_jenkins_security_group_ec2" {
+
+  source  = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/security_group/create_sg"
+  sg_name = "${var.jenkins_ec2_name}-sg"
+  vpc_id  = var.vpc_id
+
+}
+####SGRULES####
+module "jenkins_sg_rule_22" {
+
+  source            = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/security_group/create_sg_rule"
+  port              = 22
+  protocol          = "TCP"
+  ips_sg_list       = var.ip_sg_list_ec2
+  security_group_id = module.aws_jenkins_security_group_ec2.id
+
+}
+
+module "jenkins_sg_rule_80" {
+
+  source            = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/security_group/create_sg_rule"
+  port              = 80
+  protocol          = "TCP"
+  ips_sg_list       = var.ip_sg_list_ec2
+  security_group_id = module.aws_jenkins_security_group_ec2.id
+
+}
+module "jenkins_sg_rule_8080" {
+
+  source            = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/security_group/create_sg_rule"
+  port              = 8080
+  protocol          = "TCP"
+  ips_sg_list       = var.ip_sg_list_ec2
+  security_group_id = module.aws_jenkins_security_group_ec2.id
+
+}
+module "jenkins_sg_rule_443" {
+
+  source            = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/security_group/create_sg_rule"
+  port              = 443
+  protocol          = "TCP"
+  ips_sg_list       = var.ip_sg_list_ec2
+  security_group_id = module.aws_jenkins_security_group_ec2.id
+
+}
+
+
+####ec2 Instance####
+
+module "jenkins_ec2_instance" {
+  source                      = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/ec2"        
+  instance_count              = var.jenkins_instance_count
+  name                        = var.jenkins_ec2_name
+  ami                         = var.ami_id
+  instance_type               = var.jenkins_instance_type 
+  subnet_ids                  = ["${var.subnet_private_a}", "${var.subnet_private_b}"]
+  vpc_security_group_ids      = [module.aws_jenkins_security_group_ec2.id]
+  associate_public_ip_address = false
+  iam_instance_profile        = "BURoleFor${var.jenkins_ec2_name}"
+  user_data                   = "${data.template_file.userdata.rendered}"
+
+  root_block_device           = [
+    {
+      volume_type             = "gp2"
+      volume_size             = var.jenkins_root_volume_size
+      encrypted               = true
+      kms_key_id              = var.ec2_kms_key_id
+    },
+  ]
+
+  ebs_block_device = [
+    {
+      device_name             = "/dev/sdf"
+      volume_type             = "gp2"
+      volume_size             = var.jenkins_ebs_volume_size
+      encrypted               = true
+      kms_key_id              = var.ec2_kms_key_id
+    }
+  ]
+
+  tags = {
+    "Env"                     = var.jenkins_ec2_name
+    "Location"                = var.env
+    "BU"                      = var.bu
+    ### Nao Alterar ### Inicio
+    "servers"                 = "jenkins"
+    ### Nao Alterar ### FIM
+  }
+} 
+
+

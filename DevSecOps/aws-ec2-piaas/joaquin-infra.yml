@@ -1,0 +1,105 @@
+itil: 
+  request: false
+  changeorder: false
+definition: Este job cria Um PIAAS em uma Infra estrutura AWS
+global:
+  aws_account_id:
+    type: text 
+    pattern : ~/\w{4}/
+    description : Qual o Id da conta AWS
+    required: true
+    answer: null
+  aws_key_id:
+    type: password 
+    pattern: ~/\w{4}/
+    description: Define o aws key ID da conta
+    required: true
+    answer: null
+  aws_access_key:
+    type: password 
+    pattern: ~/\w{4}/
+    description: Define o aws key Password da conta
+    required: true
+    answer: null
+  ssh_username: 
+    type: text 
+    pattern: ~/\w{4}/
+    description: Nome do usuario das Instancias
+    required: true
+    answer: null
+  ssh_username_key: 
+    type: password
+    description: Define o ssh_key da conta
+    required: true
+    answer: null
+  stack_name:
+    type: text 
+    pattern: ~/\w{4}/
+    description: Nome da Stack
+    required: true
+    answer: null
+  prefix_hostname:
+    type: text 
+    pattern: ~/\w{4}/
+    description: prefixo do hostname, o Padrão é spobr
+    required: true
+    answer: null
+  app_vhost_address:
+    type: text 
+    pattern: ~/\w{4}/
+    description: Vhost (DNS FULL FQDN)
+    required: true
+    answer: null
+  ssl:
+    type: options 
+    options: true;false
+    description: Branch
+    required: false
+    answer: null
+  jenkins_admin_username: 
+    type: text 
+    pattern: ~/\w{4}/
+    description: Nome user admin Jenkins
+    required: true
+    answer: null
+  jenkins_admin_password: 
+    type: password
+    description: Define o Password do user Jenkins admin
+    required: true
+    answer: null
+  jenkins_instance_type:
+    type: options 
+    options: t3.medium;t3.micro
+    description: Tamanho da Instancia
+    required: false
+    answer: null
+  jenkins_instance_count:
+    type: options 
+    options: 1;2;3;4;5;6
+    description: Quantidades de Instancias
+    required: false
+    answer: null
+  jenkins_instance_volume_app_size:
+    type: options 
+    options: 50;100;200
+    description: Tamanho Filesystem PIAAS
+    required: false
+    answer: null
+  git_repository_core:
+    type: options 
+    options: https://bitbucketglobal.experian.local/scm/edvp/core-community.git
+    description: Repositorio Git a ser clonado do Core
+    required: false
+    answer: null
+  git_branch_core:
+    type: options 
+    options: master;dev
+    description: Branch
+    required: false
+    answer: null
+  
+before_plan:
+  - replace ans-shared-vars/lnx-credentials-env.yml,ans-shared-vars/lnx-user-env.yml,main.tf.j2,vars.tf.j2,playbook-01.yml,playbook-02.yml,ans-shared-roles/user/files/public_keys/jenkins_id_rsa.pub,ans-shared-vars/lnx-jenkins-std-app.yml
+plan:
+  - infra vars
+  - infra up
