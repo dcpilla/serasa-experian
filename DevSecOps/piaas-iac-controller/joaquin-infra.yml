@@ -1,0 +1,47 @@
+---
+# Documentação do Desenvolvedor JoaquinX: https://code.experian.local/projects/SCIB/repos/joaquin-x/browse/doc/user_guide_developer.md
+running_in: aws
+itil: 
+  request: false
+  changeorder: false
+definition: Automação responsável por instrumentar a infraestrutura do PiaaS Controller como código
+team_owner: DevSecOps PaaS Brazil
+manual_time: 240
+notification:
+  onfailure:
+    email:
+      recipients: devsecops-paas-brazil@br.experian.com
+      subject: 'JoaquinX falha automacao - piaas-iac-controller '
+  disable_in_qa: true
+global:
+  aws_account_id:
+    type: text 
+    pattern: ^(\d{1,12}|\d{1,12})$
+    description : Qual o ID da conta AWS?
+    required: true
+    answer: null
+    validationEndpoint: '/catalog-jenkins/v1/validate/aws_account'
+  ami_id:
+    type: text
+    description : Informe a AMI ID do PiaaS Controller a ser utilizada
+    required: true
+    answer: null
+  instance_type:
+    type: options 
+    description : Informe o type da instancia a ser utilizada pelo PiaaS Controller
+    options: m5.large
+    required: true
+    answer: null
+  user_integracao_ldap:
+    type: cyberark
+    description : Cyberark integration
+    required: false
+    safe: BR_PAPP_EITS_DSECOPS_STATIC
+    account: ldap-search
+    answer: static
+before_plan:
+  - replace vars.tf.j2,main.tf.j2,backend.tf,provider.tf,ldapCheck.sh,playbook-01.yml
+plan:
+  - ./ldapCheck.sh
+  - infra vars
+  - infra upt

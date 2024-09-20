@@ -1,0 +1,194 @@
+####IAM####
+
+module "aws_iam_role"  {
+  source                  = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/iam/role"
+  name                    = "BURoleForPiaasController"
+  aws_account_id          = "${var.aws_account_id}"
+  policy_names            = "${var.role_names}"
+  path_role               = "${data.template_file.assumerole.rendered}"
+}
+
+data "template_file" "piaas_iac_policy_json" {
+  template = "${file("templates/policies.json")}"
+}
+
+data "template_file" "assumerole" {
+  template = "${file("templates/assumerole_policy.json")}"
+}
+
+resource "aws_iam_role_policy" "piaas_iac_policy" {
+  name   = "BUPolicyForPiaaS"
+  role   = module.aws_iam_role.name
+  policy = data.template_file.piaas_iac_policy_json.rendered
+}
+
+####ALB SG######
+
+module "aws_security_group_alb" {
+
+  source  = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/security_group/create_sg"
+  sg_name = "${var.name}asg-sg"
+  vpc_id  = var.vpc_id
+  tags = {
+    "Environment"                 = var.env
+    "AppID"                       = var.appid
+    "CostString"                  = var.env == "prd" ? "1800.BQ.134.607500" : "1800.BR.134.603012"
+  }
+}
+
+module "sg_rule_443_alb" {
+
+  source            = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/security_group/create_sg_rule"
+  port              = 443
+  protocol          = "TCP"
+  ips_sg_list       = var.ip_sg_list
+  security_group_id = module.aws_security_group_alb.id
+
+}
+
+module "sg_rule_443_alb_eks" {
+
+  source            = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/security_group/create_sg_rule"
+  port              = 443
+  protocol          = "TCP"
+  ips_sg_list       = var.eks_pods_cidr
+  security_group_id = module.aws_security_group_alb.id
+
+}
+
+####Instance SG######
+
+module "aws_security_group_instance" {
+
+  source  = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/security_group/create_sg"
+  sg_name = "${var.name}instance-sg"
+  vpc_id  = var.vpc_id
+  tags = {
+    "Environment"                 = var.env
+    "AppID"                       = var.appid
+    "CostString"                  = var.env == "prd" ? "1800.BQ.134.607500" : "1800.BR.134.603012"
+  }
+}
+
+module "sg_rule_22_instance" {
+
+  source            = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/security_group/create_sg_rule"
+  port              = 22
+  protocol          = "TCP"
+  ips_sg_list       = var.ip_sg_list
+  security_group_id = module.aws_security_group_instance.id
+
+}
+
+module "sg_rule_8080_instance" {
+
+  source            = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/security_group/create_sg_rule"
+  port              = 8080
+  protocol          = "TCP"
+  ips_sg_list       = var.ip_sg_list
+  security_group_id = module.aws_security_group_instance.id
+
+}
+
+module "sg_rule_10050_instance" {
+
+  source            = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/security_group/create_sg_rule"
+  port              = 10050
+  protocol          = "TCP"
+  ips_sg_list       = var.egoc_zabbix_cidr
+  security_group_id = module.aws_security_group_instance.id
+
+}
+
+module "sg_rule_10051_instance" {
+
+  source            = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/security_group/create_sg_rule"
+  port              = 10051
+  protocol          = "TCP"
+  ips_sg_list       = var.egoc_zabbix_cidr
+  security_group_id = module.aws_security_group_instance.id
+
+}
+
+####ALB######
+
+module "alb_piaas_controller" {
+
+  source             = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/alb/aws_lb"
+  name               = "${var.name}alb"
+  load_balancer_type = "application"
+  subnets            = [var.subnet_private_a, var.subnet_private_b]
+  security_groups    = [module.aws_security_group_alb.id]
+
+}
+
+module "alb_targetgroup_piaas_controller" {
+
+  source             = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/alb/aws_lb_target_group"
+  name               = "${var.name}tg-8080" 
+  port               = 8080
+  protocol           = "HTTP" 
+  vpc_id             = var.vpc_id
+  path               = "login"
+
+}
+
+module "alb_listener_piaas_controller" {
+
+  source             = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/alb/aws_lb_listener"
+  load_balancer_arn  = module.alb_piaas_controller.arn
+  port               = 443
+  protocol           = "HTTPS"
+  certificate_arn    = var.env == "prd" ? "arn:aws:acm:sa-east-1:707064604759:certificate/3668745b-9a21-4ba5-85f2-960870c84d47" : "arn:aws:acm:sa-east-1:559037194348:certificate/43da5954-69fc-417e-9dbf-ed4a3eba6e30"
+  target_group_arn   = module.alb_targetgroup_piaas_controller.arn
+  type               = "forward"
+
+}
+
+####Launch Template######
+
+module "launch_template_piaas_controller" {
+  source        = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/launch_template"
+  name_prefix   = "${var.name}lt"
+  image_id      = var.ami_id
+  instance_type = var.instance_type
+  key_name      = "jenkinspair"
+  iam_role_name = module.aws_iam_role.name 
+
+  security_groups             = [module.aws_security_group_instance.id]
+
+  tags = {
+    "Environment"                 = var.env
+    "AppID"                       = var.appid
+    "CostString"                  = var.env == "prd" ? "1800.BQ.134.607500" : "1800.BR.134.603012"
+    "ResourceName"				  = "spobrpiaasctrl${var.env}01"
+    "Name"				          = "spobrpiaasctrl${var.env}01"
+    "adDomain"					  = "br.experian.local"
+    "CentrifyUnixRole"			  = "UNXR-ADM_SRE_DEVPAAS_servers"
+  }
+}
+
+####ASG######
+
+module "asg_piaas_controller" {
+  source                 = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/asg"
+  name                   = "${var.name}asg" 
+  max_size               = 1
+  min_size               = 1
+  desired_capacity       = 1
+  vpc_zone_identifier    = [var.subnet_private_a, var.subnet_private_b]
+  lb_target_group_arn    = module.alb_targetgroup_piaas_controller.arn
+  lt_id      = module.launch_template_piaas_controller.id
+  lt_version = module.launch_template_piaas_controller.latest_version
+
+}
+
+####Route 53######
+
+module "route_53_record_piaas" {
+  source                 = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/route_53"
+  zone_id_53             = var.env == "prd" ? "Z01052202REPKT6P1UVAQ" : "Z073966028SCK22OAMSCH"
+  record_name            = var.env == "prd" ? "piaas.devsecops-paas-prd.br.experian.eeca" : "piaas.sandbox-devsecops-paas.br.experian.eeca"
+  alb_dns                = module.alb_piaas_controller.dns
+  zone_id_alb            = module.alb_piaas_controller.zone_id
+}

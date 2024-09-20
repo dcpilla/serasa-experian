@@ -1,0 +1,82 @@
+####Account variables######
+variable "aws_account_id" {
+  description = "AWS Id Account"
+  default = "{{ aws_account_id }}"
+}
+variable "region" {
+  description = "Region that will be used in AWS"
+  default = "{{ aws_region }}"
+}
+
+variable "assume_role_arn" {
+  description = "Assume Role ARN"
+  default = "arn:aws:iam::{{ aws_account_id }}:role/BURoleForDevSecOpsCockpitService"
+}
+
+variable "env" {
+  type        = string
+  description = "Environment of PiaaS Controller"
+  default     = "{{ env }}"
+}
+
+variable "vpc_id" {
+  description = "VPC used in ASG creation"
+  default = "{{ vpi_id }}"
+}
+
+variable "subnet_private_a" {
+  description = "Subnet used in ASG and LB"
+  default = "{{ subnet.a }}"
+}
+
+variable "subnet_private_b" {
+  description = "Subnet used in ASG and LB"
+  default = "{{ subnet.b }}"
+}
+
+variable "role_names"{
+  description = "Policies used on IAM Role creation"
+  type        = list(string)
+  default     = ["AmazonS3ReadOnlyAccess", "IAMReadOnlyAccess"] 
+}
+
+####SG variables####
+
+variable "ip_sg_list" {
+  description = "CIDR blocks enable in sg rule"
+  default = ["10.0.0.0/9"]
+}
+
+variable "egoc_zabbix_cidr" {
+  description = "EGOC's Zabbix CIDR"
+  default = ["10.99.188.192/26"]
+}
+
+variable "eks_pods_cidr" {
+  description = "EGOC's Zabbix CIDR"
+  default = ["100.64.0.0/16"]
+}
+
+####Launch Template variables####
+
+variable "ami_id" {
+  description = "AMI ID to use in Launch Template" 
+  default = "@@AMI_ID@@" 
+} 
+
+variable "instance_type" {
+  description = "Instance type to use in Launch Template" 
+  default = "@@INSTANCE_TYPE@@" 
+} 
+
+####PiaaS variables####
+
+variable "appid" {
+  description = "Serasa Gearr ID"
+  default = "16979"
+}
+
+variable "name" {
+  description = "PiaaS name"
+  default = "piaas-controller-"
+}
