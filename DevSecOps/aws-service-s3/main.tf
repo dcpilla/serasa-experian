@@ -24,7 +24,6 @@ module "s3_bucket" {
     version                      = 4.2.1
     enabled                      = true
     region                       = var.region
-    namespace                    = var.namespace
     stage                        = var.stage
     name                         = var.name
     acl                          = var.acl
