@@ -1,8 +1,8 @@
 provider "aws" {
-  access_key = "${var.access}"
-  secret_key = "${var.secret}"
+#  access_key = "${var.access}"
+#  secret_key = "${var.secret}"
   region = "${var.region}"
-  profile = "default"
+#  profile = "default"
 
 }
 #terraform {
