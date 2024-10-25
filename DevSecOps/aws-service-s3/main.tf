@@ -5,21 +5,21 @@ provider "aws" {
   profile = "default"
 
 }
-{# terraform {
- backend "s3" {
- encrypt = true
- bucket = "secdevops-terraform-prd-tfstates"
- region = "sa-east-1"
- key = "jenkins/@@OM@@.tfstate"
- access_key = "{{ s3_terraform_bucket_key_id_prd }}"
- secret_key = "{{ s3_terraform_bucket_access_key_prd }}"
- }
-} #}
+#terraform {
+# backend "s3" {
+# encrypt = true
+# bucket = "secdevops-terraform-prd-tfstates"
+# region = "sa-east-1"
+# key = "jenkins/@@OM@@.tfstate"
+# access_key = "{{ s3_terraform_bucket_key_id_prd }}"
+# secret_key = "{{ s3_terraform_bucket_access_key_prd }}"
+# }
+#} #}
 
 
 
 module "s3_bucket" {
-{#     source                      = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/s3/s3_bucket_complete/" #}
+#     source                      = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/s3/s3_bucket_complete/"
     source                       = terraform-aws-modules/s3-bucket/aws
     version                      = 4.2.1
     enabled                      = true
