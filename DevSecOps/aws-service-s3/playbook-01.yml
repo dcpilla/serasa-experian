@@ -1,16 +1,18 @@
-##NAO ALTERAR!!!!!!######
-#Role for ALL
-- hosts: spobrcatalog
-  become: true
-  environment: "{{ proxy_env }}"
-  vars_files:
-    - ans-shared-vars/aws-@@AWS_ACCOUNT_ID@@-env.yml
-    - ans-shared-vars/lnx-credentials-env.yml
-    - ans-shared-vars/pwd-credentials.yml
-    - ans-shared-vars/lnx-proxy-env.yml
-    #####
-##FIM NAO ALTERAR!!!!!!######
-  roles:
-    - aws-replace
+---
+- hosts: localhost
+  gather_facts: no
 
-     
+  vars:
+    project_dir: "serasa-experian/DevSecOps/aws-service-s3" # folder that contains main.tf, ...
+
+  tasks:
+    - name: Run terraform
+      community.general.terraform:
+        project_path: '{{ project_dir }}'
+        state: present
+        variables: 
+          
+      register: output
+
+    - debug:
+        var: output
