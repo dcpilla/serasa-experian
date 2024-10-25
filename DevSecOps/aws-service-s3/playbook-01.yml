@@ -4,7 +4,7 @@
   gather_facts: no
 
   vars:
-    project_dir: "DevSecOps/aws-service-s3" # folder that contains main.tf, ...
+    project_dir: "/var/lib/awx/projects/_8__bucket_s3/DevSecOps/aws-service-s3" # folder that contains main.tf, ...
 
   tasks:
     - name: Run terraform
