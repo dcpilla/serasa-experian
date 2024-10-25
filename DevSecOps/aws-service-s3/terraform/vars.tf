@@ -20,7 +20,7 @@ variable "stage" {
 variable "name" {
   type        = string
   description = "Name  (e.g. `app` or `cluster`)"
-  default      = "{{ prefix_stack_hostname }}s3{{ prefix_stack_name }}{{ env }}"
+#  default      = "{{ prefix_stack_hostname }}s3{{ prefix_stack_name }}{{ env }}"
 }
 ####Account Variable######
 variable "aws_account_id" {
