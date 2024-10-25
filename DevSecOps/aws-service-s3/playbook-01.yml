@@ -3,7 +3,7 @@
   gather_facts: no
 
   vars:
-    project_dir: "/serasa-experian/DevSecOps/aws-service-s3" # folder that contains main.tf, ...
+    project_dir: "DevSecOps/aws-service-s3" # folder that contains main.tf, ...
 
   tasks:
     - name: Run terraform
