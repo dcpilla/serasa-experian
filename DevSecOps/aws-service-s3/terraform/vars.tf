@@ -28,9 +28,3 @@ variable "aws_region" {
   default = "{{ aws_region }}"
 }
 
-
-variable "force_destroy" {
-  type        = bool
-  description = "A boolean string that indicates all objects should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable"
-#  default     = "@@FORCE_DESTROY@@"
-}
