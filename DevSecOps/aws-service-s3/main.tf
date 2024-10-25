@@ -21,14 +21,8 @@ provider "aws" {
 module "s3_bucket" {
 #     source                      = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/s3/s3_bucket_complete/"
     source                       = "terraform-aws-modules/s3-bucket/aws"
-    version                      = 4.2.1
     enabled                      = true
     region                       = var.region
     stage                        = var.stage
     name                         = var.name
-    acl                          = var.acl
-    force_destroy                = var.force_destroy
-    versioning_enabled           = var.versioning_enabled
-    allow_encrypted_uploads_only = var.allow_encrypted_uploads_only
-    allowed_bucket_actions       = var.allowed_bucket_actions
 }
