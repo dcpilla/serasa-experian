@@ -13,7 +13,7 @@
         project_path: '{{ project_dir }}'
         state: present
         variables: 
-          name: "{{ s3_name }}}"
+          name: "{{ s3_name }}"
           region: "{{ aws_region }}"
           stage: "{{ aws_env }}"
           
