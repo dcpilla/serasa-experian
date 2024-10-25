@@ -20,7 +20,7 @@ provider "aws" {
 
 module "s3_bucket" {
 #     source                      = "git::https://code.experian.local/scm/scib/terraform-resources.git//aws/s3/s3_bucket_complete/"
-    source                       = terraform-aws-modules/s3-bucket/aws
+    source                       = "terraform-aws-modules/s3-bucket/aws"
     version                      = 4.2.1
     enabled                      = true
     region                       = var.region
