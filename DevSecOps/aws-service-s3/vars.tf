@@ -49,19 +49,19 @@ variable "zone_id" {
 variable "acl" {
   type        = string
   description = "The canned ACL to apply. We recommend `private` to avoid exposing sensitive information"
-  default     = "@@ACL@@"
+#  default     = "@@ACL@@"
 }
 
 variable "force_destroy" {
   type        = bool
   description = "A boolean string that indicates all objects should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable"
-  default     = "@@FORCE_DESTROY@@"
+#  default     = "@@FORCE_DESTROY@@"
 }
 
 variable "versioning_enabled" {
   type        = bool
   description = "A state of versioning. Versioning is a means of keeping multiple variants of an object in the same bucket"
-  default     = "@@VERSIONING_ENABLED@@"
+#  default     = "@@VERSIONING_ENABLED@@"
 }
 
 variable "allowed_bucket_actions" {
@@ -73,5 +73,5 @@ variable "allowed_bucket_actions" {
 variable "allow_encrypted_uploads_only" {
   type        = bool
   description = "Set to `true` to prevent uploads of unencrypted objects to S3 bucket"
-  default     = "@@ENCRYPTED_ONLY@@"
+#  default     = "@@ENCRYPTED_ONLY@@"
 }
