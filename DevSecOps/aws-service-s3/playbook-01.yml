@@ -13,6 +13,7 @@
         variables: 
           name: "{{ s3_name }}}"
           region: "{{ aws_region }}"
+          stage: "{{ aws_env }}"
           
       register: output
 
