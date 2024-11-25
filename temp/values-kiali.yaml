@@ -1,0 +1,36 @@
+additional_display_details:
+  - title: "API Documentation"
+    annotation: "kiali.io/api-spec"
+    icon_annotation: "kiali.io/api-type"
+
+auth:
+  strategy: "anonymous"
+
+external_services:
+  istio:
+    component_status: 
+      enabled: false
+
+  grafana: 
+    enabled: true
+    internal_cluster: "http://kube-prometheus-stack-grafana.monitoring-system.svc"
+    auth:
+      type: "basic"
+      username: "admin"
+      password: "admin"
+    dashboards:
+      - name: "Istio Service Dashboard"
+        variables: 
+          service: "service"
+      - name: "Istio Workload Dashboard"
+        variables: 
+          namespace: "namespace"
+          workload: "workload"
+      - name: "Istio Mesh Dashboard" 
+      - name: "Istio Control Plane Dashboard" 
+      - name: "Istio Performance Dashboard" 
+      - name: "Istio Wasm Extension Dashboard"
+
+  prometheus: 
+    url:  "http://kube-prometheus-stack-prometheus.monitoring-system.svc:9090"
+    

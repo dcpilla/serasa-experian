@@ -1,0 +1,26 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kiali-namespace-authorization
+rules:
+- apiGroups: [""]
+  resources:
+  - namespaces
+  - pods/log
+  verbs:
+  - get
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: authorize-ns-foobar-to-john
+  namespace: foobar
+subjects:
+- kind: User
+  name: john
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: kiali-namespace-authorization # The name of the ClusterRole created previously
+  apiGroup: rbac.authorization.k8s.io

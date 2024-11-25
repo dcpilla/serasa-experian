@@ -1,0 +1,124 @@
+
+## values_kube_prometheus
+## Alertmanager
+alertmanager:
+  alertmanagerSpec:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+    # nodeSelector:
+    #   Worker: infra
+    # tolerations:
+    #   - key: dedicated
+    #     operator: Equal
+    #     value: infra
+    #     effect: NoSchedule
+
+## Grafana
+grafana:
+  # image:
+  #   registry: "docker.io/grafana/grafana:11.2.2-security-01"
+  adminPassword: "admin"
+  initChownData:
+    enabled: false
+  # persistence:
+  #   enabled: true
+  #   storageClassName: local-path
+  # additionalDataSources:
+  #   - name: Loki
+  #     type: loki
+  #     url: http://loki-stack:3100/
+  # nodeSelector:
+  #   Worker: infra
+  # tolerations:
+  #   - key: dedicated
+  #     operator: Equal
+  #     value: infra
+  #     effect: NoSchedule
+
+ ## PrometheusOperator
+#  prometheusOperator:
+#    enabled: true
+  # resources:
+  #   requests:
+  #     cpu: 100m
+  #     memory: 256Mi
+  # admissionWebhooks:
+  #   patch:
+  #     nodeSelector:
+  #       Worker: infra
+  #     tolerations:
+  #       - key: dedicated
+  #         operator: Equal
+  #         value: infra
+  #         effect: NoSchedule
+  # nodeSelector:
+  #   Worker: infra
+  # tolerations:
+  #   - key: dedicated
+  #     operator: Equal
+  #     value: infra
+  #     effect: NoSchedule
+
+## Prometheus
+prometheus:
+  prometheusSpec:
+    scrapeInterval: 30s
+    evaluationInterval: 30s
+    query:
+      maxConcurrency: 10
+      maxSamples: 150000
+      timeout: 5m
+    resources:
+      requests:
+        memory: 5Gi
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: local-path
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 10Gi
+    # nodeSelector:
+    #   Worker: infra
+    # tolerations:
+    #   - key: dedicated
+    #     operator: Equal
+    #     value: infra
+    #     effect: NoSchedule
+  additionalPodMonitors:
+    - name: kube-prometheus-stack-istio-sidecars
+      podMetricsEndpoints:
+        - path: /stats/prometheus
+          port: http-envoy-prom
+          interval: 15s
+          honorLabels: true
+      namespaceSelector:
+        any: true
+      selector:
+        matchLabels:
+          security.istio.io/tlsMode: istio
+    # - name: kube-prometheus-stack-flagger
+    #   podMetricsEndpoints:
+    #     - port: http
+    #       interval: 15s
+    #       honorLabels: true
+    #   namespaceSelector:
+    #     matchNames:
+    #       - istio-system
+    #   selector:
+    #     matchLabels:
+    #       app.kubernetes.io/name: flagger
+
+## Kube-State-Metrics
+kube-state-metrics:
+  # nodeSelector:
+  #   Worker: infra
+  # tolerations:
+  #   - key: dedicated
+  #     operator: Equal
+  #     value: infra
+  #     effect: NoSchedule
