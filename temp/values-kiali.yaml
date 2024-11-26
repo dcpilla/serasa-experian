@@ -13,7 +13,7 @@ external_services:
 
   grafana: 
     enabled: true
-    internal_cluster: "http://kube-prometheus-stack-grafana.monitoring-system.svc"
+    internal_url: "http://kube-prometheus-stack-grafana.monitoring-system.svc"
     auth:
       type: "basic"
       username: "admin"

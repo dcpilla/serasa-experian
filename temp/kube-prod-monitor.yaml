@@ -1,0 +1,32 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  annotations:
+    meta.helm.sh/release-name: kube-prometheus-stack
+    meta.helm.sh/release-namespace: monitoring-system
+  creationTimestamp: "2024-11-25T20:32:34Z"
+  generation: 1
+  labels:
+    app: kube-prometheus-stack-prometheus
+    app.kubernetes.io/instance: kube-prometheus-stack
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/part-of: kube-prometheus-stack
+    app.kubernetes.io/version: 66.2.2
+    chart: kube-prometheus-stack-66.2.2
+    heritage: Helm
+    release: kube-prometheus-stack
+  name: kube-prometheus-stack-istio-sidecars
+  namespace: monitoring-system
+  resourceVersion: "29879"
+  uid: f8d84d05-1628-4b0a-b4e8-b2c8d3cde182
+spec:
+  namespaceSelector:
+    any: true
+  podMetricsEndpoints:
+  - honorLabels: true
+    interval: 15s
+    path: /stats/prometheus
+    port: http-envoy-prom
+  selector:
+    matchLabels:
+      security.istio.io/tlsMode: istio
